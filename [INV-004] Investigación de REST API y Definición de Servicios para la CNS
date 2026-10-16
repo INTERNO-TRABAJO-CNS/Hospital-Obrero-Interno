@@ -1,0 +1,108 @@
+# [INV-004] Investigación de REST API y Definición de Servicios para la CNS
+
+## 1. Descripción de la Investigación
+El objetivo principal de esta investigación es comprender el funcionamiento de las arquitecturas **REST API** y analizar cómo se utilizarán para establecer la comunicación entre el cliente móvil desarrollado en **Flutter** y el servidor backend construido con **Java Spring Boot**[span_0](start_span)[span_0](end_span).
+
+---
+
+## 2. Investigación Teórica
+
+### 2.1. ¿Qué es REST API?
+**REST** (*Representational State Transfer*) es un estilo de arquitectura de software para la construcción de servicios web. Una **REST API** permite la comunicación e intercambio de datos entre sistemas sobre el protocolo HTTP, operando de manera **sin estado** (*stateless*), lo que significa que cada petición del cliente contiene toda la información necesaria para ser procesada por el servidor.
+
+### 2.2. Métodos HTTP
+Los métodos HTTP definen las acciones que se pueden realizar sobre los recursos:
+* **`GET`**: Obtiene o recupera información de un recurso existente sin alterar su estado en el servidor.
+* **`POST`**: Crea un nuevo recurso en el servidor a partir de los datos proporcionados.
+* **`PUT`**: Actualiza o reemplaza completamente un recurso existente con la nueva representación enviada.
+* **`PATCH`**: Modifica parcialmente un recurso existente sin afectar los campos no especificados.
+* **`DELETE`**: Elimina permanentemente un recurso del servidor.
+
+### 2.3. Formato JSON
+**JSON** (*JavaScript Object Notation*) es un formato de texto ligero e independiente del lenguaje, ampliamente utilizado para el intercambio de datos en la web. Estructura la información mediante objetos (`{ clave: valor }`) y arreglos (`[ ... ]`), lo que facilita su lectura y procesamiento tanto en **Flutter** (Dart) como en **Spring Boot** (Java).
+
+### 2.4. Códigos de Respuesta HTTP
+Los códigos de estado informan al cliente sobre el resultado de una petición:
+* **2xx - Éxito:**
+  * `200 OK`: Petición procesada correctamente.
+  * `201 Created`: Recurso creado con éxito (usado habitualmente tras un `POST`).
+* **4xx - Errores del Cliente:**
+  * `400 Bad Request`: La solicitud contiene datos inválidos o mal formados.
+  * `401 Unauthorized`: El usuario no está autenticado o su sesión/token ha expirado.
+  * `403 Forbidden`: Autenticado pero sin los permisos suficientes para realizar la acción.
+  * `404 Not Found`: El recurso o endpoint solicitado no existe.
+* **5xx - Errores del Servidor:**
+  * `500 Internal Server Error`: Error no controlado o fallo interno en el backend.
+
+---
+
+## 3. Análisis de Controladores REST en Spring Boot
+
+En **Spring Boot**, los controladores se encargan de gestionar los endpoints y procesar las peticiones HTTP mediante las siguientes anotaciones principales:
+
+* **`@RestController`**: Combina `@Controller` y `@ResponseBody`, indicando que la clase devolverá respuestas estructuradas en JSON directamente.
+* **`@RequestMapping("/api/v1/...")`**: Define la ruta base para todos los endpoints expuestos dentro de ese controlador.
+* **Anotaciones de mapeo de métodos:**
+  * `@GetMapping`: Mapea solicitudes `GET`.
+  * `@PostMapping`: Mapea solicitudes `POST`.
+  * `@PutMapping`: Mapea solicitudes `PUT`.
+  * `@DeleteMapping`: Mapea solicitudes `DELETE`.
+* **Inyección de datos:**
+  * `@PathVariable`: Extrae parámetros incluidos en la URL (ej. `/pacientes/{id}`).
+  * `@RequestParam`: Extrae parámetros de consulta (*query params*) (ej. `/pacientes?nombre=Juan`).
+  * `@RequestBody`: Convierte el cuerpo JSON entrante en un objeto Java (DTO).
+
+---
+
+## 4. OpenAPI y Swagger
+
+* **OpenAPI**: Es una especificación estandarizada e independiente para describir, estructurar y documentar APIs RESTful en formato JSON o YAML.
+* **Swagger**: Es un conjunto de herramientas integradas con OpenAPI (como *Swagger UI*) que genera una interfaz interactiva en la web. Permite a los desarrolladores visualizar, probar y validar manualmente el comportamiento de los endpoints sin necesidad de utilizar clientes externos como Postman.
+
+---
+
+## 5. Propuesta de Servicios y Endpoints para la CNS
+
+### 5.1. Módulo de Pacientes
+* `GET /api/v1/pacientes` - Consulta y listado de pacientes con paginación y filtros.
+* `GET /api/v1/pacientes/{id}` - Obtención del detalle del perfil de un paciente.
+* `POST /api/v1/pacientes` - Registro de un nuevo paciente en la plataforma.
+* `PUT /api/v1/pacientes/{id}` - Actualización de datos generales del paciente.
+
+### 5.2. Módulo de Citas Médicas
+* `GET /api/v1/citas` - Historial e información de citas médicas del paciente.
+* `POST /api/v1/citas` - Solicitud y reserva de una nueva cita médica.
+* `PATCH /api/v1/citas/{id}/estado` - Cambiar el estado de una cita (`RESERVADA`, `CONFIRMADA`, `CANCELADA`).
+
+### 5.3. Módulo de Médicos y Especialidades
+* `GET /api/v1/especialidades` - Listado de especialidades médicas activas.
+* `GET /api/v1/medicos` - Directorio de médicos registrados (filtrables por especialidad).
+* `GET /api/v1/medicos/{id}/horarios` - Consulta de turnos y disponibilidad de horarios.
+
+---
+
+## 6. Documentación de Ejemplos de Solicitud y Respuesta
+
+### Ejemplo: Registro de Cita Médica (`POST /api/v1/citas`)
+
+#### Request (Solicitud enviada desde Flutter) y Response (Respuesta retornada por Spring Boot - `201 Created`)
+```json
+{
+  "request": {
+    "pacienteId": 105,
+    "medicoId": 12,
+    "especialidadId": 4,
+    "fechaHora": "2026-11-10T10:30:00",
+    "motivoConsulta": "Consulta general por síntomas febriles"
+  },
+  "response": {
+    "id": 842,
+    "codigoCita": "CNS-2026-0842",
+    "pacienteId": 105,
+    "medico": "Dr. Roberto Gómez",
+    "especialidad": "Medicina General",
+    "fechaHora": "2026-11-10T10:30:00",
+    "estado": "CONFIRMADA",
+    "creadoEn": "2026-10-16T18:57:31"
+  }
+}
