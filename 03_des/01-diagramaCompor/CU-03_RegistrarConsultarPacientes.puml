@@ -1,0 +1,50 @@
+@startuml CU-03_RegistrarConsultarPacientes
+' Caso de uso CU-03: Registrar y consultar pacientes
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-03 · RN-01 · RN-02 · RN-20
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-03: Registrar y consultar pacientes\nDiagrama de actividad
+|Enfermería / Admisión|
+start
+:Introduce identificación del paciente;
+|Sistema CNS|
+:Busca la identificación en los registros;
+|Registro de pacientes|
+if (¿El paciente ya está registrado?) then (No)
+  ' Camino principal
+else (Sí / 1a)
+  :Recupera y muestra el paciente existente, no duplica [1a];
+  stop
+endif
+|Enfermería / Admisión|
+:Solicita registrar a un paciente nuevo;
+|Sistema CNS|
+:Habilita formulario de registro;
+|Enfermería / Admisión|
+:Completa datos requeridos y confirma;
+|Registro de pacientes|
+if (¿Datos válidos y sin duplicados?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :No registra, solicita completar o corregir datos [3a];
+  stop
+endif
+:Registra el paciente identificado;
+|Sistema CNS|
+:Confirma el registro sin duplicidades;
+stop
+@enduml

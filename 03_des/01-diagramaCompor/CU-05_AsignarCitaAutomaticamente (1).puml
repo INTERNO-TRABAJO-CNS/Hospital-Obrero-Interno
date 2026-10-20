@@ -1,0 +1,46 @@
+@startuml CU-05_AsignarCitaAutomaticamente
+' Caso de uso CU-05: Asignar cita automáticamente
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-05 · RN-03 · RN-04 · RN-05 · RN-06 · RN-07 · CU-06 · CU-07
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-05: Asignar cita automáticamente\nDiagrama de actividad
+|Proceso automático (CU-05)|
+start
+:Recibe solicitud válida con especialidad;
+|Agenda y recursos|
+:Consulta médicos, horarios y consultorios vigentes;
+if (¿Hay combinación compatible?) then (Sí)
+  ' Camino principal
+else (No / 2a)
+  :Informa que no hay asignación disponible [2a];
+  stop
+endif
+|Validación (CU-06)|
+:Valida combinación mediante CU-06;
+if (¿Sigue libre y sin solapamiento?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :Descarta combinación ocupada y continúa buscando [3a];
+  stop
+endif
+|Proceso automático (CU-05)|
+:Selecciona médico, fecha, hora y consultorio disponibles;
+|Registro (CU-07)|
+:Recibe asignación validada para su confirmación CU-07;
+:Registra cita sin duplicar recursos;
+stop
+@enduml

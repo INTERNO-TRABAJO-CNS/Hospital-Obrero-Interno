@@ -1,0 +1,118 @@
+@startuml CU-00_DiagramaGeneral_CNS
+' Diagrama general del sistema CNS — Fuente: Especificación de Casos de Uso CU-01..CU-20
+' Issue: T07-Diagrama-CU
+' Incluye los 20 CU (CU-00 es el nombre de esta VISTA GENERAL, no un caso funcional adicional).
+left to right direction
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam ArrowColor #2F5D8A
+skinparam actor {
+  BackgroundColor #FFFFFF
+  BorderColor #2F5D8A
+}
+skinparam rectangle {
+  BorderColor #2F5D8A
+  FontStyle bold
+}
+skinparam usecase {
+  BackgroundColor #EAF2FB
+  BorderColor #2F5D8A
+  ArrowColor #2F5D8A
+}
+skinparam note {
+  BackgroundColor #FFF8E1
+  BorderColor #C9A227
+}
+skinparam linetype ortho
+
+title CU-00: Diagrama General de Casos de Uso - Hospital Obrero CNS
+
+actor "Paciente" as Paciente
+actor "Enfermería / Admisión" as Enfermeria
+actor "Médico" as Medico
+actor "Administrador" as Admin
+
+rectangle "Sistema de Gestión y Control de Citas Médicas — Hospital Obrero CNS" as CNS {
+  usecase "CU-01\nIniciar Sesión" as CU01
+  package "Paciente" {
+    usecase "CU-04\nSolicitar Cita Médica" as CU04
+    usecase "CU-08\nConsultar Citas del Paciente" as CU08
+  }
+  package "Enfermería / Admisión" {
+    usecase "CU-03\nRegistrar y Consultar Pacientes" as CU03
+    usecase "CU-09\nConsultar Citas Registradas" as CU09
+    usecase "CU-10\nReprogramar Cita" as CU10
+    usecase "CU-11\nCancelar Cita" as CU11
+    usecase "CU-18\nConsultar Historial de Cambios" as CU18
+  }
+  package "Médico" {
+    usecase "CU-12\nActualizar Estado de Cita" as CU12
+    usecase "CU-13\nConsultar Agenda Médica" as CU13
+    usecase "CU-14\nConsultar Información Permitida del Paciente" as CU14
+    usecase "CU-15\nRegistrar Datos de Atención" as CU15
+  }
+  package "Administrador" {
+    usecase "CU-02\nGestionar Usuarios, Roles y Permisos" as CU02
+    usecase "CU-19\nGenerar Reportes de Citas" as CU19
+    usecase "CU-20\nConsultar Indicadores de Gestión" as CU20
+  }
+  package "Procesos automáticos internos" {
+    usecase "CU-05\nAsignar Cita Automáticamente" as CU05
+    usecase "CU-06\nValidar Disponibilidad de Recursos" as CU06
+    usecase "CU-07\nRegistrar Cita Confirmada" as CU07
+    usecase "CU-16\nGenerar Notificación de Cita" as CU16
+    usecase "CU-17\nGenerar Recordatorio de Cita" as CU17
+  }
+}
+
+' Asociaciones: pacientes y personal autorizado
+Paciente -- CU01
+Paciente -- CU04
+Paciente -- CU08
+Enfermeria -- CU01
+Enfermeria -- CU03
+Enfermeria -- CU09
+Enfermeria -- CU10
+Enfermeria -- CU11
+Enfermeria -- CU18
+Enfermeria -- CU12
+Enfermeria -- CU15
+Enfermeria -- CU07
+Medico -- CU01
+Medico -- CU12
+Medico -- CU13
+Medico -- CU14
+Medico -- CU15
+Admin -- CU01
+Admin -- CU02
+Admin -- CU18
+Admin -- CU19
+Admin -- CU20
+
+' Relaciones documentadas. Se distingue derivación posterior de inclusión obligatoria.
+CU04 ..> CU05 : <<deriva>>
+CU05 ..> CU06 : <<include>>
+CU05 ..> CU07 : <<include>>
+CU07 ..> CU06 : <<include>>
+CU07 ..> CU16 : <<include>>
+CU10 ..> CU06 : <<include>>
+CU10 ..> CU16 : <<include>>
+CU11 ..> CU16 : <<include>>
+CU15 ..> CU12 : <<eventual>>
+
+note bottom of CU04
+  La solicitud especifica especialidad;
+  la asignación posterior es automática.
+end note
+note bottom of CU17
+  Se activa cuando se aproxima la cita.
+  Canal y anticipación no están definidos.
+end note
+note bottom of CU16
+  Servicio externo de notificaciones
+  pendiente de definición.
+end note
+@enduml

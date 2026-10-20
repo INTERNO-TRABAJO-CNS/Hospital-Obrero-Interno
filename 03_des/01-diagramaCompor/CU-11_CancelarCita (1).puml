@@ -1,0 +1,47 @@
+@startuml CU-11_CancelarCita
+' Caso de uso CU-11: Cancelar cita
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-11 · RN-10 · RN-11 · RN-12 · CU-16 · CU-18
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-11: Cancelar cita\nDiagrama de actividad
+|Enfermería / Admisión|
+start
+:Localiza la cita activa que requiere cancelación;
+|Sistema CNS|
+if (¿Existe una cita activa gestionable?) then (Sí)
+  ' Camino principal
+else (No / 1a)
+  :Informa que no puede cancelarse el registro [1a];
+  stop
+endif
+:Muestra datos de la cita y exige motivo;
+|Enfermería / Admisión|
+:Ingresa motivo y confirma cancelación;
+|Sistema CNS|
+if (¿Motivo informado y válido?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :No cancela, solicita registrar el motivo [3a];
+  stop
+endif
+:Actualiza el estado de la cita a cancelada;
+|Historial de cambios|
+:Conserva motivo, operación y responsable;
+|Notificación (CU-16)|
+:Genera notificación de cancelación (CU-16);
+stop
+@enduml
