@@ -1,0 +1,49 @@
+@startuml CU-15_RegistrarDatosAtencion
+' Caso de uso CU-15: Registrar datos de atención
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-15 · RN-22 · CU-12
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-15: Registrar datos de atención\nDiagrama de actividad
+|Médico / Enfermería autorizado|
+start
+:Selecciona la cita que está siendo atendida;
+|Sistema CNS|
+if (¿Cita existente y usuario autorizado?) then (Sí)
+  ' Camino principal
+else (No / 1a)
+  :Impide registrar datos de atención [1a];
+  stop
+endif
+:Presenta los datos operativos disponibles;
+|Médico / Enfermería autorizado|
+:Registra la asistencia del paciente;
+:Registra tiempo de espera y tiempo de atención;
+|Registro operativo de atención|
+if (¿Datos operativos válidos?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :No guarda, solicita corregir datos [3a];
+  stop
+endif
+|Médico / Enfermería autorizado|
+:Confirma registro de la atención;
+|Registro operativo de atención|
+:Guarda asistencia y tiempos asociados a la cita;
+|Sistema CNS|
+:Permite actualizar estado mediante CU-12, si corresponde;
+stop
+@enduml

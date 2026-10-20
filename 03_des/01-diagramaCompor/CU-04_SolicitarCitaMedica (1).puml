@@ -1,0 +1,50 @@
+@startuml CU-04_SolicitarCitaMedica
+' Caso de uso CU-04: Solicitar cita médica
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-04 · RN-01 · RN-03 · CU-05
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-04: Solicitar cita médica\nDiagrama de actividad
+|Paciente|
+start
+:Ingresa a la opción solicitar cita;
+|Aplicación móvil (Flutter)|
+:Muestra especialidades o atenciones;
+|Paciente|
+:Selecciona la especialidad que requiere;
+|Sistema CNS (Java)|
+if (¿Selección válida?) then (Sí)
+  ' Camino principal
+else (No / 2a)
+  :Solicita seleccionar una especialidad válida [2a];
+  stop
+endif
+|Paciente|
+:Confirma la solicitud, sin elegir médico ni horario;
+|Sistema CNS (Java)|
+:Registra solicitud asociada al paciente;
+|Asignación (CU-05)|
+:Recibe la solicitud para asignación automática (CU-05);
+if (¿Es posible asignar recursos?) then (Sí)
+  ' Camino principal
+else (No / 4a)
+  :No confirma cita con recursos inexistentes u ocupados [4a];
+  stop
+endif
+|Sistema CNS (Java)|
+:Continúa el registro de la cita asignada;
+stop
+@enduml

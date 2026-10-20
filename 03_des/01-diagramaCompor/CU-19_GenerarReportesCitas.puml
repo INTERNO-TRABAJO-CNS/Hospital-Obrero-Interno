@@ -1,0 +1,49 @@
+@startuml CU-19_GenerarReportesCitas
+' Caso de uso CU-19: Generar reportes de citas
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-19 · RN-23 · RN-20
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-19: Generar reportes de citas\nDiagrama de actividad
+|Administrador|
+start
+:Abre el módulo de reportes de citas;
+|Sistema CNS / reportes|
+if (¿Cuenta con permisos administrativos?) then (Sí)
+  ' Camino principal
+else (No / 1a)
+  :Impide el acceso al módulo de reportes [1a];
+  stop
+endif
+|Interfaz de reportes|
+:Muestra tipos de reportes disponibles;
+|Administrador|
+:Selecciona criterio: estado, médico, especialidad o consultorio;
+:Solicita generar reporte;
+|Sistema CNS / reportes|
+:Agrupa registros según tipo y período seleccionado;
+if (¿Existen datos para el criterio?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :Informa ausencia de resultados [3a];
+  stop
+endif
+|Interfaz de reportes|
+:Presenta reporte consolidado solicitado;
+|Administrador|
+:Revisa resultados sin alterar citas;
+stop
+@enduml

@@ -1,0 +1,49 @@
+@startuml CU-20_ConsultarIndicadoresGestion
+' Caso de uso CU-20: Consultar indicadores de gestión
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-20 · RN-25 · RN-20
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-20: Consultar indicadores de gestión\nDiagrama de actividad
+|Administrador|
+start
+:Abre componente de indicadores de gestión;
+|Sistema CNS / análisis|
+if (¿Usuario autorizado como administrador?) then (Sí)
+  ' Camino principal
+else (No / 1a)
+  :Deniega acceso al componente analítico [1a];
+  stop
+endif
+|Interfaz de indicadores|
+:Muestra indicadores disponibles;
+|Administrador|
+:Selecciona indicadores que desea analizar;
+|Sistema CNS / análisis|
+:Identifica datos registrados requeridos;
+if (¿Información suficiente para calcular?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :Indica falta de datos, no muestra valores sin respaldo [3a];
+  stop
+endif
+:Consolida demanda, cancelaciones, inasistencias y tiempos;
+|Interfaz de indicadores|
+:Muestra indicadores de demanda y carga de trabajo médica;
+|Administrador|
+:Revisa información para toma de decisiones;
+stop
+@enduml

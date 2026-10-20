@@ -1,0 +1,47 @@
+@startuml CU-14_ConsultarDatosPaciente
+' Caso de uso CU-14: Consultar información permitida del paciente
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-14 · RN-18 · RN-20
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-14: Consultar información permitida del paciente\nDiagrama de actividad
+|Médico|
+start
+:Selecciona una cita de su agenda;
+|Sistema CNS / permisos y paciente|
+if (¿Cita asignada a este médico?) then (Sí)
+  ' Camino principal
+else (No / 1a)
+  :Impide consultar datos del paciente [1a];
+  stop
+endif
+|Médico|
+:Solicita información del paciente asociado;
+|Sistema CNS / permisos y paciente|
+:Determina información básica e historial permitido al rol;
+if (¿Datos solicitados autorizados?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :Oculta datos restringidos [3a];
+  stop
+endif
+:Recupera únicamente información autorizada;
+|Interfaz clínica|
+:Muestra datos permitidos y protege los restringidos;
+|Médico|
+:Consulta información necesaria para atención;
+stop
+@enduml

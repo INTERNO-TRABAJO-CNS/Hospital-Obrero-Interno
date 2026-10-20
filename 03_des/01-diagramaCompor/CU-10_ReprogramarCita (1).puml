@@ -1,0 +1,49 @@
+@startuml CU-10_ReprogramarCita
+' Caso de uso CU-10: Reprogramar cita
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-10 · RN-07 · RN-09 · RN-11 · RN-12 · CU-06 · CU-16
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-10: Reprogramar cita\nDiagrama de actividad
+|Enfermería / Admisión|
+start
+:Localiza y selecciona cita existente;
+|Sistema CNS|
+:Muestra información actual de la cita;
+|Enfermería / Admisión|
+:Solicita reprogramación y confirma nueva opción;
+|Validación (CU-06)|
+:Valida médico, horario y consultorio mediante CU-06;
+if (¿Nueva combinación disponible?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :No modifica, solicita otra disponibilidad [3a];
+  stop
+endif
+if (¿Libre de asignación concurrente?) then (Sí)
+  ' Camino principal
+else (No / 3b)
+  :Impide doble asignación, requiere nueva validación [3b];
+  stop
+endif
+|Enfermería / Admisión|
+:Confirma el cambio autorizado;
+|Sistema CNS|
+:Actualiza cita y conserva cambio para historial;
+|Notificación (CU-16)|
+:Genera notificación de reprogramación (CU-16);
+stop
+@enduml
