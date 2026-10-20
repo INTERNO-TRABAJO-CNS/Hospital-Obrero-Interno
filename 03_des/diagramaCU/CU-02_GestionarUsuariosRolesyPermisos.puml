@@ -1,0 +1,41 @@
+@startuml CU-02_GestionarUsuariosRolesyPermisos
+' Diagrama individual de caso de uso CU-02 — Hospital Obrero CNS
+' Fuente: CNS_ CASOS DE USO(1).docx — matriz y especificación de CU
+' Issue: T07 - Diagramas de casos de uso
+left to right direction
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 14
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam ArrowColor #2F5D8A
+skinparam actor {
+  BorderColor #2F5D8A
+  BackgroundColor #FFFFFF
+}
+skinparam usecase {
+  BackgroundColor #EAF2FB
+  BorderColor #2F5D8A
+  ArrowColor #2F5D8A
+}
+skinparam rectangle {
+  BorderColor #2F5D8A
+  FontStyle bold
+}
+skinparam note {
+  BackgroundColor #FFF8E1
+  BorderColor #C9A227
+}
+title CU-02: Gestionar Usuarios, Roles y Permisos
+
+rectangle "Sistema de Gestión y Control de Citas Médicas\nHospital Obrero CNS" as CNS {
+  usecase "CU-02\nGestionar Usuarios, Roles y Permisos" as CU02
+}
+
+actor "Administrador" as ACTOR1
+ACTOR1 --> CU02
+note bottom of CU02
+  Los cambios de usuarios, roles y permisos solo se aplican después de validarse.
+end note
+
+@enduml
