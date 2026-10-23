@@ -1,0 +1,46 @@
+@startuml CU-01_IniciarSesion
+' Caso de uso CU-01: Iniciar sesión
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-01 · RN-16 · RN-20
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-01: Iniciar sesión\nDiagrama de actividad
+|Usuario autorizado|
+start
+:Selecciona iniciar sesión e ingresa credenciales;
+|Aplicación móvil / interfaz|
+:Envía las credenciales para su validación;
+|Sistema CNS / autenticación|
+if (¿Credenciales válidas?) then (Sí)
+  ' Camino principal
+else (No / 2a)
+  :Rechaza el acceso e informa que no fue posible autenticar [2a];
+  stop
+endif
+:Identifica el rol del usuario autenticado;
+if (¿Tiene permisos para la función?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :Bloquea funciones no autorizadas [3a];
+  stop
+endif
+:Aplica los permisos asignados al rol;
+|Aplicación móvil / interfaz|
+:Muestra únicamente funciones e información autorizadas;
+|Usuario autorizado|
+:Ingresa a las opciones habilitadas para su rol;
+stop
+@enduml

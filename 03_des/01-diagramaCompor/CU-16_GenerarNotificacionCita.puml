@@ -1,0 +1,44 @@
+@startuml CU-16_GenerarNotificacionCita
+' Caso de uso CU-16: Generar notificación de cita
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-16 · RN-14 · RN-20
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-16: Generar notificación de cita\nDiagrama de actividad
+|Evento de cita|
+start
+:Se registra, modifica o cancela una cita;
+|Sistema CNS|
+if (¿Operación realmente confirmada?) then (Sí)
+  ' Camino principal
+else (No / 1a)
+  :No genera avisos de cambios inexistentes [1a];
+  stop
+endif
+:Identifica paciente y tipo de operación;
+|Generador de notificaciones|
+if (¿Información necesaria disponible?) then (Sí)
+  ' Camino principal
+else (No / 2a)
+  :No genera aviso incompleto, requiere revisión [2a];
+  stop
+endif
+:Prepara contenido coherente con el estado de la cita;
+:Genera la notificación para el paciente;
+|Paciente|
+:Consulta o recibe información según canal por definir;
+stop
+@enduml

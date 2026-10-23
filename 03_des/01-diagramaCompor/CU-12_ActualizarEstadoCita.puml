@@ -1,0 +1,48 @@
+@startuml CU-12_ActualizarEstadoCita
+' Caso de uso CU-12: Actualizar estado de cita
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-12 · RN-13 · RN-22 · RN-24
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-12: Actualizar estado de cita\nDiagrama de actividad
+|Médico / Enfermería autorizado|
+start
+:Selecciona la cita que debe actualizarse;
+|Sistema CNS|
+:Muestra el estado actual de la cita;
+|Médico / Enfermería autorizado|
+:Selecciona el nuevo estado según evento ocurrido;
+|Control de estados / historial|
+if (¿El rol puede hacer esta actualización?) then (Sí)
+  ' Camino principal
+else (No / 2a)
+  :Rechaza cambio y conserva estado anterior [2a];
+  stop
+endif
+if (¿Cambio permitido para la situación actual?) then (Sí)
+  ' Camino principal
+else (No / 2b)
+  :No modifica la cita, informa estado inválido [2b];
+  stop
+endif
+|Médico / Enfermería autorizado|
+:Confirma el cambio de estado;
+|Sistema CNS|
+:Actualiza la cita con estado coherente;
+|Control de estados / historial|
+:Conserva operación para seguimiento y reportes;
+stop
+@enduml

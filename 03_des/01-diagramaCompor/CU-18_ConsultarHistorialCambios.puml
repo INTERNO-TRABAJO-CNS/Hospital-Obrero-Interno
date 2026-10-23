@@ -1,0 +1,48 @@
+@startuml CU-18_ConsultarHistorialCambios
+' Caso de uso CU-18: Consultar historial de cambios
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-18 · RN-11 · RN-12 · RN-24
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-18: Consultar historial de cambios\nDiagrama de actividad
+|Enfermería / Administrador|
+start
+:Localiza la cita cuyos cambios desea revisar;
+|Sistema CNS / permisos|
+:Muestra información general permitida;
+|Enfermería / Administrador|
+:Solicita consultar el historial de la cita;
+|Sistema CNS / permisos|
+if (¿Usuario autorizado para el historial?) then (Sí)
+  ' Camino principal
+else (No / 2a)
+  :Impide el acceso a la trazabilidad [2a];
+  stop
+endif
+|Historial de operaciones|
+:Recupera modificaciones, reprogramaciones y cancelaciones;
+if (¿Hay operaciones históricas?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :Informa que no hay cambios adicionales [3a];
+  stop
+endif
+|Sistema CNS / permisos|
+:Muestra acción, responsable, fecha y hora de cada cambio;
+|Enfermería / Administrador|
+:Revisa historial sin modificarlo;
+stop
+@enduml
