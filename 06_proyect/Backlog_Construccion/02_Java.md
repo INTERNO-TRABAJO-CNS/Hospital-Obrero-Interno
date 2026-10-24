@@ -1,494 +1,649 @@
-# Backlog de Construcción — Java
+# Backlog de Construcción — Java | CNS Hospital Obrero
 
-[Volver al índice](README.md) · Responsable indicado **como propuesta**, validar carga al iniciar cada sprint.
+[Índice general](README.md) · [Orden de creación](00_Indice_de_subida.md) · [Trazabilidad](08_Cobertura_y_trazabilidad.md) · [Flujos](09_Flujos_y_dependencias.md) · [Pruebas](12_Casos_de_prueba.md)
 
+**Total de issues propuestos:** 17. **Código:** pendiente de crear en GitHub; son especificaciones del backlog y no evidencias de implementación.
+**Responsables propuestos:** Benjamín, Matías, Alejandro, Alex. Los responsables y puntos se revisan en [07_Estimacion.md](07_Estimacion.md).
+
+Este archivo toma el comportamiento oficial de [CU-01 a CU-20](13_Comportamiento_CU.md) y la [matriz de requisitos](08_Cobertura_y_trazabilidad.md). No sustituye la aprobación de arquitectura del Sprint 2.
+
+## Distribución por Sprint
+
+| Sprint | Issues |
+|---|---|
+| S3 (02/11–13/11/2026) | [CON-01](02_Java.md#con-01) · [CON-03](02_Java.md#con-03) · [CON-05](02_Java.md#con-05) · [CON-06](02_Java.md#con-06) |
+| S4 (16/11–27/11/2026) | [CON-10](02_Java.md#con-10) · [CON-11](02_Java.md#con-11) · [CON-12](02_Java.md#con-12) · [CON-13](02_Java.md#con-13) · [CON-14](02_Java.md#con-14) · [CON-15](02_Java.md#con-15) · [CON-16](02_Java.md#con-16) · [CON-19](02_Java.md#con-19) |
+| S5 (30/11–11/12/2026) | [CON-21](02_Java.md#con-21) · [CON-24](02_Java.md#con-24) · [CON-25](02_Java.md#con-25) · [CON-26](02_Java.md#con-26) · [CON-27](02_Java.md#con-27) |
+
+---
+
+<a id="con-01"></a>
 ### [CON-01][Java] Crear estructura base del backend Spring Boot
 
-**Identificador:** `CON-01` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 3 - Bases e identidad  
-**Responsable sugerido:** Benjamín · **Tamaño inicial:** 5 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-01, RF-02, RF-03, RF-04, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-13, RF-14, RF-15, RF-16, RF-17, RF-18, RF-19, RF-20  
-**Casos de uso relacionados:** CU-01, CU-02, CU-03, CU-04, CU-05, CU-06, CU-07, CU-08, CU-09, CU-10, CU-11, CU-12, CU-13, CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-20  
-**Depende de (referencias del plan):** ELA-02, ELA-05  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Tarea técnica / validación. **Sprint:** Sprint 3 - Bases e identidad (02/11–13/11/2026).
+**Responsable sugerido:** Benjamín. **Talla inicial:** 5 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-01` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [ELA-02](../Backlog_Elaboracion/Backlog_Arquitectura_CNS.md) · [ELA-05](../Backlog_Elaboracion/Backlog_Arquitectura_CNS.md)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`  
+**Rama de trabajo (base `develop`):** `feature/con-01-crear-estructura-base-del-backend-spring-boot` (crear solo cuando se abra el issue).
 
-**Descripción:** Crear proyecto Java MVC con arquitectura modular, perfiles y manejo de errores.
+**Descripción:** Crear estructura base del backend Spring Boot. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
 
 **Criterios de aceptación**
-- [ ] Proyecto Spring Boot compila y ejecuta pruebas JUnit.
-- [ ] Paquetes controladores, servicios, dominio, repositorios, DTO y configuración separados.
-- [ ] REST y documentación OpenAPI inicial disponibles en desarrollo.
+- [ ] El backend arranca con Java/Spring Boot y separa controladores REST, servicios de aplicación, modelo de dominio, repositorios y DTO, sin reglas de negocio en controladores.
+- [ ] Los perfiles de desarrollo y pruebas cargan configuración externa; claves y contraseñas nunca están dentro del repositorio.
+- [ ] Las respuestas de validación y errores no incluyen datos personales y siguen el contrato acordado en ELA-05; se publica OpenAPI en desarrollo.
+- [ ] Una prueba de arranque automático y una petición incorrecta verifican que el servicio continúa operativo.
 
 **Tareas**
-- [ ] Crear el proyecto y configuración por ambiente.
-- [ ] Agregar endpoint de salud, validación y manejador de errores.
+- [ ] Crear proyecto, paquetes MVC y perfiles de configuración.
+- [ ] Instalar validaciones, excepciones REST, OpenAPI y prueba básica de salud.
+- [ ] Documentar compilación, ejecución y pruebas en README.
 
-**Caso de prueba sugerido:** Arranque limpio y respuesta homogénea ante error de validación.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-01-crear-estructura-base-del-backend-s` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-01A](12_Casos_de_prueba.md#cp-cns-01a) — Arrancar el backend con configuración de pruebas y comprobar endpoint de salud y pruebas JUnit.
+- [ ] [CP-CNS-01B](12_Casos_de_prueba.md#cp-cns-01b) — Enviar datos inválidos y verificar error definido sin fuga de datos.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-03"></a>
 ### [CON-03][Java] Implementar autenticación y permisos por rol
 
-**Identificador:** `CON-03` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 3 - Bases e identidad  
-**Responsable sugerido:** Matías · **Tamaño inicial:** 5 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-01, RF-02  
-**Casos de uso relacionados:** CU-01, CU-02  
-**Depende de (referencias del plan):** CON-01, CON-02  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 3 - Bases e identidad (02/11–13/11/2026).
+**Responsable sugerido:** Matías. **Talla inicial:** 5 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-03` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-01](02_Java.md#con-01) · [CON-02](03_PostgreSQL.md#con-02)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-01`  
+**Rama de trabajo (base `develop`):** `feature/con-03-implementar-autenticacion-y-permisos-por-rol` (crear solo cuando se abra el issue).
 
-**Descripción:** Proteger las API según los cuatro roles documentados.
+**Descripción:** Implementar autenticación y permisos por rol. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-01 / CU-01 — Iniciar Sesión](13_Comportamiento_CU.md#cu-01).
+**Requisitos funcionales asociados:** RF-01.
+**RNF aplicables:** RNF-01, RNF-02, RNF-05.
 
 **Criterios de aceptación**
-- [ ] Acceso exige credenciales válidas y respeta permisos por recurso.
-- [ ] El rechazo no revela si un paciente o cuenta existe.
-- [ ] Pruebas cubren sesión válida, inválida, expirada y accesos prohibidos.
+- [ ] Una cuenta válida puede autenticarse y obtener acceso únicamente a las operaciones correspondientes a su rol: paciente, admisión/enfermería, médico o administrador (CU-01).
+- [ ] Credenciales inválidas o sesión no válida impiden el ingreso y no exponen funciones restringidas (CU-01, alternativa 2a).
+- [ ] Un usuario autenticado sin rol adecuado recibe rechazo autorizado desde el backend, aunque intente acceder a una API por fuera de Flutter (CU-01, alternativa 3a).
+- [ ] El mecanismo de autenticación y duración de sesiones provienen de ELA-05/ELA-09; no se presupone login Google o JWT sin esa aprobación.
 
 **Tareas**
-- [ ] Implementar autenticación y autorización Spring Security.
-- [ ] Definir respuestas 401/403 documentadas.
+- [ ] Configurar Spring Security, identidad, sesiones y reglas por rol.
+- [ ] Implementar filtros de autorización de endpoints, manejo de errores y pruebas negativas.
+- [ ] Registrar en la documentación las decisiones de autenticación aprobadas.
 
-**Caso de prueba sugerido:** Paciente no puede consultar recursos administrativos.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-03-implementar-autenticacin-y-permisos` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-03A](12_Casos_de_prueba.md#cp-cns-03a) — Iniciar sesión con cuenta válida y comprobar las funciones autorizadas.
+- [ ] [CP-CNS-03B](12_Casos_de_prueba.md#cp-cns-03b) — Usar credenciales inválidas y tratar de consultar datos de otro rol; ambas operaciones deben rechazarse.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-05"></a>
 ### [CON-05][Java] Implementar administración de usuarios, roles y permisos
 
-**Identificador:** `CON-05` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 3 - Bases e identidad  
-**Responsable sugerido:** Matías · **Tamaño inicial:** 3 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-02  
-**Casos de uso relacionados:** CU-02  
-**Depende de (referencias del plan):** CON-03  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 3 - Bases e identidad (02/11–13/11/2026).
+**Responsable sugerido:** Matías. **Talla inicial:** 3 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-05` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-03](02_Java.md#con-03)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-02`  
+**Rama de trabajo (base `develop`):** `feature/con-05-implementar-administracion-de-usuarios-roles-y-p` (crear solo cuando se abra el issue).
 
-**Descripción:** CRUD administrativo de usuarios y asignación controlada de roles.
+**Descripción:** Implementar administración de usuarios, roles y permisos. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-02 / CU-02 — Gestionar usuarios roles y permisos](13_Comportamiento_CU.md#cu-02).
+**Requisitos funcionales asociados:** RF-02.
+**RNF aplicables:** RNF-01, RNF-05.
 
 **Criterios de aceptación**
-- [ ] Solo Administrador ejecuta altas y cambios de rol.
-- [ ] Cambios se validan y se registra actor responsable.
-- [ ] No se permiten permisos superiores mediante actualización arbitraria.
+- [ ] Solo el administrador autenticado puede consultar y modificar usuarios, roles y permisos (CU-02).
+- [ ] Cambiar un rol aplica los permisos nuevos en las operaciones posteriores; usuarios no autorizados no pueden elevar sus privilegios.
+- [ ] Un cambio inválido no altera la configuración previa del usuario (CU-02, alternativa 3a).
+- [ ] La granularidad de permisos se limita a lo autorizado por ELA-09; ninguna jerarquía adicional se inventa.
 
 **Tareas**
-- [ ] Crear controladores y servicios de usuarios.
-- [ ] Agregar pruebas de autorización.
+- [ ] Implementar servicios y controladores de administración de usuarios y roles.
+- [ ] Proteger operaciones y agregar pruebas de cambios aceptados y rechazados.
 
-**Caso de prueba sugerido:** Cuenta de paciente intenta cambiar su rol y recibe 403.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-05-implementar-administracin-de-usuari` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-05A](12_Casos_de_prueba.md#cp-cns-05a) — Administrador modifica el rol de un usuario; las funciones visibles y permisos efectivos se actualizan.
+- [ ] [CP-CNS-05B](12_Casos_de_prueba.md#cp-cns-05b) — Paciente intenta cambiar su rol y el backend rechaza sin modificar nada.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-06"></a>
 ### [CON-06][Java] Implementar registro y consulta de pacientes
 
-**Identificador:** `CON-06` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 3 - Bases e identidad  
-**Responsable sugerido:** Alejandro · **Tamaño inicial:** 5 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-03  
-**Casos de uso relacionados:** CU-03  
-**Depende de (referencias del plan):** CON-02, CON-03  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 3 - Bases e identidad (02/11–13/11/2026).
+**Responsable sugerido:** Alejandro. **Talla inicial:** 5 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-06` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-02](03_PostgreSQL.md#con-02) · [CON-03](02_Java.md#con-03)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-03`  
+**Rama de trabajo (base `develop`):** `feature/con-06-implementar-registro-y-consulta-de-pacientes` (crear solo cuando se abra el issue).
 
-**Descripción:** Gestionar datos de pacientes siguiendo los campos autorizados en documentación.
+**Descripción:** Implementar registro y consulta de pacientes. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-03 / CU-03 — Registrar y consultar pacientes](13_Comportamiento_CU.md#cu-03).
+**Requisitos funcionales asociados:** RF-03.
+**RNF aplicables:** RNF-01, RNF-02.
 
 **Criterios de aceptación**
-- [ ] Registro y consulta aplican validaciones del caso de uso.
-- [ ] No se crean pacientes duplicados bajo las claves definidas.
-- [ ] Consultas están limitadas al rol y al paciente correspondiente.
+- [ ] El personal de enfermería/admisión puede localizar al paciente usando su identificación (CU-03).
+- [ ] Si el paciente existe, se presenta el registro existente y no se crea duplicado (CU-03, alternativa 1a).
+- [ ] Si no existe, se registra con datos válidos y se vuelve a comprobar la duplicidad al confirmar; datos incompletos no se guardan (CU-03, alternativa 3a).
+- [ ] La identificación y los campos autorizados se toman de ELA-03/ELA-07; no se establece integración externa de afiliación no documentada.
 
 **Tareas**
-- [ ] Crear entidad, repositorio, servicio y endpoints.
-- [ ] Agregar validación y pruebas.
+- [ ] Crear entidad/servicio/repositorio y consultas restringidas.
+- [ ] Implementar validación de campos e identificación única con pruebas de concurrencia.
 
-**Caso de prueba sugerido:** Registro con identificador duplicado se rechaza sin corrupción.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-06-implementar-registro-y-consulta-de-` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-06A](12_Casos_de_prueba.md#cp-cns-06a) — Buscar paciente existente devuelve su registro y no incrementa la cantidad de pacientes.
+- [ ] [CP-CNS-06B](12_Casos_de_prueba.md#cp-cns-06b) — Dos registros con la misma identificación no pueden crear duplicados, incluso si se envían simultáneamente.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-10"></a>
 ### [CON-10][Java] Implementar catálogos de médicos, especialidades, recursos y agendas
 
-**Identificador:** `CON-10` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 4 - Gestion de citas  
-**Responsable sugerido:** Alex · **Tamaño inicial:** 5 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-06, RF-13  
-**Casos de uso relacionados:** CU-06, CU-13  
-**Depende de (referencias del plan):** CON-02, CON-03  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 4 - Gestion de citas (16/11–27/11/2026).
+**Responsable sugerido:** Alex. **Talla inicial:** 5 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-10` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-02](03_PostgreSQL.md#con-02) · [CON-03](02_Java.md#con-03)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-05` · `caso-uso:CU-06` · `caso-uso:CU-13`  
+**Rama de trabajo (base `develop`):** `feature/con-10-implementar-catalogos-de-medicos-especialidades` (crear solo cuando se abra el issue).
 
-**Descripción:** Preparar disponibilidad a partir de profesionales, especialidades, horarios y recursos habilitados.
+**Descripción:** Implementar catálogos de médicos, especialidades, recursos y agendas. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-05 / CU-05 — Asignar cita automáticamente](13_Comportamiento_CU.md#cu-05) · [HU-06 / CU-06 — Validar disponibilidad de Recursos](13_Comportamiento_CU.md#cu-06) · [HU-13 / CU-13 — Consultar agenda médica](13_Comportamiento_CU.md#cu-13).
+**Requisitos funcionales asociados:** RF-05, RF-06, RF-13.
+**RNF aplicables:** RNF-03.
 
 **Criterios de aceptación**
-- [ ] Catálogos y agenda consultables por roles autorizados.
-- [ ] No aparecen recursos inactivos como disponibles.
-- [ ] Horarios usan zona horaria definida por la arquitectura.
+- [ ] Servicios Java permiten consultar especialidades, médicos, horarios y consultorios con disponibilidad de origen documentado para CU-05 y CU-06.
+- [ ] La agenda refleja horarios vigentes autorizados; una especialidad no presenta médicos no relacionados.
+- [ ] Catálogos y configuraciones dependen de ELA-03/ELA-07; no se inventan turnos ni reglas de capacidad institucional.
+- [ ] Las consultas se restringen por rol y devuelven únicamente datos necesarios.
 
 **Tareas**
-- [ ] Crear modelo y endpoints de consulta/mantenimiento permitidos.
-- [ ] Probar cruces de horarios.
+- [ ] Implementar entidades, repositorios, servicios y endpoints de catálogos/agendas según diseño.
+- [ ] Preparar datos sintéticos coherentes y pruebas de relaciones.
 
-**Caso de prueba sugerido:** Agenda sin consultorio válido no habilita un cupo.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-10-implementar-catlogos-de-mdicos-espe` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-10A](12_Casos_de_prueba.md#cp-cns-10a) — Consultar especialidad devuelve solamente médicos y franjas compatibles cargadas.
+- [ ] [CP-CNS-10B](12_Casos_de_prueba.md#cp-cns-10b) — Una agenda sin recursos vigentes no produce falsos cupos disponibles.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-11"></a>
 ### [CON-11][Java] Implementar validación de disponibilidad y no doble reserva
 
-**Identificador:** `CON-11` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 4 - Gestion de citas  
-**Responsable sugerido:** Benjamín · **Tamaño inicial:** 5 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-06  
-**Casos de uso relacionados:** CU-06  
-**Depende de (referencias del plan):** CON-02, CON-10  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 4 - Gestion de citas (16/11–27/11/2026).
+**Responsable sugerido:** Benjamín. **Talla inicial:** 5 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-11` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-02](03_PostgreSQL.md#con-02) · [CON-10](02_Java.md#con-10)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-06`  
+**Rama de trabajo (base `develop`):** `feature/con-11-implementar-validacion-de-disponibilidad-y-no-do` (crear solo cuando se abra el issue).
 
-**Descripción:** Implementar validación y exclusión de reservas concurrentes.
+**Descripción:** Implementar validación de disponibilidad y no doble reserva. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-06 / CU-06 — Validar disponibilidad de Recursos](13_Comportamiento_CU.md#cu-06).
+**Requisitos funcionales asociados:** RF-06.
+**RNF aplicables:** RNF-03, RNF-04.
 
 **Criterios de aceptación**
-- [ ] Consulta disponible considera médico, horario, recurso y ocupación.
-- [ ] Dos solicitudes concurrentes no confirman el mismo cupo.
-- [ ] Se registran resultados de prueba de concurrencia.
+- [ ] CU-06 determina si una combinación de médico, fecha, horario y consultorio está libre antes de confirmar una cita.
+- [ ] Una combinación ocupada, superpuesta o con consultorio ocupado se rechaza sin crear cita (CU-06, alternativas 2a y 3a).
+- [ ] Dos solicitudes simultáneas que compiten por un mismo recurso no pueden reservarlo ambas (CU-06, alternativa 4a; RNF-04).
+- [ ] Java ejecuta la validación junto con persistencia segura en transacción; las restricciones PostgreSQL refuerzan su integridad.
 
 **Tareas**
-- [ ] Implementar consultas de elegibilidad y bloqueos/índices.
-- [ ] Crear pruebas con solicitudes simultáneas.
+- [ ] Implementar validador de recursos con intervalos y estados aprobados.
+- [ ] Incorporar transacciones, control de concurrencia y pruebas reproducibles contra PostgreSQL.
 
-**Caso de prueba sugerido:** Dos clientes compiten por el último cupo: solo una confirmación.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-11-implementar-validacin-de-disponibil` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-11A](12_Casos_de_prueba.md#cp-cns-11a) — Un consultorio ocupado no puede asignarse a otra cita solapada.
+- [ ] [CP-CNS-11B](12_Casos_de_prueba.md#cp-cns-11b) — Lanzar dos solicitudes concurrentes por el mismo médico y horario: como máximo una confirma la combinación.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-12"></a>
 ### [CON-12][Java] Implementar motor de asignación automática íntegramente en Java
 
-**Identificador:** `CON-12` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 4 - Gestion de citas  
-**Responsable sugerido:** Benjamín · **Tamaño inicial:** 5 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-05, RF-06  
-**Casos de uso relacionados:** CU-05, CU-06  
-**Depende de (referencias del plan):** CON-11, ELA-04  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 4 - Gestion de citas (16/11–27/11/2026).
+**Responsable sugerido:** Benjamín. **Talla inicial:** 5 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-12` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-11](02_Java.md#con-11) · [ELA-04](../Backlog_Elaboracion/Backlog_Arquitectura_CNS.md)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-05`  
+**Rama de trabajo (base `develop`):** `feature/con-12-implementar-motor-de-asignacion-automatica-integ` (crear solo cuando se abra el issue).
 
-**Descripción:** Elegir cupo mediante las reglas aprobadas y devolver una decisión determinista.
+**Descripción:** Implementar motor de asignación automática íntegramente en Java. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-05 / CU-05 — Asignar cita automáticamente](13_Comportamiento_CU.md#cu-05).
+**Requisitos funcionales asociados:** RF-05.
+**RNF aplicables:** RNF-03, RNF-04.
 
 **Criterios de aceptación**
-- [ ] La lógica se ejecuta en servicios Java, sin núcleo C++.
-- [ ] Se cumplen las prioridades y filtros aprobados; decisiones faltantes bloquean solo la regla afectada.
-- [ ] Si no hay disponibilidad, se devuelve un estado explícito sin reservar recursos.
+- [ ] CU-05 recibe una solicitud válida por especialidad y busca médico, fecha, hora y consultorio compatibles usando CU-06.
+- [ ] El paciente nunca elige manualmente esos recursos; la selección la realiza Java según los criterios que se aprueben en ELA-04.
+- [ ] Si no existe disponibilidad se informa que no se pudo asignar, sin inventar una cita (CU-05, alternativa 2a).
+- [ ] Si un recurso queda ocupado durante el proceso, descarta la combinación e intenta otra válida o termina sin confirmación (CU-05, alternativa 3a).
+- [ ] El algoritmo reside íntegramente en Java Spring Boot, sin motor externo C++.
 
 **Tareas**
-- [ ] Implementar estrategia de selección de cupo.
-- [ ] Probar casos borde y orden de prioridad.
+- [ ] Implementar servicio Java de asignación basado en consultas y validación de disponibilidad.
+- [ ] Incorporar selección según política institucional aprobada y pruebas para ausencia/conflicto.
 
-**Caso de prueba sugerido:** Para datos idénticos y reglas estables devuelve la misma asignación.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-12-implementar-motor-de-asignacin-auto` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-12A](12_Casos_de_prueba.md#cp-cns-12a) — Para una especialidad con recursos libres, el servicio produce combinación válida sin intervención del paciente.
+- [ ] [CP-CNS-12B](12_Casos_de_prueba.md#cp-cns-12b) — Al bloquear concurrentemente la combinación inicialmente elegida, el algoritmo no confirma doble reserva y responde según recursos restantes.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-13"></a>
 ### [CON-13][Java] Implementar solicitud y confirmación de citas con transacción
 
-**Identificador:** `CON-13` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 4 - Gestion de citas  
-**Responsable sugerido:** Alejandro · **Tamaño inicial:** 5 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-04, RF-07  
-**Casos de uso relacionados:** CU-04, CU-07  
-**Depende de (referencias del plan):** CON-06, CON-12  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 4 - Gestion de citas (16/11–27/11/2026).
+**Responsable sugerido:** Alejandro. **Talla inicial:** 5 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-13` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-06](02_Java.md#con-06) · [CON-12](02_Java.md#con-12)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-04` · `caso-uso:CU-07`  
+**Rama de trabajo (base `develop`):** `feature/con-13-implementar-solicitud-y-confirmacion-de-citas-co` (crear solo cuando se abra el issue).
 
-**Descripción:** Recibir solicitud, ejecutar asignación y guardar cita confirmada de forma consistente.
+**Descripción:** Implementar solicitud y confirmación de citas con transacción. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-04 / CU-04 — Solicitar cita médica](13_Comportamiento_CU.md#cu-04) · [HU-07 / CU-07 — Registrar cita confirmada](13_Comportamiento_CU.md#cu-07).
+**Requisitos funcionales asociados:** RF-04, RF-07.
+**RNF aplicables:** RNF-03, RNF-04.
+
+> **Cobertura conjunta:** CU-04 (solicitud) y CU-07 (registro confirmado) comparten este issue. CU-05 y CU-06 se desarrollan en CON-12 y CON-11; no confundir solicitud con cita confirmada.
 
 **Criterios de aceptación**
-- [ ] Operación de solicitud/confirmación sigue CU-04 y CU-07.
-- [ ] No queda cita confirmada si la transacción falla a mitad.
-- [ ] Se registran trazas sin datos personales innecesarios.
+- [ ] CU-04 registra la solicitud del paciente con especialidad válida sin campos de médico, fecha, hora o consultorio seleccionados por él.
+- [ ] CU-04 deriva el procesamiento al servicio CU-05, que verifica recursos con CU-06 y remite una asignación válida a CU-07.
+- [ ] CU-07 confirma una cita solo después de verificar de nuevo la disponibilidad y guarda paciente, especialidad, médico, fecha, hora, consultorio y estado inicial aprobado.
+- [ ] Si falla registro o confirmación, no queda una cita con asignación parcial; si faltan datos o se pierde disponibilidad, se rechaza sin conflicto (CU-04 2a/4a y CU-07 2a/3a).
+- [ ] La generación de notificación CU-16 sucede únicamente tras una operación confirmada; su implementación corresponde a CON-24.
 
 **Tareas**
-- [ ] Crear endpoints y orquestación en servicios.
-- [ ] Implementar rollback y tests.
+- [ ] Implementar flujo de solicitud CU-04 y coordinación del dominio CU-05/CU-06/CU-07 con transacción.
+- [ ] Crear servicios y endpoints REST según contrato ELA-05 y pruebas de rollback.
 
-**Caso de prueba sugerido:** Fallo entre reserva y confirmación no deja cupo ocupado.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-13-implementar-solicitud-y-confirmacin` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-13A](12_Casos_de_prueba.md#cp-cns-13a) — Paciente solicita especialidad válida y recibe cita confirmada con asignación automática disponible.
+- [ ] [CP-CNS-13B](12_Casos_de_prueba.md#cp-cns-13b) — Sin disponibilidad o con conflicto de último instante no se guarda cita confirmada ni se reserva un recurso inexistente.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-14"></a>
 ### [CON-14][Java] Implementar consulta de citas del paciente
 
-**Identificador:** `CON-14` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 4 - Gestion de citas  
-**Responsable sugerido:** Alejandro · **Tamaño inicial:** 3 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-08  
-**Casos de uso relacionados:** CU-08  
-**Depende de (referencias del plan):** CON-13  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 4 - Gestion de citas (16/11–27/11/2026).
+**Responsable sugerido:** Alejandro. **Talla inicial:** 3 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-14` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-13](02_Java.md#con-13)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-08`  
+**Rama de trabajo (base `develop`):** `feature/con-14-implementar-consulta-de-citas-del-paciente` (crear solo cuando se abra el issue).
 
-**Descripción:** Permitir al paciente revisar sus citas y sus estados.
+**Descripción:** Implementar consulta de citas del paciente. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-08 / CU-08 — Consultar cita paciente](13_Comportamiento_CU.md#cu-08).
+**Requisitos funcionales asociados:** RF-08.
+**RNF aplicables:** RNF-02.
 
 **Criterios de aceptación**
-- [ ] Paciente ve únicamente sus citas autorizadas.
-- [ ] Estados y fecha/hora coinciden con base de datos.
-- [ ] Se define paginación cuando proceda.
+- [ ] CU-08 devuelve al paciente autenticado únicamente sus citas y nunca las de otro paciente.
+- [ ] Cada cita mostrada incorpora médico, especialidad, fecha, hora, consultorio y estado, según el registro confirmado.
+- [ ] Si no hay citas, devuelve una lista vacía o respuesta de no registros según el contrato aprobado, sin exponer otros datos.
+- [ ] La consulta no modifica las citas.
 
 **Tareas**
-- [ ] Crear consulta por paciente autenticado.
-- [ ] Agregar pruebas de acceso cruzado.
+- [ ] Crear consulta por identidad autenticada y controlador correspondiente.
+- [ ] Escribir pruebas por propietario y sin resultados.
 
-**Caso de prueba sugerido:** Paciente A no puede consultar la cita de paciente B.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-14-implementar-consulta-de-citas-del-p` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-14A](12_Casos_de_prueba.md#cp-cns-14a) — Paciente A consulta sus citas y no recibe ninguna cita de Paciente B.
+- [ ] [CP-CNS-14B](12_Casos_de_prueba.md#cp-cns-14b) — Paciente sin citas recibe resultado vacío válido sin modificar BD.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-15"></a>
 ### [CON-15][Java] Implementar consulta de citas para admisión
 
-**Identificador:** `CON-15` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 4 - Gestion de citas  
-**Responsable sugerido:** Matías · **Tamaño inicial:** 3 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-09  
-**Casos de uso relacionados:** CU-09  
-**Depende de (referencias del plan):** CON-13  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 4 - Gestion de citas (16/11–27/11/2026).
+**Responsable sugerido:** Matías. **Talla inicial:** 3 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-15` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-13](02_Java.md#con-13)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-09`  
+**Rama de trabajo (base `develop`):** `feature/con-15-implementar-consulta-de-citas-para-admision` (crear solo cuando se abra el issue).
 
-**Descripción:** Consultar agenda y citas registradas para personal autorizado de Enfermería/Admisión.
+**Descripción:** Implementar consulta de citas para admisión. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-09 / CU-09 — Consultar citas registradas](13_Comportamiento_CU.md#cu-09).
+**Requisitos funcionales asociados:** RF-09.
+**RNF aplicables:** RNF-02.
 
 **Criterios de aceptación**
-- [ ] Filtro por fechas y otros criterios aprobados funciona.
-- [ ] Acceso denegado a quien carezca de rol.
-- [ ] Respuestas no exponen información que no corresponde.
+- [ ] Admisión/enfermería puede filtrar citas registradas por paciente, médico, fecha, estado y consultorio (CU-09).
+- [ ] Una consulta sin coincidencias informa correctamente que no hay resultados y no modifica citas.
+- [ ] Criterios incompletos o inválidos generan solicitud de corrección, y el rol no autorizado queda bloqueado.
+- [ ] La respuesta limita campos sensibles a los permitidos por el rol.
 
 **Tareas**
-- [ ] Crear endpoint de consulta administrativa.
-- [ ] Agregar pruebas por rol.
+- [ ] Implementar consultas filtradas, DTO y controlador con autorizaciones.
+- [ ] Probar combinaciones válidas, sin resultados y filtros erróneos.
 
-**Caso de prueba sugerido:** Paciente no ve consulta general de todas las citas.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-15-implementar-consulta-de-citas-para-` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-15A](12_Casos_de_prueba.md#cp-cns-15a) — Filtrar por médico y fecha devuelve solo citas coincidentes.
+- [ ] [CP-CNS-15B](12_Casos_de_prueba.md#cp-cns-15b) — Una búsqueda con criterio inválido devuelve rechazo controlado sin alterar citas.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-16"></a>
 ### [CON-16][Java] Implementar reprogramación y cancelación de citas
 
-**Identificador:** `CON-16` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 4 - Gestion de citas  
-**Responsable sugerido:** Matías · **Tamaño inicial:** 5 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-10, RF-11  
-**Casos de uso relacionados:** CU-10, CU-11  
-**Depende de (referencias del plan):** CON-11, CON-13  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 4 - Gestion de citas (16/11–27/11/2026).
+**Responsable sugerido:** Matías. **Talla inicial:** 5 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-16` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-11](02_Java.md#con-11) · [CON-13](02_Java.md#con-13)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-10` · `caso-uso:CU-11`  
+**Rama de trabajo (base `develop`):** `feature/con-16-implementar-reprogramacion-y-cancelacion-de-cita` (crear solo cuando se abra el issue).
 
-**Descripción:** Gestionar cambios de cita bajo reglas de transición aprobadas.
+**Descripción:** Implementar reprogramación y cancelación de citas. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-10 / CU-10 — Reprogramar cita](13_Comportamiento_CU.md#cu-10) · [HU-11 / CU-11 — Cancelar cita](13_Comportamiento_CU.md#cu-11).
+**Requisitos funcionales asociados:** RF-10, RF-11.
+**RNF aplicables:** RNF-03, RNF-04.
 
 **Criterios de aceptación**
-- [ ] Operaciones verifican estado, permisos y disponibilidad.
-- [ ] Cancelación libera el cupo; no reasigna todavía hasta issue CON-21.
-- [ ] Operaciones dejan registro del motivo/actor si exige documento.
+- [ ] CU-10 permite reprogramar a personal autorizado tras validar nuevamente médico, horario y consultorio con CU-06.
+- [ ] Si no hay disponibilidad o hay conflicto concurrente, conserva la asignación anterior sin crear otra cita ni perder trazabilidad (CU-10, alternativas 3a/3b).
+- [ ] CU-11 exige motivo de cancelación y deja la cita cancelada con su registro histórico sin borrar su identificación.
+- [ ] La cancelación deja el horario disponible para nuevas asignaciones válidas; una eventual asignación automática del cupo liberado es propuesta adicional, no aprobada en RF-11.
+- [ ] Los cambios confirmados quedan listos para CU-18 y CU-16; no se emiten notificaciones de operaciones rechazadas.
 
 **Tareas**
-- [ ] Crear endpoints y servicio transaccional.
-- [ ] Registrar cambio de estado e historial mínimo.
+- [ ] Implementar reprogramación transaccional reutilizando CU-06 y registro de cambios.
+- [ ] Implementar cancelación con motivo, actualización de disponibilidad y auditoría.
+- [ ] Añadir pruebas de conflicto y cambios concurrentes.
 
-**Caso de prueba sugerido:** No se cancela dos veces como dos operaciones distintas.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-16-implementar-reprogramacin-y-cancela` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-16A](12_Casos_de_prueba.md#cp-cns-16a) — Intentar reprogramar a médico/consultorio ocupados conserva cita original y no duplica recursos.
+- [ ] [CP-CNS-16B](12_Casos_de_prueba.md#cp-cns-16b) — Cancelar sin motivo es rechazado; con motivo guarda estado cancelada y traza el responsable.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-19"></a>
 ### [CON-19][Java] Implementar agenda médica y actualización de estado
 
-**Identificador:** `CON-19` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 4 - Gestion de citas  
-**Responsable sugerido:** Alex · **Tamaño inicial:** 5 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-12, RF-13  
-**Casos de uso relacionados:** CU-12, CU-13  
-**Depende de (referencias del plan):** CON-10, CON-13  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 4 - Gestion de citas (16/11–27/11/2026).
+**Responsable sugerido:** Alex. **Talla inicial:** 5 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-19` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-10](02_Java.md#con-10) · [CON-13](02_Java.md#con-13)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-12` · `caso-uso:CU-13`  
+**Rama de trabajo (base `develop`):** `feature/con-19-implementar-agenda-medica-y-actualizacion-de-est` (crear solo cuando se abra el issue).
 
-**Descripción:** Exponer la agenda del médico y actualizar estado de una cita con transiciones controladas.
+**Descripción:** Implementar agenda médica y actualización de estado. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-12 / CU-12 — Actualizar estado de cita](13_Comportamiento_CU.md#cu-12) · [HU-13 / CU-13 — Consultar agenda médica](13_Comportamiento_CU.md#cu-13).
+**Requisitos funcionales asociados:** RF-12, RF-13.
+**RNF aplicables:** RNF-01, RNF-02.
 
 **Criterios de aceptación**
-- [ ] Médico solo consulta agenda permitida.
-- [ ] Estados se validan y quedan persistidos.
-- [ ] Se conserva historial de transiciones relevantes.
+- [ ] CU-13 devuelve al médico sus citas en agenda diaria o semanal, sin asignar las de otros médicos.
+- [ ] CU-12 permite a médico/personal autorizado modificar el estado de una cita existente conforme al catálogo de estados aprobado.
+- [ ] Una cita inexistente o no perteneciente al ámbito permitido no permite cambiar estado.
+- [ ] Los cambios confirmados quedan disponibles para historial y notificaciones cuando corresponda; se registra el actor.
+- [ ] La discrepancia 'inexistente' frente a 'inasistencia' se resuelve en ELA-03 antes de definir estados definitivos.
 
 **Tareas**
-- [ ] Implementar servicios y endpoints.
-- [ ] Probar transiciones válidas e inválidas.
+- [ ] Implementar consulta de agenda diaria/semanal filtrada por médico.
+- [ ] Implementar servicio de transiciones de estado autorizadas y tests.
 
-**Caso de prueba sugerido:** Cita cancelada no puede pasar a atendida sin regla aprobada.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-19-implementar-agenda-mdica-y-actualiz` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-19A](12_Casos_de_prueba.md#cp-cns-19a) — Médico A consulta semana y no recibe citas de médico B.
+- [ ] [CP-CNS-19B](12_Casos_de_prueba.md#cp-cns-19b) — Intentar actualizar una cita inexistente o estado no aprobado no modifica registros.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-21"></a>
 ### [CON-21][Java] Implementar reasignación de cupo liberado en Java
 
-**Identificador:** `CON-21` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 5 - Integracion y seguimiento  
-**Responsable sugerido:** Benjamín · **Tamaño inicial:** 5 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-05, RF-06, RF-10, RF-11  
-**Casos de uso relacionados:** CU-05, CU-06, CU-10, CU-11  
-**Depende de (referencias del plan):** CON-16, CON-20  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Tarea técnica / validación. **Sprint:** Sprint 5 - Integracion y seguimiento (30/11–11/12/2026).
+**Responsable sugerido:** Benjamín. **Talla inicial:** 5 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-21` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-16](02_Java.md#con-16) · [CON-20](05_Pruebas.md#con-20) · [ELA-04](../Backlog_Elaboracion/Backlog_Arquitectura_CNS.md)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java` · `estado:bloqueado`  
+**Rama de trabajo (base `develop`):** `feature/con-21-implementar-reasignacion-de-cupo-liberado-en-jav` (crear solo cuando se abra el issue).
 
-**Descripción:** Procesar cupo liberado de manera consistente usando los criterios aprobados en arquitectura.
+**Descripción:** Implementar reasignación de cupo liberado en Java. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+**RNF aplicables:** RNF-03, RNF-04.
+
+> **NO APROBADO COMO RF-11:** la cancelación requiere motivo; la reasignación automática del cupo liberado no figura como obligación explícita. Solo empezar si ELA-04 y la CNS validan esa política. [Decisión pendiente](10_Decisiones_pendientes.md#d-01).
 
 **Criterios de aceptación**
-- [ ] Cupo liberado entra al flujo de reasignación permitido por los requisitos.
-- [ ] No se asigna dos veces ni a persona no elegible.
-- [ ] La operación genera evento auditable y aviso para consumidores.
+- [ ] Este Issue es CONDICIONAL: no entra en ejecución sin política de reasignación del cupo liberado validada explícitamente por la CNS en ELA-04 y decisión documentada.
+- [ ] Si se aprueba, Java asigna un cupo liberado solo a una solicitud elegible conforme a la prioridad/cola aprobada y previa validación CU-06.
+- [ ] La operación evita dobles reservas y registra la trazabilidad; si no existe persona elegible, el cupo queda libre sin asignar una cita arbitraria.
+- [ ] No se presupone confirmación de paciente, tiempo de aceptación ni lista de espera hasta que la institución lo defina.
 
 **Tareas**
-- [ ] Implementar servicio transaccional idempotente.
-- [ ] Agregar casos simultáneos de cancelación y demanda.
+- [ ] Registrar primero la decisión institucional y los escenarios de aceptación.
+- [ ] Solo si se aprueba, implementar selección y asignación transaccional con pruebas.
 
-**Caso de prueba sugerido:** Dos disparadores para el mismo cupo no producen dos citas.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-21-implementar-reasignacin-de-cupo-lib` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-21A](12_Casos_de_prueba.md#cp-cns-21a) — Con política aprobada, cancelar libera recurso y no asigna a pacientes que no cumplen sus condiciones.
+- [ ] [CP-CNS-21B](12_Casos_de_prueba.md#cp-cns-21b) — Dos reasignaciones simultáneas nunca adjudican el mismo cupo a dos citas.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-24"></a>
 ### [CON-24][Java] Generar notificaciones y recordatorios de cita
 
-**Identificador:** `CON-24` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 5 - Integracion y seguimiento  
-**Responsable sugerido:** Alejandro · **Tamaño inicial:** 5 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-16, RF-17  
-**Casos de uso relacionados:** CU-16, CU-17  
-**Depende de (referencias del plan):** CON-13, CON-21, CON-22  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 5 - Integracion y seguimiento (30/11–11/12/2026).
+**Responsable sugerido:** Alejandro. **Talla inicial:** 5 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-24` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-13](02_Java.md#con-13) · [CON-22](04_WebSocket.md#con-22)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-16` · `caso-uso:CU-17`  
+**Rama de trabajo (base `develop`):** `feature/con-24-generar-notificaciones-y-recordatorios-de-cita` (crear solo cuando se abra el issue).
 
-**Descripción:** Diseñar y ejecutar avisos de cita y recordatorios sin suponer proveedor externo no aprobado.
+**Descripción:** Generar notificaciones y recordatorios de cita. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-16 / CU-16 — Generar notificación](13_Comportamiento_CU.md#cu-16) · [HU-17 / CU-17 — Generar recordatorio de cita](13_Comportamiento_CU.md#cu-17).
+**Requisitos funcionales asociados:** RF-16, RF-17.
+**RNF aplicables:** RNF-02.
 
 **Criterios de aceptación**
-- [ ] Reglas de generación y momento del recordatorio siguen RF-16/17.
-- [ ] El mecanismo de entrega queda documentado y probado según alcance aprobado.
-- [ ] No hay avisos duplicados por reintento.
+- [ ] CU-16 genera notificación únicamente cuando registro, modificación o cancelación de cita ha sido confirmada.
+- [ ] CU-17 genera recordatorio de una cita programada al llegar la antelación configurada y aprobada; omite citas canceladas/desactualizadas.
+- [ ] La notificación identifica al destinatario correcto y contiene solo los datos permitidos; ningún cambio rechazado desencadena aviso falso.
+- [ ] El canal externo (SMS/WhatsApp/correo/push) NO se considera aprobado; la implementación usa canal interno solo si ELA-05 lo valida y documenta el medio final.
 
 **Tareas**
-- [ ] Crear servicios y agenda de tareas.
-- [ ] Probar programación y deduplicación.
+- [ ] Implementar eventos de dominio tras confirmación y generación de notificaciones/recordatorios.
+- [ ] Configurar mecanismo y anticipación aprobados y pruebas con reloj controlado.
 
-**Caso de prueba sugerido:** Dos ejecuciones programadas no duplican el mismo recordatorio.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-24-generar-notificaciones-y-recordator` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-24A](12_Casos_de_prueba.md#cp-cns-24a) — Cita cancelada antes de recordatorio no genera recordatorio antiguo.
+- [ ] [CP-CNS-24B](12_Casos_de_prueba.md#cp-cns-24b) — Una operación fallida no genera notificación de cambio inexistente.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-25"></a>
 ### [CON-25][Java] Implementar consulta permitida de paciente y registro de atención
 
-**Identificador:** `CON-25` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 5 - Integracion y seguimiento  
-**Responsable sugerido:** Alex · **Tamaño inicial:** 5 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-14, RF-15  
-**Casos de uso relacionados:** CU-14, CU-15  
-**Depende de (referencias del plan):** CON-03, CON-19  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 5 - Integracion y seguimiento (30/11–11/12/2026).
+**Responsable sugerido:** Alex. **Talla inicial:** 5 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-25` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-03](02_Java.md#con-03) · [CON-19](02_Java.md#con-19)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-14` · `caso-uso:CU-15`  
+**Rama de trabajo (base `develop`):** `feature/con-25-implementar-consulta-permitida-de-paciente-y-reg` (crear solo cuando se abra el issue).
 
-**Descripción:** Permitir al personal autorizado consultar datos permitidos y registrar atención.
+**Descripción:** Implementar consulta permitida de paciente y registro de atención. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-14 / CU-14 — Consultar información permitida del paciente](13_Comportamiento_CU.md#cu-14) · [HU-15 / CU-15 — Registrar datos de atención](13_Comportamiento_CU.md#cu-15).
+**Requisitos funcionales asociados:** RF-14, RF-15.
+**RNF aplicables:** RNF-01, RNF-02.
 
 **Criterios de aceptación**
-- [ ] Consulta y registro respetan rol, finalidad y mínimos de datos.
-- [ ] Registro de atención conserva relación con cita.
-- [ ] No se transforma en historia clínica avanzada fuera de alcance.
+- [ ] CU-14 permite al médico ver solo información básica e historial autorizado del paciente correspondiente a una cita asignada.
+- [ ] Si el médico no está vinculado a la cita o solicita un campo no permitido, el backend rechaza/omite el dato sin revelarlo (RNF-02).
+- [ ] CU-15 registra asistencia, tiempo de espera y tiempo de atención de la cita con controles de validez; no registra historia clínica integral.
+- [ ] Datos incompletos o no válidos no se guardan y la operación queda asociada a cita gestionable.
 
 **Tareas**
-- [ ] Diseñar DTO de datos permitidos.
-- [ ] Crear endpoint de registro y pruebas de autorización.
+- [ ] Implementar consulta con proyección de campos autorizados y comprobación de cita asignada.
+- [ ] Implementar servicio de registro operativo de atención y validación de tiempos.
 
-**Caso de prueba sugerido:** Un usuario sin permiso no consulta datos de atención.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-25-implementar-consulta-permitida-de-p` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-25A](12_Casos_de_prueba.md#cp-cns-25a) — Médico ajeno a cita no puede ver los datos de ese paciente.
+- [ ] [CP-CNS-25B](12_Casos_de_prueba.md#cp-cns-25b) — Registrar tiempos operativos inválidos no altera la atención, y datos válidos quedan asociados a la cita.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-26"></a>
 ### [CON-26][Java] Implementar historial de cambios de citas
 
-**Identificador:** `CON-26` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 5 - Integracion y seguimiento  
-**Responsable sugerido:** Alejandro · **Tamaño inicial:** 3 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-18  
-**Casos de uso relacionados:** CU-18  
-**Depende de (referencias del plan):** CON-16, CON-19  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 5 - Integracion y seguimiento (30/11–11/12/2026).
+**Responsable sugerido:** Alejandro. **Talla inicial:** 3 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-26` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-16](02_Java.md#con-16) · [CON-19](02_Java.md#con-19)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-18`  
+**Rama de trabajo (base `develop`):** `feature/con-26-implementar-historial-de-cambios-de-citas` (crear solo cuando se abra el issue).
 
-**Descripción:** Exponer una trazabilidad de cambios con autor, operación y fecha de acuerdo a los permisos.
+**Descripción:** Implementar historial de cambios de citas. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-18 / CU-18 — Consultar historial de cambios](13_Comportamiento_CU.md#cu-18).
+**Requisitos funcionales asociados:** RF-18.
+**RNF aplicables:** RNF-02.
 
 **Criterios de aceptación**
-- [ ] Se registran alta y modificaciones relevantes.
-- [ ] Historial no se altera al actualizar una cita.
-- [ ] Consultas protegidas por permisos.
+- [ ] CU-18 permite a admisión/administrador consultar cambios de una cita con acción, usuario responsable y fecha/hora.
+- [ ] Las reprogramaciones y cancelaciones confirmadas conservan evidencia sin sobrescribir el historial previo.
+- [ ] Usuario sin permiso no puede acceder al historial y una cita sin cambios retorna resultado informativo.
+- [ ] La política de retención y nivel de detalle queda pendiente de ELA-09; no se inventa tiempo de conservación.
 
 **Tareas**
-- [ ] Implementar endpoint y filtros.
-- [ ] Probar integridad del historial.
+- [ ] Implementar registro auditado integrado con operaciones confirmadas.
+- [ ] Implementar consulta protegida y pruebas por rol.
 
-**Caso de prueba sugerido:** Reprogramación deja rastro del estado anterior y nuevo.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-26-implementar-historial-de-cambios-de` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-26A](12_Casos_de_prueba.md#cp-cns-26a) — Reprogramar y cancelar genera registros diferenciados con actor y momento.
+- [ ] [CP-CNS-26B](12_Casos_de_prueba.md#cp-cns-26b) — Usuario sin permiso no puede recuperar historial de cambios.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
 
 ---
 
+<a id="con-27"></a>
 ### [CON-27][Java] Implementar reportes de citas e indicadores de gestión
 
-**Identificador:** `CON-27` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 5 - Integracion y seguimiento  
-**Responsable sugerido:** Alex · **Tamaño inicial:** 5 puntos  
-**Tecnología/área:** Java  
-**Requisitos relacionados:** RF-19, RF-20  
-**Casos de uso relacionados:** CU-19, CU-20  
-**Depende de (referencias del plan):** CON-13, CON-19  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:java`
+**Tipo:** Historia de usuario / implementación. **Sprint:** Sprint 5 - Integracion y seguimiento (30/11–11/12/2026).
+**Responsable sugerido:** Alex. **Talla inicial:** 5 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-27` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-13](02_Java.md#con-13) · [CON-19](02_Java.md#con-19)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:historia-usuario` · `tec:java` · `caso-uso:CU-19` · `caso-uso:CU-20`  
+**Rama de trabajo (base `develop`):** `feature/con-27-implementar-reportes-de-citas-e-indicadores-de-g` (crear solo cuando se abra el issue).
 
-**Descripción:** Agregar agregaciones administrativas desde datos de citas.
+**Descripción:** Implementar reportes de citas e indicadores de gestión. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+
+**Historias y casos de uso cubiertos:** [HU-19 / CU-19 — Generar reportes de citas](13_Comportamiento_CU.md#cu-19) · [HU-20 / CU-20 — Consultar indicadores de gestión](13_Comportamiento_CU.md#cu-20).
+**Requisitos funcionales asociados:** RF-19, RF-20.
+**RNF aplicables:** RNF-02.
 
 **Criterios de aceptación**
-- [ ] Reportes responden a RF-19/20 y tienen alcance temporal explícito.
-- [ ] Consultas se ejecutan con permisos administrativos.
-- [ ] Se prueban totales contra datos conocidos.
+- [ ] CU-19 genera reportes de citas programadas, atendidas y canceladas y agrupaciones por médico, especialidad y consultorio.
+- [ ] CU-20 consulta indicadores de demanda, cancelaciones, inasistencias, espera, atención y carga desde datos almacenados y autorizados.
+- [ ] Solo administrador puede acceder a reportes e indicadores; una consulta sin datos presenta resultado vacío/insuficiente sin fabricar cifras.
+- [ ] Fórmulas, rangos y definiciones de indicadores se fijan antes de implementar según decisión institucional; no se supone cómo calcular tasa de inasistencia.
 
 **Tareas**
-- [ ] Definir consultas y filtros autorizados.
-- [ ] Documentar indicadores concretos derivados de requisitos.
+- [ ] Implementar consultas agregadas, servicios y endpoints administrativos.
+- [ ] Documentar fórmulas aprobadas y probar conjuntos de datos sintéticos controlados.
 
-**Caso de prueba sugerido:** Con un juego sintético pequeño los totales coinciden.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-27-implementar-reportes-de-citas-e-ind` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-27A](12_Casos_de_prueba.md#cp-cns-27a) — Reporte por especialidad concuerda con número de citas del conjunto de prueba.
+- [ ] [CP-CNS-27B](12_Casos_de_prueba.md#cp-cns-27b) — Indicador sin datos o usuario no administrador obtiene ausencia de información o acceso denegado según corresponda.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.

@@ -1,59 +1,82 @@
-# Backlog de Construcción — Servidor
+# Backlog de Construcción — Servidor | CNS Hospital Obrero
 
-[Volver al índice](README.md) · Responsable indicado **como propuesta**, validar carga al iniciar cada sprint.
+[Índice general](README.md) · [Orden de creación](00_Indice_de_subida.md) · [Trazabilidad](08_Cobertura_y_trazabilidad.md) · [Flujos](09_Flujos_y_dependencias.md) · [Pruebas](12_Casos_de_prueba.md)
 
-### [CON-30][Servidor] Desplegar ambiente de integración de Java, Flutter y PostgreSQL
+**Total de issues propuestos:** 2. **Código:** pendiente de crear en GitHub; son especificaciones del backlog y no evidencias de implementación.
+**Responsables propuestos:** Matías, Alex. Los responsables y puntos se revisan en [07_Estimacion.md](07_Estimacion.md).
 
-**Identificador:** `CON-30` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 5 - Integracion y seguimiento  
-**Responsable sugerido:** Matías · **Tamaño inicial:** 3 puntos  
-**Tecnología/área:** Servidor  
-**Requisitos relacionados:** RF-01, RF-04, RF-05, RF-07, RF-16, RF-17  
-**Casos de uso relacionados:** CU-01, CU-04, CU-05, CU-07, CU-16, CU-17  
-**Depende de (referencias del plan):** CON-09, CON-22  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:servidor`
+Este archivo toma el comportamiento oficial de [CU-01 a CU-20](13_Comportamiento_CU.md) y la [matriz de requisitos](08_Cobertura_y_trazabilidad.md). No sustituye la aprobación de arquitectura del Sprint 2.
 
-**Descripción:** Proporcionar entorno de pruebas seguro, sin infraestructura específica impuesta antes de decidirla.
+## Distribución por Sprint
 
-**Criterios de aceptación**
-- [ ] Backend accesible de manera cifrada al ambiente de pruebas.
-- [ ] Base de prueba separada de datos reales.
-- [ ] Se documenta despliegue, variables y rollback sin publicar secretos.
-
-**Tareas**
-- [ ] Configurar despliegue reproducible.
-- [ ] Validar API/WS desde móvil o emulador.
-
-**Caso de prueba sugerido:** Una nueva versión se despliega y revierte con guía.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-30-desplegar-ambiente-de-integracin-de` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+| Sprint | Issues |
+|---|---|
+| S5 (30/11–11/12/2026) | [CON-30](06_Servidor.md#con-30) |
+| S6 (14/12–23/12/2026) | [CON-35](06_Servidor.md#con-35) |
 
 ---
 
-### [CON-35][Servidor] Probar respaldo, restauración y recuperación del sistema
+<a id="con-30"></a>
+### [CON-30][Servidor] Desplegar ambiente de integración de Java, Flutter y PostgreSQL
 
-**Identificador:** `CON-35` (referencia temporal de planificación; comprobar T-XX libre antes de crear en GitHub).  
-**Milestone:** Sprint 6 - Validacion y entrega  
-**Responsable sugerido:** Alex · **Tamaño inicial:** 3 puntos  
-**Tecnología/área:** Servidor  
-**Requisitos relacionados:** RF-01, RF-02, RF-03, RF-04, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-13, RF-18, RF-19, RF-20  
-**Casos de uso relacionados:** CU-01, CU-02, CU-03, CU-04, CU-05, CU-06, CU-07, CU-08, CU-09, CU-10, CU-11, CU-12, CU-13, CU-18, CU-19, CU-20  
-**Depende de (referencias del plan):** CON-30  
-**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:servidor`
+**Tipo:** Tarea técnica / validación. **Sprint:** Sprint 5 - Integracion y seguimiento (30/11–11/12/2026).
+**Responsable sugerido:** Matías. **Talla inicial:** 3 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-30` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-09](05_Pruebas.md#con-09) · [CON-22](04_WebSocket.md#con-22)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:tarea` · `tec:servidor`  
+**Rama de trabajo (base `develop`):** `feature/con-30-desplegar-ambiente-de-integracion-de-java-flutte` (crear solo cuando se abra el issue).
 
-**Descripción:** Validar recuperación de datos y operación ante caída del entorno.
+**Descripción:** Desplegar ambiente de integración de Java, Flutter y PostgreSQL. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
 
 **Criterios de aceptación**
-- [ ] Respaldo de base de pruebas puede restaurarse en otro destino.
-- [ ] Credenciales se administran fuera del repositorio.
-- [ ] Procedimiento escrito incluye responsable y pasos reversibles.
+- [ ] Ambiente de integración ejecuta Java Spring Boot y PostgreSQL de pruebas, aislado de información real de la CNS.
+- [ ] Desde Flutter de pruebas se consume REST y WebSocket mediante transporte cifrado y credenciales de prueba.
+- [ ] Configuración, despliegue y reversión son reproducibles y documentados, sin credenciales publicadas.
+- [ ] Infraestructura/proveedor definitivo se registra como pendiente de decisión; no se declara un proveedor no confirmado.
 
 **Tareas**
-- [ ] Realizar respaldo/restauración.
-- [ ] Documentar límites y recuperación.
+- [ ] Preparar entorno, variables y scripts de despliegue reproducibles.
+- [ ] Verificar acceso cifrado, migraciones y conectividad desde app.
 
-**Caso de prueba sugerido:** Restauración recupera citas y sus referencias intactas.  
-**Caso de prueba CP-XX:** numerar después de revisar los CP existentes.  
-**Rama:** `feature/TXX-con-35-probar-respaldo-restauracin-y-recup` (sustituir `TXX` por número libre).  
-**Issue GitHub:** `#PENDIENTE` (anotar después de crearlo).
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-30A](12_Casos_de_prueba.md#cp-cns-30a) — Desde un cliente de pruebas se autentica, consulta cita y reconecta WebSocket.
+- [ ] [CP-CNS-30B](12_Casos_de_prueba.md#cp-cns-30b) — Desplegar y revertir versión conserva esquema y citas de prueba según procedimiento.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
+
+---
+
+<a id="con-35"></a>
+### [CON-35][Servidor] Probar respaldo, restauración y recuperación del sistema
+
+**Tipo:** Tarea técnica / validación. **Sprint:** Sprint 6 - Validacion y entrega (14/12–23/12/2026).
+**Responsable sugerido:** Alex. **Talla inicial:** 3 puntos ([estimación](07_Estimacion.md)).
+**Referencia del plan:** `CON-35` · **GitHub:** `#PENDIENTE` (no se ha verificado número existente).
+**Dependencias:** [CON-30](06_Servidor.md#con-30)  
+**Etiquetas sugeridas:** `fase:construccion` · `tipo:prueba` · `tec:servidor`  
+**Rama de trabajo (base `develop`):** `feature/con-35-probar-respaldo-restauracion-y-recuperacion-del` (crear solo cuando se abra el issue).
+
+**Descripción:** Probar respaldo, restauración y recuperación del sistema. La implementación debe cumplir únicamente el alcance aprobado del CNS, separando Vista Flutter, control REST y Modelo Java según el diseño MVC.
+**RNF aplicables:** RNF-03, RNF-04.
+
+**Criterios de aceptación**
+- [ ] Base de pruebas puede respaldarse y restaurarse en un entorno independiente con todas sus relaciones y cambios de citas.
+- [ ] El procedimiento registra fecha, versión de esquema y pasos de recuperación; usa credenciales externas al repositorio.
+- [ ] Se verifica que la restauración no produce pérdida de integridad ni reserva incompatible.
+- [ ] No se prueba con información personal real sin autorización institucional.
+
+**Tareas**
+- [ ] Preparar y ejecutar respaldo y restauración de datos sintéticos.
+- [ ] Documentar proceso, tiempo observado y verificación de consistencia.
+
+**Casos de prueba de referencia (identificadores locales, no CP oficiales)**
+- [ ] [CP-CNS-35A](12_Casos_de_prueba.md#cp-cns-35a) — Restaurar base con citas, usuarios y audit trail preserva referencias y relaciones.
+- [ ] [CP-CNS-35B](12_Casos_de_prueba.md#cp-cns-35b) — Después de restaurar, no hay cita duplicada para la misma combinación incompatible de recursos.
+
+**Fuentes y relaciones:** [Especificación de CU](13_Comportamiento_CU.md) · [Cobertura RF/HU](08_Cobertura_y_trazabilidad.md) · [Decisiones abiertas](10_Decisiones_pendientes.md) · [Flujo de entrega](09_Flujos_y_dependencias.md).
+Si cambia un criterio o contrato, actualizar el documento aprobado de arquitectura y los vínculos de trazabilidad en el mismo Pull Request.
+
+**Registro al crear en GitHub:** número `#____` · PR `#____` · CP oficial `____` · evidencia `05_pro/____`.
