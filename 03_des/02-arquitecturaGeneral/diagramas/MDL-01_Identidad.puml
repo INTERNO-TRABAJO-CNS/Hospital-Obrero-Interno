@@ -1,0 +1,17 @@
+@startuml
+title MDL-01 · Identidad y pacientes (provisional)
+class Persona
+class Usuario
+class Paciente { numeroAseguradoCNS }
+class Rol
+class Permiso
+Persona -- Paciente : identidad
+Persona -- Usuario : cuenta
+Usuario -- Rol
+Rol -- Permiso
+note right of Paciente
+Afiliación obligatoria.
+CI solo identifica persona.
+Validar contra DER.
+end note
+@enduml

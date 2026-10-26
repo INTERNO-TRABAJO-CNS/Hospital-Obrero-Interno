@@ -1,0 +1,33 @@
+@startuml
+title CNS — MVC y flujo de responsabilidades
+actor Usuario
+rectangle "VISTA · Flutter" as V {
+ rectangle "Pantallas por rol" as P
+}
+rectangle "CONTROL DE INTERACCIÓN" as CF {
+ rectangle "Controlador/estado Flutter" as U
+}
+rectangle "CONTROLADOR SERVIDOR" as CS {
+ rectangle "REST Controller Spring" as R
+}
+rectangle "MODELO · Java" as MOD {
+ rectangle "Servicios y reglas (MDL-01..05)" as S
+ rectangle "Repositorios/JPA" as J
+}
+database "PostgreSQL" as DB
+rectangle "Canal de actualización" as EVT {
+ rectangle "WebSocket (solo difusión)" as W
+}
+Usuario --> P
+P --> U
+U --> R : REST HTTPS
+R --> S
+S --> J
+J --> DB
+S --> W : después de commit
+W --> U : evento para refrescar
+note right of S
+Validación, asignación,
+control de concurrencia
+end note
+@enduml

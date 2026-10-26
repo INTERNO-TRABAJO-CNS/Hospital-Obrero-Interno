@@ -1,0 +1,14 @@
+@startuml
+title MDL-04 · Operaciones e historial
+class "CitaRef (M03)" as Cita
+class RegistroLlegada
+class CambioCita
+class DatosAtencion
+Cita --> RegistroLlegada
+Cita --> CambioCita
+Cita --> DatosAtencion
+note bottom
+Secretaría confirma llegada y cancela si procede;
+los cambios usan el contrato atómico de M03.
+end note
+@enduml

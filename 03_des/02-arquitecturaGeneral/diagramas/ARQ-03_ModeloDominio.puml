@@ -1,0 +1,84 @@
+@startuml
+title CNS — Diagrama conceptual de clases (NO representa DER validado)
+skinparam classAttributeIconSize 0
+package "MDL-01 · Alejandro" {
+ class Persona { +personaId }
+ class Usuario {
+ +usuarioId
+ +personaId
+}
+ class Paciente {
+ +pacienteId
+ +numeroAseguradoCNS
+}
+ class Rol { +rolId }
+ class Permiso { +permisoId }
+ Persona "1" -- "0..1" Paciente : identidad (validar)
+ Persona "1" -- "0..1" Usuario : cuenta (validar)
+ Usuario "*" -- "*" Rol
+ Rol "*" -- "*" Permiso
+}
+package "MDL-02 · Alex" {
+ class Medico { +medicoId }
+ class Especialidad { +especialidadId }
+ class Consultorio { +consultorioId }
+ class AgendaMedica { +agendaId }
+ class FranjaDisponible {
+ +franjaId
+ +inicio
+ +fin
+}
+ Medico "*" -- "*" Especialidad : validar cardinalidad
+ Medico "1" -- "*" AgendaMedica
+ AgendaMedica "1" o-- "*" FranjaDisponible
+}
+package "MDL-03 · Benjamín" {
+ class SolicitudCita {
+ +solicitudId
+ +fechaSolicitud
+}
+ class CitaMedica {
+ +citaId
+ +inicio
+ +fin
+ +estado
+ +version
+}
+}
+package "MDL-04 · Matías" {
+ class CambioCita {
+ +cambioId
+ +motivo
+ +fechaHora
+}
+ class RegistroLlegada {
+ +llegadaId
+ +fechaHora
+}
+ class DatosAtencion { +atencionId }
+}
+package "MDL-05 · Abigal" {
+ class Notificacion {
+ +notificacionId
+ +tipo
+}
+ class Recordatorio { +recordatorioId }
+}
+Paciente "1" -- "*" SolicitudCita
+Paciente "1" -- "*" CitaMedica
+SolicitudCita "1" -- "0..1" CitaMedica : origen
+CitaMedica "*" --> "1" Medico
+CitaMedica "*" --> "1" Especialidad
+CitaMedica "*" --> "1" Consultorio
+CitaMedica "*" --> "1" AgendaMedica
+CitaMedica "1" -- "*" CambioCita
+CitaMedica "1" -- "0..1" RegistroLlegada : propuesta
+CitaMedica "1" -- "0..1" DatosAtencion : validar
+CitaMedica "1" -- "*" Notificacion
+CitaMedica "1" -- "*" Recordatorio
+note right of CitaMedica
+Estados: PROGRAMADA,
+ATENDIDA, CANCELADA.
+Inasistencia es motivo/evento.
+end note
+@enduml
