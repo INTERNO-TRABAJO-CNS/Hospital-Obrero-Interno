@@ -1,0 +1,320 @@
+# MDL-04 — Operaciones e historial del ciclo de vida de citas
+
+> **Tipo:** Diseño / elaboración de arquitectura MVC  
+> **Sprint:** Sprint 2  
+> **Tarea:** S2-M04  
+> **Estado del documento:** Propuesta de diseño pendiente de contraste con los documentos fuente vigentes del Sprint 1 y los acuerdos de S2-M02, S2-M03 y S2-M05.  
+> **Alcance:** CU-10, CU-11, CU-12, CU-15 y CU-18; RF-10, RF-11, RF-12, RF-15 y RF-18; HU-10, HU-11, HU-12, HU-15 y HU-18.  
+> **Restricción:** Diseño y documentación solamente. No incluye código de producción.
+
+## 1. Propósito
+
+Definir conceptualmente las operaciones sobre una cita médica ya existente para reprogramarla, cancelarla, actualizar su estado, registrar datos administrativos de atención y conservar/consultar el historial de acciones. Este modelo reutiliza el identificador y las operaciones de `CitaMedica` acordadas en S2-M03 y consulta la disponibilidad definida por S2-M02. No redefine el alta de citas ni la entidad `CitaMedica`.
+
+## 2. Alcance y límites
+
+### Incluido
+- Reprogramación autorizada de una cita existente (CU-10).
+- Cancelación con motivo e historial (CU-11).
+- Actualización de estado por personal autorizado, conforme a los requisitos vigentes (CU-12).
+- Registro administrativo de asistencia, tiempo de espera y datos de atención dentro del alcance aprobado (CU-15).
+- Conservación y consulta de acciones, responsable, momento y motivo cuando corresponda (CU-18).
+- Registro conceptual de auditoría mediante `HistorialCambio`.
+- Reglas de consistencia, tratamiento de fallos y coordinación de mensajes de cambios confirmados.
+
+### Excluido
+- Alta o creación inicial de citas, responsabilidad de S2-M03.
+- Redefinición de `CitaMedica` o de su identificador.
+- Implementación de código de producción, endpoints, clases ejecutables o cambios de base de datos.
+- Reasignación automática de citas por inasistencia o cancelación. La tarea la identifica como S2-M07/cambio futuro, no como funcionalidad aprobada de S2-M04.
+- Ampliación del alcance a historia clínica o registro de diagnóstico/tratamiento.
+- Definición de permisos nuevos para médicos, Secretaría u otros perfiles sin control de cambios aprobado.
+
+## 3. Dependencias y acuerdos entre tareas
+
+| Dependencia | Uso en S2-M04 | Límite / acuerdo necesario |
+|---|---|---|
+| S2-M02 — Disponibilidad | Consultar si el nuevo horario/recurso puede asignarse durante una reprogramación. | Reutilizar la operación y las reglas de disponibilidad acordadas; no inventar su firma ni duplicar su lógica. |
+| S2-M03 — CitaMedica | Identificar la cita existente y utilizar las operaciones acordadas sobre ella. | No redefinir entidad, identificador ni alta de cita. Confirmar los nombres exactos de operaciones y atributos en su diseño. |
+| S2-M05 — Mensajes/notificaciones | Acordar los mensajes emitidos después de cambios de estado confirmados. | Los mensajes deben corresponder a cambios confirmados, no a intentos rechazados. Nombres y canales quedan sujetos al acuerdo con S2-M05. |
+| S2-M07 — Reasignación | Referencia para una posible reasignación por inasistencia/cancelación. | Fuera del alcance aprobado de S2-M04; registrar como dependencia/cambio futuro. |
+
+## 4. Responsabilidades conceptuales en MVC
+
+La distribución siguiente es una propuesta de responsabilidades y debe adaptarse a la arquitectura MVC ya aprobada por el equipo.
+
+- **Vista:** presenta el formulario/solicitud, datos actuales, errores de validación y resultado de la operación. No decide permisos ni disponibilidad por sí misma.
+- **Controlador:** recibe la solicitud, identifica la operación, entrega los datos al componente de servicio y presenta el resultado. No contiene reglas de negocio complejas.
+- **Servicio de ciclo de vida de citas:** coordina autorización, validaciones, disponibilidad cuando corresponda, actualización de la cita, auditoría y coordinación de eventos.
+- **Modelo `CitaMedica`:** entidad existente definida en S2-M03. Se utiliza mediante su identificador y operaciones acordadas; no se redefine aquí.
+- **Servicio de disponibilidad S2-M02:** determina si el horario/recurso solicitado puede asignarse conforme a las reglas vigentes.
+- **`HistorialCambio`:** concepto de auditoría que representa una acción realizada sobre una cita u objeto del sistema.
+- **Coordinación S2-M05:** recibe/acuerda los eventos o mensajes asociados a cambios confirmados.
+
+## 5. Operaciones del ciclo de vida
+
+### 5.1 `reprogramar`
+
+**Caso de uso relacionado:** CU-10.  
+**Objetivo:** cambiar la fecha/hora y, si corresponde según el modelo vigente, los recursos de una cita existente sin perder la programación previa cuando la operación falle.
+
+**Datos conceptuales de entrada**
+- Identificador de la cita existente.
+- Nueva fecha/hora solicitada.
+- Actor que solicita la operación.
+- Motivo, si el requisito vigente lo solicita.
+
+**Precondiciones**
+- La cita existe.
+- La cita se encuentra en un estado que permite reprogramación según las reglas aprobadas.
+- El actor está autorizado según la matriz/perfil vigente.
+- La nueva fecha/hora cumple las validaciones de negocio.
+
+**Flujo principal**
+1. El controlador recibe la solicitud y la deriva al servicio.
+2. El servicio identifica la cita mediante el identificador acordado con S2-M03.
+3. Verifica existencia, estado y autorización.
+4. Consulta S2-M02 para revalidar la disponibilidad del nuevo horario y de los recursos aplicables.
+5. Si la disponibilidad se confirma, aplica la modificación de forma consistente.
+6. Registra `HistorialCambio` con actor, acción, momento, objeto afectado y motivo cuando corresponda.
+7. Tras confirmar el cambio, coordina con S2-M05 el mensaje/evento que corresponda.
+8. Devuelve el resultado confirmado.
+
+**Alternativas y errores**
+- Cita inexistente: rechazar sin modificación; la semántica exacta de errores debe seguir los requisitos vigentes.
+- Actor no autorizado: rechazar sin modificar la cita.
+- Estado no compatible con reprogramación: rechazar sin modificar la cita.
+- Horario/recurso no disponible: rechazar; conservar fecha, hora y recursos anteriores.
+- Error durante la persistencia o el registro obligatorio de historial: no dejar un cambio parcial confirmado. Aplicar la estrategia transaccional que defina la arquitectura/persistencia del proyecto.
+- Disponibilidad cambia entre consulta y confirmación: la operación debe volver a validar/proteger la asignación en el punto de confirmación, usando el mecanismo acordado con S2-M02 y S2-M03.
+
+**Regla de consistencia:** la programación anterior no se libera ni se reemplaza hasta que pueda confirmarse la nueva asignación. La consulta de disponibilidad por sí sola no debe considerarse garantía suficiente ante solicitudes concurrentes.
+
+**Resultado:** reprogramación confirmada o rechazo sin pérdida de la cita anterior.
+
+### 5.2 `cancelar`
+
+**Caso de uso relacionado:** CU-11.  
+**Objetivo:** cancelar una cita existente con motivo y trazabilidad.
+
+**Datos conceptuales de entrada**
+- Identificador de la cita.
+- Motivo de cancelación.
+- Actor solicitante.
+
+**Precondiciones**
+- La cita existe.
+- Su estado permite la cancelación según las reglas vigentes.
+- El actor está autorizado.
+- El motivo se proporciona cuando lo exige el requisito.
+
+**Flujo principal**
+1. Recibir la solicitud.
+2. Localizar la cita existente.
+3. Validar estado y autorización.
+4. Validar la presencia del motivo conforme al requisito vigente.
+5. Cambiar al estado de cancelación definido en la documentación base; no inventar aquí el nombre del estado.
+6. Registrar el historial con actor, acción, fecha/hora, objeto afectado y motivo.
+7. Confirmar la operación y coordinar con S2-M05 el mensaje/evento aplicable al cambio confirmado.
+
+**Alternativas y errores**
+- Cita inexistente: rechazar sin cambios.
+- Actor no autorizado: rechazar sin cambios.
+- Estado que no admite cancelación: rechazar sin cambios.
+- Motivo requerido ausente: solicitar corrección/rechazar según el comportamiento aprobado.
+- Error al guardar la cancelación o el historial: no dejar una cancelación confirmada sin su registro de auditoría requerido.
+
+**Resultado:** cancelación confirmada con motivo y auditoría, o rechazo sin cambio parcial.
+
+### 5.3 `actualizarEstado`
+
+**Caso de uso relacionado:** CU-12.  
+**Objetivo:** actualizar el estado de una cita únicamente cuando la transición esté permitida y el actor tenga autorización.
+
+**Datos conceptuales de entrada**
+- Identificador de la cita.
+- Estado solicitado.
+- Actor solicitante.
+- Motivo o contexto si lo exige la transición aprobada.
+
+**Flujo principal**
+1. Identificar la cita existente.
+2. Validar que el estado solicitado exista en el catálogo vigente.
+3. Validar la transición desde el estado actual al solicitado.
+4. Comprobar que el actor tenga autorización para esa transición, según los requisitos aprobados.
+5. Aplicar el cambio de estado.
+6. Registrar `HistorialCambio`.
+7. Confirmar el cambio y acordar con S2-M05 el mensaje/evento correspondiente.
+8. Devolver el resultado.
+
+**Alternativas y errores**
+- Cita inexistente: rechazar.
+- Estado desconocido o transición no permitida: rechazar.
+- Actor no autorizado: rechazar.
+- Error de persistencia/auditoría: no confirmar un cambio parcial.
+- No se define por inferencia qué actor puede asignar cada estado; debe verificarse en la fuente vigente.
+
+**Pendiente obligatorio RF-12:** la documentación descrita en la tarea presenta una discrepancia entre «inexistente» e «inasistencia». Debe conservarse como **PENDIENTE DE ACLARACIÓN**. No sustituir una palabra por otra ni alterar unilateralmente la documentación base. Registrar la decisión mediante el proceso de control de cambios del equipo.
+
+### 5.4 `registrarDatosAtencion`
+
+**Caso de uso relacionado:** CU-15.  
+**Objetivo:** registrar información administrativa de asistencia y atención dentro del alcance aprobado.
+
+**Datos conceptuales de entrada**
+- Identificador de la cita.
+- Dato de asistencia.
+- Tiempo de espera.
+- Datos administrativos de atención contemplados en los requisitos.
+- Actor responsable.
+
+**Flujo principal**
+1. Identificar la cita.
+2. Verificar que el estado/contexto permite registrar los datos.
+3. Verificar la autorización del actor según la documentación vigente.
+4. Validar formato, coherencia y obligatoriedad de los datos según los requisitos aprobados.
+5. Registrar los datos administrativos.
+6. Registrar la acción en el historial cuando corresponda al diseño de auditoría aprobado.
+7. Devolver confirmación.
+
+**Alternativas y errores**
+- Cita inexistente: rechazar el registro.
+- Actor no autorizado: rechazar.
+- Datos incompletos o inconsistentes: informar validación y no guardar parcialmente.
+- Registro duplicado o actualización de datos ya registrados: comportamiento pendiente de definir si los requisitos vigentes no lo especifican.
+
+**Límite:** no añadir diagnósticos, tratamientos ni contenido clínico que no forme parte del alcance administrativo definido.
+
+### 5.5 `registrarCambio`
+
+**Caso de uso relacionado:** CU-18; operación transversal invocada por las operaciones que generan acciones auditables.  
+**Objetivo:** conservar la trazabilidad de una acción realizada sobre una cita u otro objeto contemplado.
+
+**Datos conceptuales**
+- `actor`: identidad/referencia del responsable.
+- `accion`: operación efectuada.
+- `fechaHora`: momento registrado.
+- `objetoAfectado`: referencia al objeto y, cuando aplique, a la cita.
+- `motivo`: explicación cuando corresponda; obligatorio para cancelación conforme a CU-11.
+
+**Reglas**
+- Registrar la acción únicamente de acuerdo con el resultado real de la operación; no presentar intentos rechazados como cambios confirmados.
+- La fecha/hora debe proceder de una fuente temporal coherente con la política del sistema.
+- El historial debe asociarse al objeto afectado mediante referencias estables.
+- El registro obligatorio de auditoría y la operación que documenta deben mantener consistencia transaccional o contar con un mecanismo de recuperación explícitamente aprobado.
+- No se debe permitir que el registro de historial cambie por sí mismo los datos de la cita.
+- La consulta de historial debe respetar las autorizaciones de lectura que estén definidas en los requisitos vigentes.
+
+**Resultado:** registro de auditoría conservado y consultable según las reglas aprobadas.
+
+## 6. Modelo conceptual `HistorialCambio`
+
+`HistorialCambio` es un concepto de auditoría; no implica por sí solo que se cree una tabla física con esos nombres. La implementación física queda fuera de esta tarea.
+
+| Atributo conceptual | Descripción | Regla |
+|---|---|---|
+| actor | Referencia al usuario/responsable que ejecutó la acción. | Debe poder identificarse según el modelo de usuarios vigente. |
+| accion | Nombre conceptual de la acción efectuada. | Ej.: reprogramación, cancelación, cambio de estado o registro administrativo. |
+| fechaHora | Momento de la acción. | Usar la política temporal común del sistema. |
+| objetoAfectado | Referencia al objeto modificado, normalmente la cita identificada por S2-M03. | No duplicar la definición de `CitaMedica`. |
+| motivo | Motivo asociado a la acción, cuando corresponda. | Conservar el motivo de cancelación. |
+
+La cardinalidad física, identificador propio, representación de valores anteriores/nuevos, retención, integridad y permisos de consulta deben alinearse con los modelos y RNF vigentes; no se fijan aquí si la documentación fuente no los define.
+
+## 7. Transacciones y consistencia
+
+### Reprogramación
+- Validar la cita y la autorización.
+- Revalidar disponibilidad con S2-M02.
+- Confirmar el cambio de programación sin liberar/perder primero la programación anterior.
+- Conservar la consistencia entre la nueva programación y el historial.
+- Ante horario ocupado, conflicto concurrente o fallo de persistencia, rechazar/abortar y mantener la programación anterior.
+
+### Cancelación
+- El cambio de estado y el registro de motivo/auditoría deben quedar consistentes.
+- No informar cancelación confirmada si falla el guardado obligatorio.
+- La eventual liberación de recursos debe seguir las reglas acordadas con S2-M02/S2-M03; no definir un procedimiento distinto en este documento.
+
+### Actualización de estado
+- Validar transición y autorización antes de aplicar el cambio.
+- Guardar el cambio y su auditoría como una unidad lógica consistente.
+- Emitir/solicitar mensajes de S2-M05 solo tras la confirmación.
+
+### Registro de datos de atención
+- Validar todos los datos antes de confirmar.
+- Evitar registros parciales ante errores.
+- Aplicar la política de auditoría aprobada para el registro.
+
+### Nota sobre concurrencia
+La consulta de disponibilidad y la actualización pueden competir con otra operación simultánea. El diseño debe utilizar el mecanismo de consistencia que acuerden los componentes de disponibilidad y persistencia; una consulta previa aislada no garantiza que el recurso siga libre al confirmar.
+
+## 8. Autorización
+
+La autorización se verifica en la capa de servicio/control de acceso establecida por la arquitectura del proyecto, no se confía únicamente en la interfaz.
+
+La matriz exacta de actores y permisos debe extraerse de los requisitos vigentes. Este documento no concede nuevas facultades a médicos, Secretaría ni otros perfiles. Si una operación no tiene actor/permisos claramente definidos en las fuentes, debe anotarse como pendiente para revisión y control de cambios.
+
+## 9. Coordinación de eventos con S2-M05
+
+Como mínimo, acordar si se requiere un mensaje/evento después de:
+- Reprogramación confirmada.
+- Cancelación confirmada.
+- Cambio de estado confirmado.
+
+Para cada mensaje, S2-M05 y S2-M04 deben acordar nombre, datos mínimos, destinatarios, momento de emisión, tratamiento de errores y política ante reintentos. Este documento no fija nombres definitivos de eventos ni presume un canal concreto. Los intentos rechazados no deben producir mensajes que indiquen un cambio confirmado.
+
+## 10. Discrepancias y pendientes
+
+| ID | Asunto | Estado / tratamiento |
+|---|---|---|
+| P-01 | RF-12 usa de forma discrepante «inexistente» e «inasistencia». | **PENDIENTE DE ACLARACIÓN.** No corregir unilateralmente; solicitar decisión y control de cambios. |
+| P-02 | Permisos exactos de cada actor para CU-10, CU-11, CU-12 y CU-15. | Confirmar en los requisitos vigentes; no inferir nuevas facultades. |
+| P-03 | Nombres y firmas exactas de operaciones de disponibilidad y `CitaMedica`. | Confirmar con S2-M02 y S2-M03; reutilizar sus contratos. |
+| P-04 | Nombres/carga útil y política de entrega de eventos. | Acordar con S2-M05. |
+| P-05 | Reasignación por inasistencia/cancelación. | Fuera del alcance aprobado de S2-M04; corresponde a S2-M07/cambio futuro. |
+| P-06 | Política para registros administrativos duplicados o modificados. | Confirmar si no está especificada en las fuentes vigentes. |
+| P-07 | Modelo físico, retención y permisos de consulta del historial. | Alinear con los modelos/RNF vigentes; no inventar decisiones de persistencia. |
+
+## 11. Verificación del diseño
+
+### Caso A — Reprogramación a horario ocupado
+**Dado** que una cita existente tiene una programación confirmada y el nuevo horario solicitado está ocupado,  
+**cuando** un actor autorizado intenta reprogramarla,  
+**entonces** el servicio consulta/revalida disponibilidad, rechaza la operación y conserva sin cambios la programación original. No se registra una reprogramación como confirmada ni se emite un mensaje de cambio confirmado.
+
+### Caso B — Cancelación autorizada
+**Dado** que una cita existente admite cancelación y el actor está autorizado,  
+**cuando** se solicita cancelar indicando el motivo requerido,  
+**entonces** el cambio de estado, el motivo, el actor, la fecha/hora y el registro de auditoría quedan consistentes. Si falla una parte obligatoria, no se devuelve una cancelación confirmada.
+
+## 12. Trazabilidad inicial
+
+| Caso de uso | RF | HU | Operación / elemento | Observación |
+|---|---|---|---|---|
+| CU-10 | RF-10 | HU-10 | `reprogramar` | Revalidar disponibilidad con S2-M02. |
+| CU-11 | RF-11 | HU-11 | `cancelar`, `HistorialCambio` | Motivo, actor y momento conservados. |
+| CU-12 | RF-12 | HU-12 | `actualizarEstado`, `HistorialCambio` | Discrepancia RF-12 pendiente. |
+| CU-15 | RF-15 | HU-15 | `registrarDatosAtencion` | Solo datos administrativos dentro del alcance. |
+| CU-18 | RF-18 | HU-18 | `registrarCambio` y consulta de historial | Actor, acción, fecha/hora, objeto y motivo cuando corresponde. |
+
+La asociación anterior reproduce los códigos indicados en la tarea. La trazabilidad detallada debe cotejarse con los documentos fuente del Sprint 1.
+
+## 13. Criterios de aceptación cubiertos
+
+- [x] Se distinguen las operaciones de reprogramar, cancelar, actualizar estado y registrar datos de atención.
+- [x] Se define conceptualmente `HistorialCambio` con actor, acción, fecha/hora, objeto afectado y motivo cuando corresponde.
+- [x] Se establece que la cancelación conserva motivo, autor y fecha/hora.
+- [x] Se especifica que una reprogramación a horario ocupado no cambia la cita original.
+- [x] Se identifican los puntos transaccionales y la necesidad de consistencia.
+- [x] La discrepancia RF-12 se deja pendiente, sin corrección unilateral.
+- [x] La reasignación se deja fuera del alcance aprobado de S2-M04 y se referencia a S2-M07/cambio futuro.
+- [x] Se identifica el acuerdo de mensajes con S2-M05.
+- [ ] Confirmar permisos, nombres exactos de operaciones y contratos contra los documentos fuente vigentes.
+- [ ] Revisión cruzada por otro integrante antes de integrar.
+
+## 14. Archivos relacionados
+
+- `MDL-04_operaciones_historial.mdy`: este documento.
+- `MDL-04_operaciones_historial.puml`: diagramas de secuencia y modelo conceptual.
+
+**Nota de entrega:** la extensión `.mdy` se utiliza porque así la solicita la tarea. El contenido se ha redactado en texto estructurado; confirmar con el equipo si `.mdy` tiene una sintaxis/herramienta específica antes de dar el archivo por definitivo.
