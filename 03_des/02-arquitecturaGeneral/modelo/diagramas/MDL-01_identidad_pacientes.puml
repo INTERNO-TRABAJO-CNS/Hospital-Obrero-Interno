@@ -1,0 +1,54 @@
+@startuml MDL-01_identidad_pacientes
+skinparam monochrome false
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "Submodelo de Identidad y Pacientes (MDL-01)" {
+
+    class Persona {
+        + id_persona: UUID [PK]
+        + tipo_documento: EnumDocumento
+        + numero_documento: String [Unique]
+        + nombres: String
+        + apellidos: String
+        + fecha_nacimiento: Date
+        + genero: String
+    }
+
+    class Usuario {
+        + id_usuario: UUID [PK]
+        + id_persona: UUID [FK, Nullable, Unique]
+        + correo_electronico: String [Unique]
+        + password_hash: String
+        + estado_cuenta: EnumEstado
+    }
+
+    class Rol {
+        + id_rol: UUID [PK]
+        + nombre_rol: String [Unique]
+    }
+
+    class Permiso {
+        + id_permiso: UUID [PK]
+        + codigo_permiso: String [Unique]
+    }
+
+    class Paciente {
+        + id_paciente: UUID [PK] -- Referencia Estable S2-M03
+        + id_persona: UUID [FK, Unique]
+        + numero_historia_clinica: String [Unique]
+    }
+    
+    note bottom of Paciente
+        Consumido por S2-M03 para registrar actos médicos
+        y por S2-M05 mediante PacienteMinimoDTO.
+    end note
+
+    Persona "1" -down- "0..1" Usuario : "tiene cuenta de acceso"
+    Persona "1" -down- "0..1" Paciente : "está registrado como"
+    
+    Usuario "*" M-..-M "*" Rol : "Usuario_Rol"
+    Rol "*" M-..-M "*" Permiso : "Rol_Permiso"
+
+}
+@enduml
