@@ -1,0 +1,71 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+title MDL-05 · Consultas, notificaciones y reportes (lectura)
+
+package "MDL-03/MDL-04 (fuente transaccional)" {
+  class EventoCitaConfirmado {
+    +eventoId
+    +citaId
+    +tipoEvento
+    +version
+    +timestamp
+  }
+}
+
+package "MDL-05 (lectura/comunicación)" {
+  class Notificacion <<EntidadPersistente>> {
+    +notificacionId
+    +citaId
+    +pacienteIdDestinatario
+    +tipoEvento
+    +fechaGeneracion
+    +estadoLectura
+  }
+
+  class Recordatorio <<EntidadPersistente>> {
+    +recordatorioId
+    +citaId
+    +pacienteIdDestinatario
+    +fechaProgramadaEnvio
+    +estadoEnvio
+  }
+
+  class ConsultaDeCitasDTO <<DTO>>
+  class ReporteCitasDTO <<DTO>>
+  class IndicadorGestionDTO <<DTO/calculo>>
+
+  class ConsultaCitasController <<Controlador>>
+  class NotificacionController <<Controlador>>
+  class RecordatorioController <<Controlador>>
+  class ReporteController <<Controlador>>
+  class IndicadorController <<Controlador>>
+}
+
+class RestAPI <<FuenteDeVerdad>>
+class WebSocket <<AvisoConfirmado>>
+
+EventoCitaConfirmado --> NotificacionController : evento post-commit
+NotificacionController --> Notificacion : persistir idempotente(eventoId)
+RecordatorioController --> Recordatorio : generar recordatorio vigente
+
+ConsultaCitasController --> ConsultaDeCitasDTO : CU-08 / CU-09
+ReporteController --> ReporteCitasDTO : CU-19
+IndicadorController --> IndicadorGestionDTO : CU-20
+
+RestAPI --> ConsultaCitasController : consultar/filtros
+RestAPI --> ReporteController : solicitar reporte
+RestAPI --> IndicadorController : consultar indicador
+
+WebSocket --> NotificacionController : informar cambio confirmado
+WebSocket ..> RestAPI : cliente reconsulta al reconectar
+
+note bottom
+- REST confirma transacción de negocio.
+- WebSocket solo notifica cambios ya confirmados.
+- Si WS falla, backend conserva cita confirmada;
+  el cliente sincroniza por REST.
+- Backend aplica privacidad por rol/relación (RNF-02).
+end note
+
+@enduml
