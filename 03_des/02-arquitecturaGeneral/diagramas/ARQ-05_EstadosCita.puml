@@ -1,0 +1,16 @@
+@startuml
+title CNS — Ciclo de vida confirmado de CitaMedica
+[*] --> PROGRAMADA : asignación validada
+PROGRAMADA --> ATENDIDA : atención registrada
+PROGRAMADA --> CANCELADA : cancelación autorizada + motivo
+PROGRAMADA --> PROGRAMADA : reprogramar (revalidar y auditar)
+ATENDIDA --> [*]
+CANCELADA --> [*]
+note right of PROGRAMADA
+«Inasistencia» es un motivo de cancelación,
+NO un cuarto estado; +10min y Secretaría.
+end note
+note bottom of CANCELADA
+Reversión excepcional pendiente de validación.
+end note
+@enduml

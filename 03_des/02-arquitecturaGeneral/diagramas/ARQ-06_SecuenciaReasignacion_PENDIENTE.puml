@@ -1,0 +1,36 @@
+@startuml
+title CAMBIO PENDIENTE — Reasignación por ofertas (NO APROBADO EN RF/CU)
+actor "Secretaría/Enfermería" as N
+actor "Paciente elegible" as P
+participant "REST" as R
+participant "M04 Cancelación" as M4
+participant "M03 Motor Java" as M3
+participant "M02 Disponibilidad" as M2
+participant "M05 Buzón" as B
+database PostgreSQL as DB
+N -> R : cancelar cita por motivo (regla +10min)
+R -> M4 : cancelar autorizadamente
+M4 -> DB : confirmar CANCELADA + auditar
+DB --> M4 : commit
+M4 -> M3 : evento cupo liberado (propuesta)
+M3 -> M2 : candidatos de próximos días compatibles
+M2 --> M3 : elegibles (prioridad PENDIENTE)
+M3 -> B : ofertas simultáneas al buzón
+B --> P : oferta voluntaria
+P -> R : aceptar oferta (REST futuro)
+R -> M3 : confirmar aceptación
+M3 -> DB : transacción: validar cupo y aceptación primera
+alt ganador y recursos válidos
+ M3 -> DB : mover cita y liberar su cupo anterior
+ M3 -> DB : COMMIT
+ M3 -> B : invalidar demás ofertas
+else no es el primero / expirado
+ M3 -> DB : ROLLBACK
+ R --> P : oferta ya no disponible
+end
+note over M3,B
+Prioridad, plazo, horizonte y elegibilidad
+siguen PENDIENTES DE VALIDACIÓN.
+No se retira cita anterior sin aceptación.
+end note
+@enduml
