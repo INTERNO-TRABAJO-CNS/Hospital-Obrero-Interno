@@ -1,0 +1,187 @@
+@startuml MDL-04_operaciones_historial
+title MDL-04 — Ciclo de vida de citas e historial\nDiseño conceptual (sin código de producción)
+hide footbox
+autonumber
+
+actor "Actor autorizado\n(según requisitos vigentes)" as Actor
+boundary "Vista" as Vista
+control "Controlador MVC" as Controlador
+control "Servicio de ciclo\nde vida de citas" as Servicio
+entity "CitaMedica\n(definida en S2-M03)" as Cita
+participant "Disponibilidad\n(S2-M02)" as Disponibilidad
+database "HistorialCambio\n(conceptual)" as Historial
+participant "Mensajes/eventos\n(S2-M05)" as Mensajes
+
+== CU-10: Reprogramación ==
+Actor -> Vista: Solicitar reprogramación\n(idCita, nueva fecha/hora)
+Vista -> Controlador: Enviar solicitud
+Controlador -> Servicio: reprogramar(idCita, nueva fecha/hora, actor)
+Servicio -> Cita: Obtener cita existente
+Cita --> Servicio: Cita / resultado de búsqueda
+
+alt Cita inexistente
+  Servicio --> Controlador: Rechazar: cita no encontrada
+  Controlador --> Vista: Mostrar error
+else Cita existente
+  Servicio -> Servicio: Validar estado permitido\ny autorización vigente
+  alt Estado no permitido o actor no autorizado
+    Servicio --> Controlador: Rechazar sin modificar
+    Controlador --> Vista: Mostrar error
+  else Validaciones correctas
+    Servicio -> Disponibilidad: Consultar/revalidar nuevo horario y recursos
+    Disponibilidad --> Servicio: Disponible / ocupado
+    alt Horario ocupado o recurso no disponible
+      Servicio --> Controlador: Rechazar; conservar programación anterior
+      Controlador --> Vista: Informar indisponibilidad
+    else Disponible
+      note over Servicio,Cita
+        Confirmar el cambio de forma consistente.
+        No liberar ni reemplazar la programación anterior
+        antes de poder confirmar la nueva.
+        Proteger contra cambios concurrentes.
+      end note
+      Servicio -> Cita: Aplicar nueva programación\n(contrato de S2-M03)
+      Cita --> Servicio: Cambio confirmado
+      Servicio -> Historial: registrarCambio(actor, acción,\nfechaHora, objeto, motivo si aplica)
+      Historial --> Servicio: Registro consistente
+      Servicio ->> Mensajes: Solicitar evento acordado\ncon S2-M05 (solo tras confirmar)
+      Servicio --> Controlador: Reprogramación confirmada
+      Controlador --> Vista: Mostrar confirmación
+    end
+  end
+end
+
+== CU-11: Cancelación ==
+Actor -> Vista: Solicitar cancelación\n(idCita, motivo)
+Vista -> Controlador: Enviar solicitud
+Controlador -> Servicio: cancelar(idCita, motivo, actor)
+Servicio -> Cita: Obtener cita existente
+Cita --> Servicio: Cita / resultado de búsqueda
+
+alt Cita inexistente
+  Servicio --> Controlador: Rechazar
+  Controlador --> Vista: Mostrar error
+else Cita existente
+  Servicio -> Servicio: Validar estado, motivo\ny autorización vigente
+  alt No autorizada, estado no permitido\no motivo requerido ausente
+    Servicio --> Controlador: Rechazar sin cambios
+    Controlador --> Vista: Mostrar error
+  else Validaciones correctas
+    group Unidad lógica consistente
+      Servicio -> Cita: Cambiar al estado de cancelación\nsegún reglas vigentes
+      Cita --> Servicio: Cambio aplicado
+      Servicio -> Historial: Registrar cancelación:\nactor, acción, fechaHora, cita, motivo
+      Historial --> Servicio: Registro confirmado
+    end
+    Servicio ->> Mensajes: Solicitar evento acordado\ncon S2-M05 tras confirmación
+    Servicio --> Controlador: Cancelación confirmada
+    Controlador --> Vista: Mostrar confirmación
+  end
+end
+
+== CU-12: Actualización de estado ==
+Actor -> Vista: Solicitar cambio de estado\n(idCita, nuevo estado)
+Vista -> Controlador: Enviar solicitud
+Controlador -> Servicio: actualizarEstado(idCita, estado, actor)
+Servicio -> Cita: Obtener cita existente
+Cita --> Servicio: Cita / resultado de búsqueda
+Servicio -> Servicio: Validar estado y transición,\nautorización según requisitos
+alt Cita inexistente, transición inválida\no actor no autorizado
+  Servicio --> Controlador: Rechazar sin cambios
+  Controlador --> Vista: Mostrar error
+else Cambio permitido
+  Servicio -> Cita: Aplicar cambio de estado
+  Cita --> Servicio: Cambio confirmado
+  Servicio -> Historial: registrarCambio(actor, acción,\nfechaHora, cita, motivo si corresponde)
+  Historial --> Servicio: Registro consistente
+  Servicio ->> Mensajes: Coordinar evento con S2-M05
+  Servicio --> Controlador: Cambio confirmado
+  Controlador --> Vista: Mostrar confirmación
+end
+note over Servicio
+PENDIENTE RF-12: discrepancia entre
+«inexistente» e «inasistencia».
+No corregir unilateralmente la fuente.
+end note
+
+== CU-15: Registro administrativo de atención ==
+Actor -> Vista: Registrar asistencia/espera/atención
+Vista -> Controlador: Enviar datos administrativos
+Controlador -> Servicio: registrarDatosAtencion(idCita, datos, actor)
+Servicio -> Cita: Verificar cita y contexto permitido
+Cita --> Servicio: Resultado
+Servicio -> Servicio: Validar datos y autorización
+alt Cita no válida, datos inconsistentes\no actor no autorizado
+  Servicio --> Controlador: Rechazar sin guardar parcialmente
+  Controlador --> Vista: Mostrar validación/error
+else Datos válidos
+  Servicio -> Cita: Registrar datos administrativos\n(según modelo vigente)
+  Cita --> Servicio: Registro confirmado
+  opt Auditoría requerida por reglas vigentes
+    Servicio -> Historial: registrarCambio(actor, acción,\nfechaHora, cita, motivo si corresponde)
+    Historial --> Servicio: Registro consistente
+  end
+  Servicio --> Controlador: Datos registrados
+  Controlador --> Vista: Mostrar confirmación
+end
+
+== CU-18: Consulta de historial ==
+Actor -> Vista: Solicitar historial de una cita
+Vista -> Controlador: Enviar consulta
+Controlador -> Servicio: Consultar historial(idCita, actor)
+Servicio -> Servicio: Validar autorización de consulta
+alt Consulta no autorizada
+  Servicio --> Controlador: Rechazar consulta
+  Controlador --> Vista: Mostrar error
+else Consulta autorizada
+  Servicio -> Historial: Consultar acciones por objeto afectado
+  Historial --> Servicio: Registros de historial
+  Servicio --> Controlador: Historial consultable
+  Controlador --> Vista: Presentar acciones, responsables,\nfecha/hora y motivos disponibles
+end
+
+@enduml
+
+
+@startuml MDL-04_historial_conceptual
+title MDL-04 — Modelo conceptual de auditoría
+hide methods
+skinparam classAttributeIconSize 0
+
+class "CitaMedica" as CitaMedica <<existente: S2-M03>> {
+  identificador : según S2-M03
+}
+
+class "HistorialCambio" as HistorialCambio <<conceptual>> {
+  actor : referencia al responsable
+  accion : acción realizada
+  fechaHora : momento de la acción
+  objetoAfectado : referencia al objeto
+  motivo : opcional/según operación
+}
+
+class "Servicio de ciclo de vida" as Servicio {
+  reprogramar()
+  cancelar()
+  actualizarEstado()
+  registrarDatosAtencion()
+  registrarCambio()
+}
+
+Servicio ..> CitaMedica : utiliza contrato existente
+Servicio ..> HistorialCambio : registra/consulta
+CitaMedica "1" <-- "0..*" HistorialCambio : objeto afectado\n(referencia conceptual)
+
+note right of HistorialCambio
+No define por sí mismo una tabla física.
+El esquema persistente, la retención y los permisos
+de consulta deben alinearse con los documentos vigentes.
+El motivo es obligatorio para cancelación cuando
+así lo exige CU-11.
+end note
+
+note bottom of CitaMedica
+No redefinir la entidad ni sus atributos:
+usar el modelo aprobado en S2-M03.
+end note
+@enduml
