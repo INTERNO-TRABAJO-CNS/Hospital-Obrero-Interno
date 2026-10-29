@@ -1,0 +1,27 @@
+@startuml ED-07_RecordatorioCita
+' CNS — diagrama de estados UML 2.x a partir de casos de uso del ZIP
+' Casos relacionados: CU-17
+hide empty description
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 17
+skinparam ArrowColor #292929
+skinparam StateBorderColor #292929
+skinparam StateBackgroundColor white
+skinparam StateFontColor #222222
+skinparam StateBorderThickness 1.6
+skinparam roundcorner 18
+top to bottom direction
+title Diagrama de estados: RecordatorioCita
+state "Programado" as programado
+state "Pendiente de emisión" as listo
+state "Emitido" as emitido
+state "Anulado" as anulado
+[*] --> programado : recordatorio asociado a cita activa
+programado --> listo : se aproxima la cita (CU-17)
+programado --> anulado : cita cancelada o fecha modificada
+listo --> emitido : se genera y emite recordatorio
+emitido --> [*]
+anulado --> [*]
+' NOTA: La anticipación y el canal del recordatorio no están definidos; anular el recordatorio anterior al reprogramar es una propuesta de diseño coherente.
+@enduml

@@ -1,0 +1,27 @@
+@startuml ED-06_NotificacionCita
+' CNS — diagrama de estados UML 2.x a partir de casos de uso del ZIP
+' Casos relacionados: CU-07, CU-10, CU-11, CU-16
+hide empty description
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 17
+skinparam ArrowColor #292929
+skinparam StateBorderColor #292929
+skinparam StateBackgroundColor white
+skinparam StateFontColor #222222
+skinparam StateBorderThickness 1.6
+skinparam roundcorner 18
+top to bottom direction
+title Diagrama de estados: NotificacionCita
+state "Generada" as generada
+state "Pendiente de emisión" as pendiente
+state "Emitida" as emitida
+state "Fallida" as fallida
+[*] --> generada : alta, cambio o cancelación de cita
+generada --> pendiente : preparar notificación (CU-16)
+pendiente --> emitida : emisión exitosa
+pendiente --> fallida : fallo de emisión
+emitida --> [*]
+fallida --> [*]
+' NOTA: El canal de notificación aún no está definido. «Emitida» no equivale a entregada o leída; el reintento no está especificado.
+@enduml

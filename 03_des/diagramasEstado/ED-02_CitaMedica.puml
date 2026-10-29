@@ -1,0 +1,33 @@
+@startuml ED-02_CitaMedica
+' CNS — diagrama de estados UML 2.x a partir de casos de uso del ZIP
+' Casos relacionados: CU-07, CU-10, CU-11, CU-12, CU-15
+hide empty description
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 17
+skinparam ArrowColor #292929
+skinparam StateBorderColor #292929
+skinparam StateBackgroundColor white
+skinparam StateFontColor #222222
+skinparam StateBorderThickness 1.6
+skinparam roundcorner 18
+top to bottom direction
+title Diagrama de estados: CitaMedica
+state "Programada" as programada
+state "En espera" as espera
+state "En atención" as atencion
+state "Atendida" as atendida
+state "Cancelada" as cancelada
+state "Inasistencia" as inasistencia
+[*] --> programada : cita asignada y registrada (CU-07)
+programada --> programada : reprogramación válida (CU-10)
+programada --> espera : enfermería registra llegada (CU-15)
+espera --> atencion : médico inicia atención
+atencion --> atendida : médico finaliza atención
+programada --> cancelada : secretaría cancela (CU-11)
+programada --> inasistencia : secretaría registra ausencia (CU-12)
+atendida --> [*]
+cancelada --> [*]
+inasistencia --> [*]
+' NOTA: «Programada» equivale a cita asignada/registrada. Confirmación SÍ/NO de llegada se mantiene como dato operacional; no confundir ambas confirmaciones. Reprogramar cambia horario y queda en historial, no es estado permanente.
+@enduml

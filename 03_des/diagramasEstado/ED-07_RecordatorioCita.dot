@@ -1,0 +1,19 @@
+digraph CNS {
+graph [layout=dot, rankdir=TB, bgcolor="white", pad="0.32", margin="0.08", nodesep="0.78", ranksep="0.88", splines=true, labelloc=t, label="", fontname="DejaVu Sans", fontsize=25, fontcolor="#1E1E1E", outputorder=edgesfirst];
+node [fontname="DejaVu Sans",fontsize=18, fontcolor="#222222", shape=box, style="rounded,filled", fillcolor="#FFFFFF", color="#292929", penwidth=1.65, margin="0.22,0.15"];
+edge [fontname="DejaVu Sans", fontsize=12, fontcolor="#242424", color="#292929", penwidth=1.4, arrowsize=0.9];
+title [shape=box, label="Diagrama de estados: RecordatorioCita", style="rounded", fontsize=24, penwidth=1.4, margin="0.16,0.10"];
+title -> start [style=invis, weight=50];
+start [shape=circle, style=filled, fillcolor="#222222", fixedsize=true, width=0.31, height=0.31, label=""];
+end [shape=doublecircle, style=filled, fillcolor="#222222", color="#222222", fixedsize=true, width=0.37, height=0.37, label="", penwidth=1.4];
+programado [label="Programado"];
+listo [label="Pendiente de emisión"];
+emitido [label="Emitido"];
+anulado [label="Anulado"];
+start -> programado [label="recordatorio asociado a cita\nactiva"];
+programado -> listo [label="se aproxima la cita (CU-17)"];
+programado -> anulado [label="cita cancelada o fecha modificada"];
+listo -> emitido [label="se genera y emite recordatorio"];
+emitido -> end [];
+anulado -> end [];
+}
