@@ -35,7 +35,8 @@ rectangle "Sistema de Gestión y Control de Citas Médicas\nHospital Obrero CNS"
 actor "Médico" as ACTOR1
 ACTOR1 --> CU13
 note bottom of CU13
-  Consulta de agenda diaria o semanal, exclusivamente del médico autenticado.
+  Citas del día actual y selector de otras fechas, exclusivamente del médico autenticado.
 end note
 
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

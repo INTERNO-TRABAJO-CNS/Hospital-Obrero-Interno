@@ -33,7 +33,7 @@ else (No / 2a)
   stop
 endif
 |Historial de operaciones|
-:Recupera modificaciones, reprogramaciones y cancelaciones;
+:Recupera confirmaciones de asistencia, cancelaciones (del paciente o automáticas) y finalizaciones de atención;
 if (¿Hay operaciones históricas?) then (Sí)
   ' Camino principal
 else (No / 3a)
@@ -45,4 +45,5 @@ endif
 |Enfermería / Administrador|
 :Revisa historial sin modificarlo;
 stop
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

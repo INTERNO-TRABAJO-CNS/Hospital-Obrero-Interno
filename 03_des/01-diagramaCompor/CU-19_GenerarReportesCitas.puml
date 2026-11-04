@@ -17,33 +17,31 @@ skinparam activity {
   StartColor #35628E
   EndColor #35628E
 }
-title CU-19: Generar reportes de citas\nDiagrama de actividad
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-19: Generar reportes y agenda de supervisión\nDiagrama de actividad
 |Administrador|
 start
-:Abre el módulo de reportes de citas;
-|Sistema CNS / reportes|
-if (¿Cuenta con permisos administrativos?) then (Sí)
+:Abre reportes y agenda de supervisión;
+|Sistema CNS (Java)|
+if (¿Tiene permiso administrativo?) then (Sí)
   ' Camino principal
 else (No / 1a)
-  :Impide el acceso al módulo de reportes [1a];
+  :Impide el acceso [1a];
   stop
 endif
-|Interfaz de reportes|
-:Muestra tipos de reportes disponibles;
+:Muestra el resumen por especialidad con médico, horario y cantidad de fichas;
 |Administrador|
-:Selecciona criterio: estado, médico, especialidad o consultorio;
-:Solicita generar reporte;
-|Sistema CNS / reportes|
-:Agrupa registros según tipo y período seleccionado;
+:Selecciona un médico o un reporte;
+|Sistema CNS (Java)|
 if (¿Existen datos para el criterio?) then (Sí)
-  ' Camino principal
+  :Muestra el detalle con número de ficha, horario, estado y cumplimiento;
 else (No / 3a)
-  :Informa ausencia de resultados [3a];
+  :Informa que no hay información disponible [3a];
   stop
 endif
-|Interfaz de reportes|
-:Presenta reporte consolidado solicitado;
+:Actualiza la vista en tiempo real por WebSocket;
+:Si se intenta modificar una cita, no lo permite porque la agenda es de solo lectura [3b];
 |Administrador|
-:Revisa resultados sin alterar citas;
+:Observa y verifica el cumplimiento de citas y horarios;
 stop
 @enduml

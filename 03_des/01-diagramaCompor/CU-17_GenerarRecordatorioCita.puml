@@ -17,28 +17,26 @@ skinparam activity {
   StartColor #35628E
   EndColor #35628E
 }
-title CU-17: Generar recordatorio de cita\nDiagrama de actividad
-|Proceso automático|
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-17: Generar aviso previo de cita\nDiagrama de actividad
+|Proceso automático (CU-17)|
 start
-:Evalúa citas próximas a su fecha programada;
-|Sistema CNS / citas|
-if (¿Dentro del período configurado?) then (Sí)
+:Identifica citas PROGRAMADAS próximas a su hora;
+if (¿Faltan 45 minutos?) then (Sí)
   ' Camino principal
 else (No / 1a)
-  :No genera recordatorio todavía [1a];
+  :No genera el aviso todavía [1a];
   stop
 endif
-:Consulta estado e información actual de la cita;
-if (¿La cita continúa programada y vigente?) then (Sí)
+|Sistema CNS (Java)|
+if (¿La cita sigue vigente y sin asistencia confirmada?) then (Sí)
   ' Camino principal
 else (No / 2a)
-  :No genera aviso con datos cancelados o antiguos [2a];
+  :No genera el aviso [2a];
   stop
 endif
-|Generador de recordatorios|
-:Prepara recordatorio con información vigente;
-:Genera recordatorio de la cita;
+:Genera el aviso de cancelación si no confirma hasta 30 minutos antes;
 |Paciente|
-:Recibe o consulta recordatorio por mecanismo por definir;
+:Recibe el aviso en la aplicación;
 stop
 @enduml

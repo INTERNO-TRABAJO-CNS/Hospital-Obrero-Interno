@@ -35,11 +35,10 @@ rectangle "Sistema de Gestión y Control de Citas Médicas\nHospital Obrero CNS"
 
 actor "Médico" as ACTOR1
 ACTOR1 --> CU15
-actor "Enfermería autorizada" as ACTOR2
-ACTOR2 --> CU15
 CU12 ..> CU15 : <<extend>>
 note bottom of CU15
-  Registrar asistencia, tiempo de espera y atención; estado se actualiza cuando corresponda.
+  El médico registra receta/medicación y el fin de la atención; la cita pasa a ATENDIDA.
 end note
 
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

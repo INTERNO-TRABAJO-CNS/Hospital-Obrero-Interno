@@ -17,31 +17,33 @@ skinparam activity {
   StartColor #35628E
   EndColor #35628E
 }
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 title CU-13: Consultar agenda médica\nDiagrama de actividad
 |Médico|
 start
-:Abre la opción de agenda médica;
-|Sistema CNS / agendas|
+:Abre la agenda médica;
+|Sistema CNS (Java)|
 if (¿Usuario autenticado como médico?) then (Sí)
   ' Camino principal
 else (No / 1a)
-  :Impide acceso a agenda médica restringida [1a];
+  :Impide el acceso a la agenda médica restringida [1a];
   stop
 endif
-|Médico|
-:Elige vista diaria o semanal;
-|Interfaz de agenda|
-:Envía el período de consulta;
-|Sistema CNS / agendas|
-:Busca citas asignadas al médico autenticado;
-if (¿Existen citas para el período?) then (Sí)
-  ' Camino principal
+:Busca las citas del día actual del médico autenticado;
+if (¿Existen citas hoy?) then (Sí)
+  |Interfaz de agenda|
+  :Muestra cantidad de citas, número de ficha y hora;
 else (No / 3a)
   :Informa que no hay citas programadas [3a];
-  stop
 endif
-|Interfaz de agenda|
-:Muestra las citas en la vista solicitada;
+|Médico|
+if (¿Desea ver otra fecha?) then (Sí)
+  :Pulsa otras fechas y elige una fecha;
+  |Sistema CNS (Java)|
+  :Muestra las citas de la fecha elegida;
+else (No)
+  ' Camino principal
+endif
 |Médico|
 :Revisa su agenda sin modificar registros;
 stop

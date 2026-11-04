@@ -37,7 +37,8 @@ actor "Paciente" as ACTOR1
 ACTOR1 --> CU04
 CU04 ..> CU05 : <<invoca>>
 note bottom of CU04
-  El paciente indica especialidad; no selecciona médico, fecha, hora ni consultorio.
+  El paciente indica especialidad y día; no selecciona médico, hora ni consultorio.
 end note
 
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

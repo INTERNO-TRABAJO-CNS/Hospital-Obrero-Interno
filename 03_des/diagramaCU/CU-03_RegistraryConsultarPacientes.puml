@@ -34,8 +34,11 @@ rectangle "Sistema de Gestión y Control de Citas Médicas\nHospital Obrero CNS"
 
 actor "Enfermería / Admisión" as ACTOR1
 ACTOR1 --> CU03
+actor "Asegurado titular" as ACTOR2
+ACTOR2 --> CU03
 note bottom of CU03
-  Antes de registrar, verificar la identificación y evitar pacientes duplicados.
+  El titular crea su cuenta con su número de afiliado; enfermería registra beneficiarios con la afiliación del titular y su CI. Evitar duplicados.
 end note
 
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

@@ -33,6 +33,8 @@ title CU-00: Diagrama General de Casos de Uso - Hospital Obrero CNS
 actor "Paciente" as Paciente
 actor "Enfermería / Admisión" as Enfermeria
 actor "Médico" as Medico
+actor "Pantalla TV (solo lectura)" as TV
+actor "Sistema (automático)" as Sistema
 actor "Administrador" as Admin
 
 rectangle "Sistema de Gestión y Control de Citas Médicas — Hospital Obrero CNS" as CNS {
@@ -40,12 +42,12 @@ rectangle "Sistema de Gestión y Control de Citas Médicas — Hospital Obrero C
   package "Paciente" {
     usecase "CU-04\nSolicitar Cita Médica" as CU04
     usecase "CU-08\nConsultar Citas del Paciente" as CU08
+    usecase "CU-10\nReprogramar Cita" as CU10
+    usecase "CU-11\nCancelar Cita" as CU11
   }
   package "Enfermería / Admisión" {
     usecase "CU-03\nRegistrar y Consultar Pacientes" as CU03
     usecase "CU-09\nConsultar Citas Registradas" as CU09
-    usecase "CU-10\nReprogramar Cita" as CU10
-    usecase "CU-11\nCancelar Cita" as CU11
     usecase "CU-18\nConsultar Historial de Cambios" as CU18
   }
   package "Médico" {
@@ -72,15 +74,16 @@ rectangle "Sistema de Gestión y Control de Citas Médicas — Hospital Obrero C
 Paciente -- CU01
 Paciente -- CU04
 Paciente -- CU08
+Paciente -- CU03
+Paciente -- CU10
+Paciente -- CU11
+Sistema -- CU11
+TV -- CU09
 Enfermeria -- CU01
 Enfermeria -- CU03
 Enfermeria -- CU09
-Enfermeria -- CU10
-Enfermeria -- CU11
 Enfermeria -- CU18
 Enfermeria -- CU12
-Enfermeria -- CU15
-Enfermeria -- CU07
 Medico -- CU01
 Medico -- CU12
 Medico -- CU13
@@ -98,21 +101,23 @@ CU05 ..> CU06 : <<include>>
 CU05 ..> CU07 : <<include>>
 CU07 ..> CU06 : <<include>>
 CU07 ..> CU16 : <<include>>
-CU10 ..> CU06 : <<include>>
+CU10 ..> CU11 : <<include>>
+CU10 ..> CU04 : <<deriva>>
 CU10 ..> CU16 : <<include>>
 CU11 ..> CU16 : <<include>>
 CU15 ..> CU12 : <<eventual>>
 
 note bottom of CU04
-  La solicitud especifica especialidad;
+  La solicitud especifica especialidad y día;
   la asignación posterior es automática.
 end note
 note bottom of CU17
-  Se activa cuando se aproxima la cita.
-  Canal y anticipación no están definidos.
+  Aviso 45 minutos antes de la cita.
+  Canal: aplicación y WebSocket.
 end note
 note bottom of CU16
   Servicio externo de notificaciones
   pendiente de definición.
 end note
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

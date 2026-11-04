@@ -26,16 +26,17 @@ skinparam note {
   BackgroundColor #FFF8E1
   BorderColor #C9A227
 }
-title CU-02: Gestionar Usuarios, Roles y Permisos
+title CU-02: Gestionar Usuarios, Roles y Catálogos
 
 rectangle "Sistema de Gestión y Control de Citas Médicas\nHospital Obrero CNS" as CNS {
-  usecase "CU-02\nGestionar Usuarios, Roles y Permisos" as CU02
+  usecase "CU-02\nGestionar Usuarios, Roles y Catálogos" as CU02
 }
 
 actor "Administrador" as ACTOR1
 ACTOR1 --> CU02
 note bottom of CU02
-  Los cambios de usuarios, roles y permisos solo se aplican después de validarse.
+  Gestiona usuarios, roles y catálogos (médicos, especialidades, consultorios, horarios, cupos 5-7, días no hábiles, pacientes). Los cambios se aplican solo tras validarse.
 end note
 
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

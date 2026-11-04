@@ -17,33 +17,32 @@ skinparam activity {
   StartColor #35628E
   EndColor #35628E
 }
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 title CU-15: Registrar datos de atención\nDiagrama de actividad
-|Médico / Enfermería autorizado|
+|Médico|
 start
-:Selecciona la cita que está siendo atendida;
-|Sistema CNS|
-if (¿Cita existente y usuario autorizado?) then (Sí)
+:Selecciona la cita en atención;
+|Sistema CNS (Java)|
+if (¿Cita de su agenda y en ASISTENCIA_CONFIRMADA?) then (Sí)
   ' Camino principal
 else (No / 1a)
-  :Impide registrar datos de atención [1a];
+  :Impide registrar la receta y finalizar la cita [1a];
   stop
 endif
-:Presenta los datos operativos disponibles;
-|Médico / Enfermería autorizado|
-:Registra la asistencia del paciente;
-:Registra tiempo de espera y tiempo de atención;
-|Registro operativo de atención|
-if (¿Datos operativos válidos?) then (Sí)
+:Muestra los datos autocompletados de afiliado, ficha, fecha, hora y consulta;
+|Médico|
+:Registra la medicación o receta;
+|Sistema CNS (Java)|
+if (¿Receta válida?) then (Sí)
   ' Camino principal
-else (No / 3a)
-  :No guarda, solicita corregir datos [3a];
+else (No / 2a)
+  :No confirma hasta corregir la información [2a];
   stop
 endif
-|Médico / Enfermería autorizado|
-:Confirma registro de la atención;
-|Registro operativo de atención|
-:Guarda asistencia y tiempos asociados a la cita;
-|Sistema CNS|
-:Permite actualizar estado mediante CU-12, si corresponde;
+:Agrega la receta al historial clínico;
+|Médico|
+:Registra el fin de la atención;
+|Control de estados / historial|
+:Guarda la hora de fin y cambia la cita a ATENDIDA mediante CU-12;
 stop
 @enduml

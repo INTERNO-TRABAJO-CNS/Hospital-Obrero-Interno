@@ -30,16 +30,19 @@ title CU-10: Reprogramar Cita
 
 rectangle "Sistema de Gestión y Control de Citas Médicas\nHospital Obrero CNS" as CNS {
   usecase "CU-10\nReprogramar Cita" as CU10
-  usecase "CU-06\nValidar Disponibilidad de Recursos" as CU06
+  usecase "CU-11\nCancelar Cita" as CU11
+  usecase "CU-04\nSolicitar Cita Médica" as CU04
   usecase "CU-16\nGenerar Notificación de Cita" as CU16
 }
 
-actor "Enfermería / Admisión" as ACTOR1
+actor "Paciente" as ACTOR1
 ACTOR1 --> CU10
-CU10 ..> CU06 : <<include>>
+CU10 ..> CU11 : <<include>>
+CU10 ..> CU04 : <<deriva>>
 CU10 ..> CU16 : <<include>>
 note bottom of CU10
-  Revalidar recursos antes de guardar la reprogramación y notificar al paciente.
+  Reprogramar = cancelar la cita vigente y enviar una nueva solicitud con prioridad menor.
 end note
 
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

@@ -37,7 +37,8 @@ note left of CU17
   No existe actor humano iniciador.
 end note
 note bottom of CU17
-  La cita debe seguir programada; anticipación y canal del recordatorio sin definir.
+  Aviso 45 minutos antes de la cita; la cita debe seguir programada y sin asistencia confirmada.
 end note
 
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

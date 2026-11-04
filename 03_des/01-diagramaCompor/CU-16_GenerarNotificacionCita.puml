@@ -17,28 +17,26 @@ skinparam activity {
   StartColor #35628E
   EndColor #35628E
 }
-title CU-16: Generar notificación de cita\nDiagrama de actividad
-|Evento de cita|
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-16: Generar notificación\nDiagrama de actividad
+|Sistema CNS (Java)|
 start
-:Se registra, modifica o cancela una cita;
-|Sistema CNS|
-if (¿Operación realmente confirmada?) then (Sí)
+:Detecta que una cita fue registrada o cancelada;
+if (¿La operación quedó confirmada?) then (Sí)
   ' Camino principal
 else (No / 1a)
-  :No genera avisos de cambios inexistentes [1a];
+  :No genera notificación [1a];
   stop
 endif
-:Identifica paciente y tipo de operación;
-|Generador de notificaciones|
-if (¿Información necesaria disponible?) then (Sí)
+:Identifica al paciente y el tipo de operación;
+if (¿Hay información completa?) then (Sí)
   ' Camino principal
 else (No / 2a)
-  :No genera aviso incompleto, requiere revisión [2a];
+  :No genera contenido incompleto [2a];
   stop
 endif
-:Prepara contenido coherente con el estado de la cita;
-:Genera la notificación para el paciente;
+:Genera la notificación;
 |Paciente|
-:Consulta o recibe información según canal por definir;
+:Recibe la notificación en la aplicación por WebSocket;
 stop
 @enduml

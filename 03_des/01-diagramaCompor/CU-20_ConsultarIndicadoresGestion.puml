@@ -40,10 +40,11 @@ else (No / 3a)
   :Indica falta de datos, no muestra valores sin respaldo [3a];
   stop
 endif
-:Consolida demanda, cancelaciones, inasistencias y tiempos;
+:Consolida demanda, cancelaciones (incluidas las automáticas), carga de trabajo y cumplimiento del mínimo de 5 fichas por médico;
 |Interfaz de indicadores|
 :Muestra indicadores de demanda y carga de trabajo médica;
 |Administrador|
 :Revisa información para toma de decisiones;
 stop
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

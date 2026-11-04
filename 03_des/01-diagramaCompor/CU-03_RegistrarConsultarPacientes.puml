@@ -17,34 +17,34 @@ skinparam activity {
   StartColor #35628E
   EndColor #35628E
 }
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 title CU-03: Registrar y consultar pacientes\nDiagrama de actividad
-|Enfermería / Admisión|
+|Titular o enfermería|
 start
-:Introduce identificación del paciente;
-|Sistema CNS|
-:Busca la identificación en los registros;
-|Registro de pacientes|
-if (¿El paciente ya está registrado?) then (No)
+:Ingresa el número de afiliado y, para un beneficiario, su CI;
+|Sistema CNS (Java)|
+:Valida el afiliado contra la tabla interna de afiliados;
+if (¿El afiliado existe en la tabla interna?) then (Sí)
   ' Camino principal
+else (No / 1b)
+  :No crea cuenta ni registro e informa que el afiliado no fue encontrado [1b];
+  stop
+endif
+:Busca si el paciente ya está registrado;
+if (¿Paciente ya registrado?) then (No / 2a)
+  |Titular o enfermería|
+  :Completa los datos requeridos y confirma;
+  |Sistema CNS (Java)|
+  if (¿Datos completos y válidos?) then (Sí)
+    :Registra al paciente sin duplicar y crea su historial clínico en la primera atención;
+  else (No / 3a)
+    :No registra y solicita completar o corregir la información [3a];
+    stop
+  endif
 else (Sí / 1a)
-  :Recupera y muestra el paciente existente, no duplica [1a];
-  stop
+  :Muestra el registro existente y evita crear un duplicado [1a];
 endif
-|Enfermería / Admisión|
-:Solicita registrar a un paciente nuevo;
-|Sistema CNS|
-:Habilita formulario de registro;
-|Enfermería / Admisión|
-:Completa datos requeridos y confirma;
-|Registro de pacientes|
-if (¿Datos válidos y sin duplicados?) then (Sí)
-  ' Camino principal
-else (No / 3a)
-  :No registra, solicita completar o corregir datos [3a];
-  stop
-endif
-:Registra el paciente identificado;
-|Sistema CNS|
-:Confirma el registro sin duplicidades;
+|Titular o enfermería|
+:Consulta el registro del paciente;
 stop
 @enduml

@@ -17,29 +17,29 @@ skinparam activity {
   StartColor #35628E
   EndColor #35628E
 }
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 title CU-07: Registrar cita confirmada\nDiagrama de actividad
-|Asignación / Enfermería|
+|Sistema CNS (Java)|
 start
-:Recibe asignación validada y datos de la cita;
-:Confirma registrar la cita cuando corresponda;
-|Validación (CU-06)|
-:Verifica que médico, horario y consultorio sigan libres;
-if (¿Asignación aún válida?) then (Sí)
+:Recibe la asignación validada con todos los datos;
+|Base de datos (PostgreSQL)|
+:Revalida la asignación dentro de la misma transacción;
+if (¿La asignación sigue válida?) then (Sí)
   ' Camino principal
 else (No / 2a)
-  :No registra, solicita nueva validación o asignación [2a];
+  :No registra y devuelve el proceso a una nueva asignación [2a];
   stop
 endif
-|Sistema CNS|
-if (¿Datos obligatorios completos?) then (Sí)
+|Sistema CNS (Java)|
+if (¿Datos completos?) then (Sí)
   ' Camino principal
 else (No / 3a)
-  :No confirma hasta completar datos [3a];
+  :No confirma hasta contar con la información necesaria [3a];
   stop
 endif
-:Registra paciente, especialidad, médico, fecha, hora y consultorio;
-:Marca estado inicial programada y confirma cita;
-|Notificación (CU-16)|
-:Genera notificación correspondiente (CU-16);
+:Genera el número de ficha y registra la cita en estado PROGRAMADA;
+:Marca la solicitud de origen como ASIGNADA;
+|Notificaciones (CU-16)|
+:Genera la notificación y emite la actualización por WebSocket;
 stop
 @enduml

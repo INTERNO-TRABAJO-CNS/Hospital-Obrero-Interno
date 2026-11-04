@@ -17,31 +17,32 @@ skinparam activity {
   StartColor #35628E
   EndColor #35628E
 }
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 title CU-11: Cancelar cita\nDiagrama de actividad
-|Enfermería / Admisión|
+|Paciente o sistema|
 start
-:Localiza la cita activa que requiere cancelación;
-|Sistema CNS|
-if (¿Existe una cita activa gestionable?) then (Sí)
-  ' Camino principal
-else (No / 1a)
-  :Informa que no puede cancelarse el registro [1a];
-  stop
+if (¿Quién origina la cancelación?) then (Paciente)
+  :Selecciona su cita programada y pide cancelarla;
+  |Sistema CNS (Java)|
+  if (¿Cita PROGRAMADA sin asistencia confirmada?) then (Sí)
+    |Paciente o sistema|
+    :Confirma la cancelación;
+    |Sistema CNS (Java)|
+    :Registra el motivo Cancelada por el paciente;
+  else (No / 1a-2a)
+    :Informa que la cancelación no puede ejecutarse [1a-2a];
+    stop
+  endif
+else (Sistema / A1)
+  |Proceso automático|
+  :Detecta que faltan 30 minutos y enfermería no confirmó la asistencia [A1];
+  |Sistema CNS (Java)|
+  :Registra el motivo No confirmó asistencia con usuario Sistema [A1];
 endif
-:Muestra datos de la cita y exige motivo;
-|Enfermería / Admisión|
-:Ingresa motivo y confirma cancelación;
-|Sistema CNS|
-if (¿Motivo informado y válido?) then (Sí)
-  ' Camino principal
-else (No / 3a)
-  :No cancela, solicita registrar el motivo [3a];
-  stop
-endif
-:Actualiza el estado de la cita a cancelada;
-|Historial de cambios|
-:Conserva motivo, operación y responsable;
-|Notificación (CU-16)|
-:Genera notificación de cancelación (CU-16);
+|Sistema CNS (Java)|
+:Cambia el estado a CANCELADA y conserva la cita;
+:Registra la operación en el historial CU-18;
+|Notificaciones (CU-16)|
+:Genera la notificación al paciente;
 stop
 @enduml

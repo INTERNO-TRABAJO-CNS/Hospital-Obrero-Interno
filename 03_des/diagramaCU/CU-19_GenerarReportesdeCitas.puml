@@ -35,7 +35,8 @@ rectangle "Sistema de Gestión y Control de Citas Médicas\nHospital Obrero CNS"
 actor "Administrador" as ACTOR1
 ACTOR1 --> CU19
 note bottom of CU19
-  Reportes de citas por estado, médico, especialidad y consultorio.
+  Reportes por estado, médico, especialidad y consultorio, y agenda de supervisión de solo lectura en tiempo real.
 end note
 
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

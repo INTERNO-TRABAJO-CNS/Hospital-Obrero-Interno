@@ -33,11 +33,14 @@ rectangle "Sistema de Gestión y Control de Citas Médicas\nHospital Obrero CNS"
   usecase "CU-16\nGenerar Notificación de Cita" as CU16
 }
 
-actor "Enfermería / Admisión" as ACTOR1
+actor "Paciente" as ACTOR1
 ACTOR1 --> CU11
+actor "Sistema (cancelación automática)" as ACTOR2
+ACTOR2 --> CU11
 CU11 ..> CU16 : <<include>>
 note bottom of CU11
-  La cancelación requiere motivo y debe conservarse para la trazabilidad.
+  El paciente cancela o el sistema cancela a los 30 min sin confirmación; la cita se conserva como CANCELADA.
 end note
 
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

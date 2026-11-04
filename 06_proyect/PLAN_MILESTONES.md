@@ -1,17 +1,17 @@
 # Plan de Milestones y Sprints — CNS Hospital Obrero
 
-**Versión:** propuesta de planificación del 23/10/2026. **Método del proyecto:** Modelo en V (desarrollo y verificación) + tablero Kanban para el flujo. Se conservan los nombres de backlog «Elaboración» y «Construcción» por su utilidad organizativa, sin convertir el proceso en una copia técnica de ChuroViaje.
+**Versión:** actualizada el 04/11/2026 (fechas reales de los Sprints 1–6; antes: propuesta del 23/10/2026). **Método del proyecto:** Modelo en V (desarrollo y verificación) + tablero Kanban para el flujo. Se conservan los nombres de backlog «Elaboración» y «Construcción» por su utilidad organizativa, sin convertir el proceso en una copia técnica de ChuroViaje.
 
 | GitHub Milestone (título exacto recomendado) | Inicio | Due date en GitHub | Objetivo y salida |
 |---|---|---|---|
-| Sprint 1 - Documentacion | Finalizado; fechas originales por confirmar | Dejar sin due date si no está confirmada | Documentos y avances ya realizados: no duplicar. |
-| Sprint 2 - Arquitectura MVC | 2026-10-19 | **2026-10-30** | Arquitectura Java MVC, dominio, reglas de asignación, UI v1, API, WS y esquema BD. |
-| Sprint 3 - Bases e identidad | 2026-11-02 | **2026-11-13** | Base Flutter/Java/PostgreSQL, identidad y pacientes. |
-| Sprint 4 - Gestion de citas | 2026-11-16 | **2026-11-27** | Disponibilidad, asignación, solicitud y confirmación, cambio/cancelación y agendas. |
-| Sprint 5 - Integracion y seguimiento | 2026-11-30 | **2026-12-11** | Reasignación, WebSocket, notificaciones, reportes, ambiente integrado. |
-| Sprint 6 - Validacion y entrega | 2026-12-14 | **2026-12-23** | Pruebas finales, rendimiento, seguridad, respaldo y entrega (sprint corto, nueva propuesta). |
+| Sprint 1 - Documentacion | 2026-10-01 | **2026-10-22** | Documentos y avances ya realizados: no duplicar. |
+| Sprint 2 - Arquitectura MVC | 2026-10-23 | **2026-10-29** | Arquitectura Java MVC, dominio, reglas de asignación, UI v1, API, WS y esquema BD. |
+| Sprint 3 - Bases e identidad | 2026-10-30 | **2026-11-05** | Base Flutter/Java/PostgreSQL, identidad y pacientes. |
+| Sprint 4 - Gestion de citas | 2026-11-06 | **2026-11-12** | Rama T100, catálogos, login/pacientes, agenda médica, historial del paciente (módulos con datos simulados). |
+| Sprint 5 - Integracion y seguimiento | 2026-11-13 | **2026-11-20** | Validación y asignación de citas, solicitud, listado/TV, confirmación de asistencia, cancelación, receta, notificaciones y aviso T-45. |
+| Sprint 6 - Validacion y entrega | 2026-11-21 | **2026-11-28** | Reportes y supervisión, reprogramar, historial de cambios, integración, pruebas finales y entrega. |
 
-GitHub Milestones registra **fecha límite**, no campo de fecha de inicio; anotar el inicio en la descripción. Sprint 2–5 mantienen las fechas de dos semanas usadas en la planificación reciente. Sprint 6 es una **ampliación propuesta** para no confundir desarrollo con la validación y evitar dar por completa la implementación al final de Sprint 5.
+GitHub Milestones registra **fecha límite**, no campo de fecha de inicio; anotar el inicio en la descripción. Fechas confirmadas por el equipo el 04/11/2026 (Sprint 1: 1–22 oct; 2: 23–29 oct; 3: 30 oct–5 nov; 4: 6–12 nov; 5: 13–20 nov; 6: 21–28 nov). El Sprint 1 dejó de estar «sin fecha».
 
 ## Qué crear primero en GitHub (sin usar gh)
 
@@ -31,46 +31,46 @@ GitHub Milestones registra **fecha límite**, no campo de fecha de inicio; anota
 
 **Description:**
 
-> Inicio: por confirmar. Etapa: Elaboración documental (ya finalizada). Objetivo: Documentación, requisitos, investigación y CU-01 a CU-20: conservar issues previos; sin recrearlos. Seguimiento mediante Issues, Pull Requests y trazabilidad RF-CU. Cerrar solo trabajos verificados.
+> Inicio: 2026-10-01. Etapa: Elaboración documental (ya finalizada). Objetivo: Documentación, requisitos, investigación y CU-01 a CU-20: conservar issues previos; sin recrearlos. Seguimiento mediante Issues, Pull Requests y trazabilidad RF-CU. Cerrar solo trabajos verificados.
 
-**Due date:** `SIN FECHA: confirmar el cierre del Sprint 1`
+**Due date:** `2026-10-22`
 
 ### Sprint 2 - Arquitectura MVC
 
 **Description:**
 
-> Inicio: 2026-10-19. Etapa: Elaboración. Objetivo: Modelo de dominio, MVC, reglas de asignación y reasignación, diseño UI v1, BD, contratos REST/WebSocket y revisión. Seguimiento mediante Issues, Pull Requests y trazabilidad RF-CU. Cerrar solo trabajos verificados.
+> Inicio: 2026-10-23. Etapa: Elaboración. Objetivo: Modelo de dominio, MVC, reglas de asignación y reasignación, diseño UI v1, BD, contratos REST/WebSocket y revisión. Seguimiento mediante Issues, Pull Requests y trazabilidad RF-CU. Cerrar solo trabajos verificados.
 
-**Due date:** `2026-10-30`
+**Due date:** `2026-10-29`
 
 ### Sprint 3 - Bases e identidad
 
 **Description:**
 
-> Inicio: 2026-11-02. Etapa: Construcción. Objetivo: Estructuras Java/Flutter, migraciones, seguridad/roles, pacientes y pruebas base. Seguimiento mediante Issues, Pull Requests y trazabilidad RF-CU. Cerrar solo trabajos verificados.
+> Inicio: 2026-10-30. Etapa: Construcción. Objetivo: Estructuras Java/Flutter, migraciones, seguridad/roles, pacientes y pruebas base. Seguimiento mediante Issues, Pull Requests y trazabilidad RF-CU. Cerrar solo trabajos verificados.
 
-**Due date:** `2026-11-13`
+**Due date:** `2026-11-05`
 
 ### Sprint 4 - Gestion de citas
 
 **Description:**
 
-> Inicio: 2026-11-16. Etapa: Construcción. Objetivo: Disponibilidad, asignación, consultas, confirmación, reprogramación, cancelación y agenda. Seguimiento mediante Issues, Pull Requests y trazabilidad RF-CU. Cerrar solo trabajos verificados.
+> Inicio: 2026-11-06. Etapa: Construcción. Objetivo: Rama T100, catálogos, login y pacientes, agenda médica e historial del paciente. Seguimiento mediante Issues, Pull Requests y trazabilidad RF-CU. Cerrar solo trabajos verificados.
 
-**Due date:** `2026-11-27`
+**Due date:** `2026-11-12`
 
 ### Sprint 5 - Integracion y seguimiento
 
 **Description:**
 
-> Inicio: 2026-11-30. Etapa: Construcción. Objetivo: Reasignación, WebSocket, notificaciones, atención, historial, indicadores y despliegue de prueba. Seguimiento mediante Issues, Pull Requests y trazabilidad RF-CU. Cerrar solo trabajos verificados.
+> Inicio: 2026-11-13. Etapa: Construcción. Objetivo: Validación y asignación, solicitud, listado y TV, confirmación de asistencia, cancelación, receta, notificaciones y aviso T-45. Seguimiento mediante Issues, Pull Requests y trazabilidad RF-CU. Cerrar solo trabajos verificados.
 
-**Due date:** `2026-12-11`
+**Due date:** `2026-11-20`
 
 ### Sprint 6 - Validacion y entrega
 
 **Description:**
 
-> Inicio: 2026-12-14. Etapa: Pruebas/Transición. Objetivo: Pruebas de extremo a extremo, concurrencia, seguridad, respaldo, correcciones y entrega. Seguimiento mediante Issues, Pull Requests y trazabilidad RF-CU. Cerrar solo trabajos verificados.
+> Inicio: 2026-11-21. Etapa: Pruebas/Transición. Objetivo: Pruebas de extremo a extremo, concurrencia, seguridad, respaldo, correcciones y entrega. Seguimiento mediante Issues, Pull Requests y trazabilidad RF-CU. Cerrar solo trabajos verificados.
 
-**Due date:** `2026-12-23`
+**Due date:** `2026-11-28`

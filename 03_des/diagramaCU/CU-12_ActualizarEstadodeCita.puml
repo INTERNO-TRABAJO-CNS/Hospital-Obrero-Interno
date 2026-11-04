@@ -34,10 +34,13 @@ rectangle "Sistema de Gestión y Control de Citas Médicas\nHospital Obrero CNS"
 
 actor "Médico" as ACTOR1
 ACTOR1 --> CU12
-actor "Enfermería autorizada" as ACTOR2
+actor "Enfermería" as ACTOR2
 ACTOR2 --> CU12
+actor "Sistema (cancelación automática)" as ACTOR3
+ACTOR3 --> CU12
 note bottom of CU12
-  Actualizar solo estados permitidos; conservar la operación para seguimiento.
+  Enfermería confirma asistencia; el médico registra el fin; estados: PROGRAMADA, ASISTENCIA_CONFIRMADA, ATENDIDA, CANCELADA.
 end note
 
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

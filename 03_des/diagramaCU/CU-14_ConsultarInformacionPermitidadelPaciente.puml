@@ -35,7 +35,8 @@ rectangle "Sistema de Gestión y Control de Citas Médicas\nHospital Obrero CNS"
 actor "Médico" as ACTOR1
 ACTOR1 --> CU14
 note bottom of CU14
-  Mostrar información básica e historial permitido de pacientes con cita asignada.
+  Mostrar nombre, citas pasadas, atenciones y recetas anteriores de pacientes con cita en su agenda.
 end note
 
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

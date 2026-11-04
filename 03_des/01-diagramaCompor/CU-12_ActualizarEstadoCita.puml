@@ -17,32 +17,35 @@ skinparam activity {
   StartColor #35628E
   EndColor #35628E
 }
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 title CU-12: Actualizar estado de cita\nDiagrama de actividad
-|Médico / Enfermería autorizado|
+|Enfermería o médico|
 start
-:Selecciona la cita que debe actualizarse;
-|Sistema CNS|
-:Muestra el estado actual de la cita;
-|Médico / Enfermería autorizado|
-:Selecciona el nuevo estado según evento ocurrido;
-|Control de estados / historial|
-if (¿El rol puede hacer esta actualización?) then (Sí)
+:Selecciona una cita del día;
+|Sistema CNS (Java)|
+:Muestra el estado actual y las acciones permitidas para su rol;
+if (¿El rol puede actualizar el estado?) then (Sí)
   ' Camino principal
 else (No / 2a)
-  :Rechaza cambio y conserva estado anterior [2a];
+  :Rechaza el cambio y conserva el estado anterior [2a];
   stop
 endif
-if (¿Cambio permitido para la situación actual?) then (Sí)
-  ' Camino principal
-else (No / 2b)
-  :No modifica la cita, informa estado inválido [2b];
-  stop
+if (¿Quién actualiza?) then (Enfermería)
+  if (¿Cita del día actual y hasta 30 minutos antes de su hora?) then (Sí)
+    :Confirma la asistencia y cambia a ASISTENCIA_CONFIRMADA;
+  else (No / 2c-2d)
+    :Rechaza porque no es del día o ya fue cancelada automáticamente [2c-2d];
+    stop
+  endif
+else (Médico)
+  if (¿Cita en ASISTENCIA_CONFIRMADA?) then (Sí)
+    :Registra el fin de la atención y cambia a ATENDIDA;
+  else (No / 2b)
+    :No modifica la cita e informa estado inválido [2b];
+    stop
+  endif
 endif
-|Médico / Enfermería autorizado|
-:Confirma el cambio de estado;
-|Sistema CNS|
-:Actualiza la cita con estado coherente;
 |Control de estados / historial|
-:Conserva operación para seguimiento y reportes;
+:Conserva la operación para seguimiento y reportes;
 stop
 @enduml

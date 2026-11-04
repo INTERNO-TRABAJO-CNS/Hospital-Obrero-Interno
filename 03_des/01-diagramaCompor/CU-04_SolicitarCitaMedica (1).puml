@@ -17,34 +17,43 @@ skinparam activity {
   StartColor #35628E
   EndColor #35628E
 }
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 title CU-04: Solicitar cita médica\nDiagrama de actividad
 |Paciente|
 start
 :Ingresa a la opción solicitar cita;
-|Aplicación móvil (Flutter)|
-:Muestra especialidades o atenciones;
+|Aplicación Flutter|
+:Muestra las especialidades Consultorio Familiar, Odontología y Pediatría;
 |Paciente|
-:Selecciona la especialidad que requiere;
+:Selecciona la especialidad;
 |Sistema CNS (Java)|
-if (¿Selección válida?) then (Sí)
+if (¿Especialidad válida?) then (Sí)
   ' Camino principal
 else (No / 2a)
   :Solicita seleccionar una especialidad válida [2a];
   stop
 endif
 |Paciente|
-:Confirma la solicitud, sin elegir médico ni horario;
+:Selecciona el día de atención;
 |Sistema CNS (Java)|
-:Registra solicitud asociada al paciente;
-|Asignación (CU-05)|
-:Recibe la solicitud para asignación automática (CU-05);
-if (¿Es posible asignar recursos?) then (Sí)
+if (¿Día hábil dentro de los 15 días hábiles y sin otra cita ese día?) then (Sí)
   ' Camino principal
-else (No / 4a)
-  :No confirma cita con recursos inexistentes u ocupados [4a];
+else (No / 3a)
+  :No permite confirmar y solicita elegir otro día [3a];
   stop
 endif
+|Paciente|
+:Confirma la solicitud sin elegir médico ni hora;
 |Sistema CNS (Java)|
-:Continúa el registro de la cita asignada;
+:Registra la solicitud en la cola con su orden de llegada;
+|Asignación (CU-05)|
+:Procesa la solicitud en orden de llegada;
+if (¿Hay cupo para el día solicitado?) then (Sí)
+  |Sistema CNS (Java)|
+  :Muestra la cita asignada con ficha, médico, hora y consultorio;
+else (No / 5a)
+  |Sistema CNS (Java)|
+  :Muestra NO HAY CUPOS y deja la solicitud EN_ESPERA para el siguiente día hábil [5a];
+endif
 stop
 @enduml

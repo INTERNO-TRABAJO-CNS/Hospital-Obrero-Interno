@@ -34,8 +34,11 @@ rectangle "Sistema de Gestión y Control de Citas Médicas\nHospital Obrero CNS"
 
 actor "Enfermería / Admisión" as ACTOR1
 ACTOR1 --> CU09
+actor "Pantalla TV (solo lectura)" as ACTOR2
+ACTOR2 --> CU09
 note bottom of CU09
-  Búsqueda de citas por paciente, médico, fecha, estado o consultorio.
+  Búsqueda de fichas del día actual por paciente, médico, estado o consultorio; la TV solo muestra el listado.
 end note
 
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 @enduml

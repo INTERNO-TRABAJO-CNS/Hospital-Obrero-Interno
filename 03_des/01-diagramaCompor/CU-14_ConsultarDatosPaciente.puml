@@ -17,31 +17,29 @@ skinparam activity {
   StartColor #35628E
   EndColor #35628E
 }
-title CU-14: Consultar información permitida del paciente\nDiagrama de actividad
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-14: Consultar historial del paciente\nDiagrama de actividad
 |Médico|
 start
 :Selecciona una cita de su agenda;
-|Sistema CNS / permisos y paciente|
-if (¿Cita asignada a este médico?) then (Sí)
+|Sistema CNS (Java)|
+if (¿La cita está en la agenda del médico?) then (Sí)
   ' Camino principal
 else (No / 1a)
-  :Impide consultar datos del paciente [1a];
+  :Impide acceder al historial del paciente [1a];
   stop
 endif
 |Médico|
-:Solicita información del paciente asociado;
-|Sistema CNS / permisos y paciente|
-:Determina información básica e historial permitido al rol;
-if (¿Datos solicitados autorizados?) then (Sí)
+:Solicita el historial del paciente;
+|Sistema CNS (Java)|
+:Recupera nombre, citas pasadas con fecha y hora, atenciones y recetas anteriores;
+if (¿Datos autorizados para el rol?) then (Sí)
   ' Camino principal
 else (No / 3a)
-  :Oculta datos restringidos [3a];
-  stop
+  :No muestra el dato restringido [3a];
 endif
-:Recupera únicamente información autorizada;
-|Interfaz clínica|
-:Muestra datos permitidos y protege los restringidos;
+:Muestra el historial permitido;
 |Médico|
-:Consulta información necesaria para atención;
+:Revisa la información sin modificarla;
 stop
 @enduml

@@ -17,35 +17,37 @@ skinparam activity {
   StartColor #35628E
   EndColor #35628E
 }
-title CU-02: Gestionar usuarios, roles y permisos\nDiagrama de actividad
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-02: Gestionar usuarios, roles y catálogos\nDiagrama de actividad
 |Administrador|
 start
-:Accede a gestión de usuarios y roles;
-|Sistema CNS / permisos|
-if (¿Tiene rol y permiso administrador?) then (Sí)
+:Abre la gestión de usuarios, roles y catálogos;
+|Sistema CNS (Java)|
+if (¿Tiene rol de administrador?) then (Sí)
   ' Camino principal
 else (No / 1a)
   :Impide el acceso a la administración [1a];
   stop
 endif
-|Interfaz de administración|
-:Presenta usuarios, roles y permisos disponibles;
+:Muestra usuarios, roles y catálogos de médicos, especialidades, consultorios, horarios, cupos, días no hábiles y pacientes;
 |Administrador|
-:Selecciona usuario o tarea administrativa;
-|Interfaz de administración|
-:Muestra configuración y permisos actuales;
-|Administrador|
-:Registra o modifica roles y permisos;
-|Sistema CNS / permisos|
-if (¿Se validan los cambios?) then (Sí)
+:Selecciona el registro y crea, modifica o elimina;
+|Sistema CNS (Java)|
+if (¿Cambio válido, con cupo de 5 a 7 fichas y duración dentro del rango?) then (Sí)
   ' Camino principal
 else (No / 3a)
-  :No guarda, solicita corregir información [3a];
+  :No guarda y solicita corregir la información [3a];
+  stop
+endif
+if (¿Afecta citas ya programadas?) then (No)
+  ' Camino principal
+else (Sí / 3b)
+  :No aplica el cambio mientras existan citas afectadas [3b];
   stop
 endif
 |Administrador|
 :Confirma la operación;
-|Sistema CNS / permisos|
-:Guarda cambios y aplica permisos al usuario afectado;
+|Base de datos (PostgreSQL)|
+:Guarda el cambio y deja la disponibilidad lista para la asignación;
 stop
 @enduml

@@ -17,34 +17,30 @@ skinparam activity {
   StartColor #35628E
   EndColor #35628E
 }
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
 title CU-09: Consultar citas registradas\nDiagrama de actividad
-|Enfermería / Admisión|
+|Enfermería o pantalla TV|
 start
-:Abre el módulo de consulta de citas;
-|Interfaz de consultas|
-:Presenta criterios de búsqueda disponibles;
-|Enfermería / Admisión|
-:Elige paciente, médico, fecha, estado o consultorio;
-|Sistema CNS / citas|
-if (¿Criterio completo y válido?) then (Sí)
+:Abre la consulta de fichas del día;
+|Sistema CNS (Java)|
+:Muestra los criterios paciente, médico, estado y consultorio con la fecha del día actual;
+|Enfermería o pantalla TV|
+:Selecciona el criterio y su valor;
+|Sistema CNS (Java)|
+if (¿Criterio válido y fecha del día actual?) then (Sí)
   ' Camino principal
-else (No / 2a)
-  :Solicita corregir el criterio de búsqueda [2a];
+else (No / 2a-2b)
+  :Solicita corregir el criterio o rechaza fechas distintas al día actual [2a-2b];
   stop
 endif
-|Enfermería / Admisión|
-:Ejecuta la búsqueda;
-|Sistema CNS / citas|
-:Busca citas según el filtro autorizado;
-if (¿Se encontraron coincidencias?) then (Sí)
+:Busca las fichas del día;
+if (¿Hay coincidencias?) then (Sí)
   ' Camino principal
 else (No / 3a)
-  :Informa que no se encontraron citas [3a];
+  :Informa que no se encontraron resultados [3a];
   stop
 endif
-|Interfaz de consultas|
-:Presenta los resultados al personal autorizado;
-|Enfermería / Admisión|
-:Revisa las citas registradas;
+|Enfermería o pantalla TV|
+:Revisa el listado de fichas en solo lectura;
 stop
 @enduml

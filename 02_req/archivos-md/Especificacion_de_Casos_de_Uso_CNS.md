@@ -10,7 +10,7 @@
 | Asignaturas | Taller de Sistema de Información (SIS-227) e Ingeniería de Software (SIS-213) |
 | Equipo de trabajo | Alejandro Álvaro Davila Albornoz, Abigal Noelia Farfan Chaves, Alex Sandro Ledezma Patiño, Benjamín Alejandro Sirpa Calizaya y Matias Alejandro García Suarez. |
 | Lugar y fecha de portada | Tarija, Bolivia — septiembre de 2026 |
-| Estado de los casos de uso | Borrador (según fichas individuales) |
+| Estado de los casos de uso | Borrador (según fichas individuales); CU-02 a CU-20 actualizados el 04/11/2026 (ver `06_proyect/CAMBIOS_04-11-2026.md`) |
 
 ## Índice de casos de uso
 
@@ -43,19 +43,19 @@ Relación de los **20 casos de uso** con sus requisitos funcionales y actores pr
 | --- | --- | --- | --- |
 | CU-01 | Iniciar Sesión | RF-01 | Paciente / Enfermería-Admisión / Médico / Administrador |
 | CU-02 | Gestionar usuarios roles y permisos | RF-02 | Administrador |
-| CU-03 | Registrar y consultar pacientes | RF-03 | Personal de Enfermería / Admisión |
+| CU-03 | Registrar y consultar pacientes | RF-03 | Asegurado titular / Personal de Enfermería / Admisión |
 | CU-04 | Solicitar cita médica | RF-04 | Paciente |
 | CU-05 | Asignar cita automáticamente | RF-05 | Sistema (proceso automático de asignación) |
 | CU-06 | Validar disponibilidad de Recursos | RF-06 | Sistema (proceso de validación) |
-| CU-07 | Registrar cita confirmada | RF-07 | Sistema, personal de Enfermería-Admisión |
+| CU-07 | Registrar cita confirmada | RF-07 | Sistema (proceso automático) |
 | CU-08 | Consultar cita paciente | RF-08 | Paciente |
-| CU-09 | Consultar citas registradas | RF-09 | Personal de enfermería / Admisión |
-| CU-10 | Reprogramar cita | RF-10 | Personal de enfermería / Admisión |
-| CU-11 | Cancelar cita | RF-11 | Personal de enfermería / Admisión |
-| CU-12 | Actualizar estado de cita | RF-12 | Médico / Personal de enfermería autorizado |
+| CU-09 | Consultar citas registradas | RF-09 | Personal de enfermería / Admisión; pantalla TV (solo lectura) |
+| CU-10 | Reprogramar cita | RF-10 | Paciente |
+| CU-11 | Cancelar cita | RF-11 | Paciente / Sistema (cancelación automática) |
+| CU-12 | Actualizar estado de cita | RF-12 | Personal de enfermería / Médico / Sistema |
 | CU-13 | Consultar agenda médica | RF-13 | Médico |
 | CU-14 | Consultar información permitida del paciente | RF-14 | Médico |
-| CU-15 | Registrar datos de atención | RF-15 | Médico / Personal de Enfermería autorizado |
+| CU-15 | Registrar datos de atención | RF-15 | Médico |
 | CU-16 | Generar notificación | RF-16 | Sistema (proceso automático) |
 | CU-17 | Generar recordatorio de cita | RF-17 | Sistema (proceso automático) |
 | CU-18 | Consultar historial de cambios | RF-18 | Personal de Enfermería / Administrador |
@@ -158,9 +158,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-02 |
 | Nombre del caso de uso: | Gestionar Usuarios, Roles y Permisos |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
@@ -175,7 +175,7 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Postcondiciones (Éxito): | • Los cambios de usuario, rol o permisos quedan guardados.<br>• Los permisos actualizados se aplican a las funciones disponibles para el usuario afectado. |
 | Garantía Mínima (Fallo): | Si el administrador no posee autorización o los datos no pueden validarse, no se aplican cambios a roles ni permisos. |
 | Actores Secundarios: | No se identifican sistemas externos en el documento base. |
-| Descripción Breve (Qué/Para qué): | Permite al administrador gestionar usuarios, roles y permisos de acceso para controlar quién puede utilizar cada función del sistema. Derivado de RF-02. |
+| Descripción Breve (Qué/Para qué): | Permite al administrador gestionar usuarios, roles y permisos y mantener los catálogos de operación (médicos, especialidades, consultorios, horarios de atención, disponibilidad, fichas y cupos, días no hábiles y pacientes) mediante crear, consultar, modificar y eliminar (CRUD). Derivado de RF-02, RU-11 y RU-13. |
 
 ### Modelo de contexto visual
 
@@ -196,10 +196,10 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
-| 1 | El administrador abre la gestión de usuarios y roles. | El sistema muestra los usuarios y roles disponibles para administración. |
-| 2 | El administrador selecciona un usuario o la opción de gestión correspondiente. | El sistema presenta la información y permisos actuales asociados. |
-| 3 | El administrador registra o modifica el rol y los permisos. | El sistema valida los cambios solicitados. |
-| 4 | El administrador confirma la operación. | El sistema guarda los cambios y aplica los permisos correspondientes. |
+| 1 | El administrador abre la gestión de usuarios, roles y catálogos. | El sistema muestra las opciones de administración disponibles. |
+| 2 | El administrador selecciona un usuario, rol o catálogo (médico, especialidad, consultorio, horario, cupos, días no hábiles, paciente). | El sistema presenta la información y permisos actuales. |
+| 3 | El administrador crea, modifica o elimina el registro. | El sistema valida el cambio (por ejemplo: cupo diario entre 5 y 7 fichas por médico y duración dentro del rango de la especialidad). |
+| 4 | El administrador confirma la operación. | El sistema guarda los cambios, aplica permisos o disponibilidad y los deja disponibles para la asignación de citas. |
 
 ### Diagrama de comportamiento UML
 
@@ -211,8 +211,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 | Paso Ref. | Condición de Desvío | Acción de Recuperación / Salida |
 | --- | --- | --- |
-| 1a | El usuario que intenta gestionar permisos no posee rol de administrador. | El sistema impide el acceso a la función de administración. |
+| 1a | El usuario que intenta gestionar no posee rol de administrador. | El sistema impide el acceso a la función de administración. |
 | 3a | La configuración solicitada no puede validarse. | El sistema no guarda los cambios y solicita corregir la información antes de confirmar. |
+| 3b | El cambio afectaría citas ya programadas (por ejemplo, eliminar un horario con fichas asignadas). | El sistema no aplica el cambio mientras existan citas programadas afectadas. |
 
 ### Requisitos especiales (no funcionales específicos)
 
@@ -224,7 +225,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 ### Variaciones de tecnología y datos
 
-- El documento base no especifica una jerarquía interna de permisos más allá de los roles definidos; su detalle deberá establecerse posteriormente.
+- Las cuentas de enfermería/secretaría (aprox. 15 a 20 personas) tendrán usuario y contraseña individuales; se implementa en una etapa posterior.
+
+- El administrador NO modifica citas asignadas: solo las supervisa (ver CU-19).
 
 <a id="cu-03"></a>
 
@@ -237,24 +240,24 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-03 |
 | Nombre del caso de uso: | Registrar y Consultar Pacientes |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
 | Campo | Detalle |
 | --- | --- |
 | Nombre del Caso de Uso: | CU-03: Registrar y Consultar Pacientes |
-| Actor Principal (Quién): | Personal de Enfermería / Admisión |
+| Actor Principal (Quién): | Asegurado titular (crea su cuenta) / Personal de Enfermería / Admisión (localiza o registra pacientes y crea el historial clínico en la primera atención) |
 | Nivel de Abstracción: | User Goal (Objetivo de usuario) |
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
-| Evento Disparador (Trigger): | El personal autorizado necesita localizar o registrar a un paciente para gestionar sus citas. |
-| Precondiciones (Cuándo): | • El personal se encuentra autenticado y autorizado.<br>• Se dispone de la identificación del paciente. |
-| Postcondiciones (Éxito): | • Si el paciente ya existe, se recupera su registro.<br>• Si no existe, el paciente queda registrado sin duplicar información. |
+| Evento Disparador (Trigger): | El asegurado titular desea crear su cuenta, o el personal necesita localizar o registrar a un paciente (titular o beneficiario) para gestionar sus citas. |
+| Precondiciones (Cuándo): | • Para la cuenta: el titular dispone de su número de afiliado.<br>• Para el beneficiario: se dispone de la afiliación del titular y del CI del beneficiario.<br>• El personal se encuentra autenticado y autorizado. |
+| Postcondiciones (Éxito): | • La cuenta del titular queda creada solo si su afiliado existe en la tabla interna de afiliados.<br>• Si el paciente ya existe, se recupera su registro; si no, queda registrado sin duplicar información.<br>• En la primera atención se crea su historial clínico. |
 | Garantía Mínima (Fallo): | Si se detecta un paciente ya registrado, el sistema evita crear un registro duplicado y conserva el registro existente. |
 | Actores Secundarios: | No se identifican sistemas externos de afiliación o identificación en el documento base. |
-| Descripción Breve (Qué/Para qué): | Permite al personal de enfermería/admisión registrar o localizar pacientes mediante su identificación, verificando previamente que no exista un registro duplicado. Derivado de RF-03 y RU-05. |
+| Descripción Breve (Qué/Para qué): | Permite al titular crear su cuenta validando su número de afiliado, y al personal de enfermería/admisión localizar o registrar titulares y beneficiarios (por afiliación del titular y CI del beneficiario) sin duplicados. Los beneficiarios no son afiliados ni tienen cuenta propia. Derivado de RF-03 y RU-05. |
 
 ### Modelo de contexto visual
 
@@ -266,8 +269,9 @@ Identificación de quiénes se preocupan por este caso de uso y qué garantías 
 
 | Parte Interesada (Stakeholder) | Interés en este Caso de Uso (Garantía exigida) |
 | --- | --- |
+| Asegurado titular | Crear su cuenta de forma sencilla con su número de afiliado. |
 | Enfermería / Admisión | Localizar o registrar pacientes de forma rápida y sin duplicaciones. |
-| Paciente | Mantener un único registro válido asociado a sus citas. |
+| Paciente / Beneficiario | Mantener un único registro e historial clínico asociado a sus citas. |
 
 ### Escenario principal de éxito (camino feliz / Happy Path)
 
@@ -275,10 +279,10 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
-| 1 | El personal ingresa la identificación del paciente. | El sistema busca si existe un paciente con esa identificación. |
-| 2 | Si no existe, el personal solicita registrar al paciente. | El sistema habilita el registro de la información necesaria. |
-| 3 | El personal completa la información requerida y confirma. | El sistema valida nuevamente que no exista duplicidad. |
-| 4 | — | El sistema registra al paciente y confirma la operación. |
+| 1 | El titular ingresa su número de afiliado para crear su cuenta, o el personal ingresa la afiliación del titular. | El sistema valida el afiliado contra la tabla interna de afiliados y busca si existe el paciente. |
+| 2 | Para un beneficiario, el personal ingresa su CI. | El sistema busca al beneficiario asociado a la afiliación del titular. |
+| 3 | Si no existe, el personal solicita registrar al paciente y completa los datos requeridos. | El sistema valida nuevamente que no exista duplicidad. |
+| 4 | — | El sistema registra al paciente, crea su historial clínico si es la primera atención y confirma la operación. |
 
 ### Diagrama de comportamiento UML
 
@@ -290,8 +294,10 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 | Paso Ref. | Condición de Desvío | Acción de Recuperación / Salida |
 | --- | --- | --- |
-| 1ª | El paciente ya se encuentra registrado. | El sistema muestra el registro existente y evita crear un duplicado. El flujo continúa con la consulta del paciente. |
-| 3a | La información necesaria para el registro está incompleta o no puede validarse. | El sistema no registra al paciente y solicita completar o corregir la información. |
+| 1a | El paciente ya se encuentra registrado. | El sistema muestra el registro existente y evita crear un duplicado. El flujo continúa con la consulta del paciente. |
+| 1b | El número de afiliado no figura en la tabla interna de afiliados. | El sistema no crea la cuenta ni el registro e informa que el afiliado no fue encontrado. |
+| 3a | La información necesaria está incompleta o no puede validarse. | El sistema no registra al paciente y solicita completar o corregir la información. |
+| 2a | El beneficiario no está registrado bajo la afiliación del titular. | El personal registra al beneficiario con su CI bajo esa afiliación y se crea su historial en la primera atención. |
 
 ### Requisitos especiales (no funcionales específicos)
 
@@ -303,7 +309,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 ### Variaciones de tecnología y datos
 
-- El documento base no define el tipo de identificador ni la integración con sistemas externos de afiliación; estos aspectos quedan pendientes de definición.
+- Solo los asegurados titulares crean cuenta; los beneficiarios (por ejemplo, la esposa o los hijos) se atienden con la afiliación del titular y su CI.
+
+- La validación del afiliado es interna al prototipo (tabla interna de afiliados); no hay integración con sistemas institucionales de la CNS.
 
 <a id="cu-04"></a>
 
@@ -316,9 +324,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-04 |
 | Nombre del caso de uso: | Solicitar Cita Médica |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
@@ -328,12 +336,12 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Actor Principal (Quién): | Paciente |
 | Nivel de Abstracción: | User Goal (Objetivo de usuario) |
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
-| Evento Disparador (Trigger): | El paciente requiere atención médica y solicita una cita según la especialidad o atención requerida. |
-| Precondiciones (Cuándo): | • El paciente se encuentra habilitado para solicitar atención.<br>• El paciente ha iniciado sesión con un rol autorizado. |
-| Postcondiciones (Éxito): | • La solicitud de cita queda registrada.<br>• El paciente no selecciona manualmente médico, fecha, hora ni consultorio.<br>• La solicitud queda disponible para el proceso de asignación automática. |
+| Evento Disparador (Trigger): | El paciente requiere atención médica y solicita una cita indicando la especialidad y el día en que desea ser atendido. |
+| Precondiciones (Cuándo): | • El paciente ha iniciado sesión con su cuenta.<br>• El paciente no tiene otra cita programada en el día solicitado.<br>• El día solicitado es un día hábil dentro de los próximos 15 días hábiles. |
+| Postcondiciones (Éxito): | • La solicitud queda registrada en la cola de solicitudes con su orden de llegada.<br>• El paciente selecciona solo especialidad y día; no selecciona médico, hora ni consultorio.<br>• La solicitud queda disponible para la asignación automática (CU-05). |
 | Garantía Mínima (Fallo): | Si no se puede registrar la solicitud, no se confirma ninguna cita ni se asignan recursos. |
 | Actores Secundarios: | CU-05 Asignar Cita Automáticamente, como proceso relacionado posterior a la solicitud. |
-| Descripción Breve (Qué/Para qué): | Permite al paciente solicitar una cita indicando la especialidad o atención requerida, sin elegir manualmente médico, fecha, hora o consultorio. Derivado de RF-04 y RU-01. |
+| Descripción Breve (Qué/Para qué): | Permite al paciente solicitar una cita indicando la especialidad (Consultorio Familiar / Medicina General, Odontología o Pediatría) y el día de atención, sin elegir médico, hora ni consultorio. Si no hay cupos muestra «NO HAY CUPOS» y la solicitud pasa a lista de espera. Derivado de RF-04 y RU-01. |
 
 ### Modelo de contexto visual
 
@@ -354,10 +362,12 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
-| 1 | El paciente accede a la opción de solicitar cita. | El sistema muestra las especialidades o atenciones disponibles para solicitud. |
-| 2 | El paciente selecciona la especialidad o atención requerida. | El sistema registra la selección para la solicitud. |
-| 3 | El paciente confirma la solicitud. | El sistema registra la solicitud sin exigir seleccionar médico, fecha, hora o consultorio. |
-| 4 | — | El sistema deriva la solicitud al proceso de asignación automática de cita (CU-05). |
+| 1 | El paciente accede a la opción de solicitar cita. | El sistema muestra las especialidades disponibles. |
+| 2 | El paciente selecciona la especialidad. | El sistema registra la selección. |
+| 3 | El paciente selecciona el día de atención. | El sistema valida que sea día hábil, que esté dentro de los 15 días hábiles y que el paciente no tenga otra cita ese día. |
+| 4 | El paciente confirma la solicitud. | El sistema registra la solicitud (ID de afiliado, especialidad, día y orden de llegada) en la cola. |
+| 5 | — | El sistema deriva la solicitud al proceso de asignación automática (CU-05). |
+| 6 | — | El sistema muestra al paciente la cita asignada (ficha, médico, especialidad, fecha, hora y consultorio) o el mensaje «NO HAY CUPOS» con la solicitud en espera. |
 
 ### Diagrama de comportamiento UML
 
@@ -369,20 +379,25 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 | Paso Ref. | Condición de Desvío | Acción de Recuperación / Salida |
 | --- | --- | --- |
-| 2a | El paciente no selecciona una especialidad o atención válida. | El sistema no permite confirmar la solicitud y solicita completar la selección. |
-| 4a | No existe disponibilidad que permita una asignación inmediata. | El sistema no confirma una cita con recursos inexistentes u ocupados e informa que no fue posible completar la asignación. |
+| 2a | El paciente no selecciona una especialidad válida. | El sistema no permite confirmar la solicitud y solicita completar la selección. |
+| 3a | El día no es hábil, está fuera de los 15 días hábiles o el paciente ya tiene una cita ese día. | El sistema no permite confirmar y solicita elegir otro día. |
+| 5a | No existen cupos para el día solicitado. | El sistema informa «NO HAY CUPOS», deja la solicitud EN_ESPERA para el siguiente día hábil (hasta 15 días hábiles) y no confirma ninguna cita; la solicitud sigue pendiente hasta encontrar disponibilidad. |
 
 ### Requisitos especiales (no funcionales específicos)
 
 - **Seguridad:** Solo el paciente autenticado debe poder registrar solicitudes a su nombre.
 
-- **Usabilidad:** La solicitud no debe exigir al paciente seleccionar manualmente médico, fecha, hora o consultorio.
+- **Usabilidad:** La solicitud exige únicamente especialidad y día; nunca médico, hora ni consultorio.
 
 - **Consistencia:** La posterior asignación debe utilizar disponibilidad vigente, conforme RNF-03.
 
+- **Portabilidad:** La pantalla debe funcionar en móvil y computadora, conforme RNF-07.
+
 ### Variaciones de tecnología y datos
 
-- El documento base no define reglas de preferencia, prioridad o cola para solicitudes sin disponibilidad; deben validarse con la institución.
+- La prioridad de las solicitudes y la lista de espera se definen en CU-05.
+
+- Cambio 04/11/2026: se agrega la selección del día (antes el paciente solo indicaba la especialidad).
 
 <a id="cu-05"></a>
 
@@ -395,9 +410,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-05 |
 | Nombre del caso de uso: | Asignar Cita Automáticamente |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
@@ -407,12 +422,12 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Actor Principal (Quién): | Sistema (proceso automático de asignación) |
 | Nivel de Abstracción: | Subfunction |
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
-| Evento Disparador (Trigger): | Existe una solicitud de cita válida que debe ser procesada según la especialidad requerida. |
-| Precondiciones (Cuándo): | • Existe una solicitud de cita registrada.<br>• Se dispone de información vigente de médicos, horarios y consultorios. |
-| Postcondiciones (Éxito): | • Se asigna un médico de la especialidad requerida, una fecha, una hora y un consultorio disponibles.<br>• La asignación queda preparada para su registro y confirmación. |
+| Evento Disparador (Trigger): | Existe una solicitud de cita válida en la cola de solicitudes. |
+| Precondiciones (Cuándo): | • Existe al menos una solicitud registrada en la cola.<br>• Se dispone de información vigente de médicos, horarios, consultorios y fichas. |
+| Postcondiciones (Éxito): | • Se asigna un médico de la especialidad, una hora y un consultorio dentro del día solicitado y se genera el número de ficha.<br>• Si no hay cupo, la solicitud queda EN_ESPERA para el siguiente día hábil (hasta 15 días hábiles).<br>• La asignación queda preparada para su registro (CU-07). |
 | Garantía Mínima (Fallo): | Si no existen recursos compatibles disponibles, el sistema no confirma una asignación inválida ni duplica recursos. |
 | Actores Secundarios: | CU-06 Validar Disponibilidad de Recursos y CU-07 Registrar Cita Confirmada. |
-| Descripción Breve (Qué/Para qué): | Procesa una solicitud de cita y selecciona automáticamente recursos compatibles disponibles, evitando que el paciente tenga que buscar manualmente médicos y horarios. Derivado de RF-05 y RU-02. |
+| Descripción Breve (Qué/Para qué): | Procesa las solicitudes de la cola en orden de llegada y asigna automáticamente médico, hora y consultorio con cupo. Las solicitudes que provienen de cancelaciones del paciente se atienden con menor prioridad que las de pacientes que no cancelaron. Derivado de RF-05 y RU-02. |
 
 ### Modelo de contexto visual
 
@@ -434,10 +449,10 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
-| 1 | — | El sistema recibe una solicitud válida con la especialidad requerida. |
-| 2 | — | El sistema consulta la disponibilidad vigente de médicos, horarios y consultorios. |
+| 1 | — | El sistema toma la siguiente solicitud de la cola según orden de llegada y prioridad. |
+| 2 | — | El sistema consulta la disponibilidad vigente de los médicos de la especialidad para el día solicitado (máximo 7 fichas por médico y día). |
 | 3 | — | El sistema valida la combinación de recursos mediante CU-06. |
-| 4 | — | El sistema selecciona una combinación disponible de médico, fecha, hora y consultorio. |
+| 4 | — | El sistema asigna un médico con cupo y una hora según la duración de la especialidad; varios médicos pueden atender a la misma hora porque cada uno tiene su consultorio. |
 | 5 | — | El sistema envía la asignación validada al registro de cita confirmada (CU-07). |
 
 ### Diagrama de comportamiento UML
@@ -450,8 +465,10 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 | Paso Ref. | Condición de Desvío | Acción de Recuperación / Salida |
 | --- | --- | --- |
-| 2a | No existen recursos disponibles para la especialidad requerida. | El sistema no confirma una cita y comunica que no existe una asignación disponible con la información vigente. |
-| 3a | Un recurso deja de estar disponible durante el procesamiento. | El sistema descarta esa combinación y continúa evaluando otra disponibilidad compatible, sin duplicar el recurso ocupado. |
+| 2a | No existen cupos para el día solicitado. | El sistema informa «NO HAY CUPOS», coloca la solicitud EN_ESPERA para el siguiente día hábil y repite la búsqueda ese día. |
+| 2b | Se agotaron los 15 días hábiles sin cupo. | La solicitud queda en estado SIN_CUPO, no se crea cita y se informa al paciente. |
+| 3a | Un recurso deja de estar disponible durante el procesamiento. | El sistema descarta esa combinación y continúa con otra compatible, sin duplicar el recurso ocupado. |
+| 3b | Dos solicitudes simultáneas compiten por el mismo cupo. | PostgreSQL permite que solo una obtenga el cupo; la otra continúa con la siguiente opción o pasa a espera. |
 
 ### Requisitos especiales (no funcionales específicos)
 
@@ -463,7 +480,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 ### Variaciones de tecnología y datos
 
-- El documento base no define el criterio de prioridad para elegir entre varias combinaciones disponibles; este criterio debe acordarse con la institución.
+- Criterio de desempate entre médicos con cupo: PENDIENTE de validar (propuesta por defecto: el médico con menos fichas ese día).
+
+- La reasignación automática de cupos liberados por cancelaciones NO se implementa por ahora (decisión 04/11/2026).
 
 <a id="cu-06"></a>
 
@@ -476,9 +495,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-06 |
 | Nombre del caso de uso: | Validar Disponibilidad de Recursos |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
@@ -488,12 +507,12 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Actor Principal (Quién): | Sistema (proceso de validación) |
 | Nivel de Abstracción: | Subfunction |
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
-| Evento Disparador (Trigger): | Una solicitud, confirmación o reprogramación requiere verificar médico, horario y consultorio. |
+| Evento Disparador (Trigger): | Una solicitud o confirmación requiere verificar médico, horario, consultorio y fichas del día. |
 | Precondiciones (Cuándo): | • Existe una combinación candidata de médico, fecha, hora y consultorio.<br>• La información de disponibilidad se encuentra accesible para validación. |
 | Postcondiciones (Éxito): | • La combinación queda marcada como disponible o no disponible.<br>• No se permite confirmar una combinación con recursos ocupados o solapados. |
 | Garantía Mínima (Fallo): | Ante incertidumbre o conflicto de disponibilidad, el sistema no confirma la combinación como válida. |
-| Actores Secundarios: | CU-05 Asignar Cita Automáticamente, CU-07 Registrar Cita Confirmada y CU-10 Reprogramar Cita utilizan esta validación. |
-| Descripción Breve (Qué/Para qué): | Verifica la disponibilidad del médico, horario y consultorio antes de confirmar o modificar una cita, impidiendo solapamientos. Derivado de RF-06 y RU-07. |
+| Actores Secundarios: | CU-05 Asignar Cita Automáticamente y CU-07 Registrar Cita Confirmada utilizan esta validación. |
+| Descripción Breve (Qué/Para qué): | Verifica la disponibilidad del médico, horario y consultorio antes de confirmar una cita, impidiendo solapamientos y respetando el máximo de 7 fichas por médico y día y la duración de la especialidad. Derivado de RF-06 y RU-07. |
 
 ### Modelo de contexto visual
 
@@ -516,10 +535,11 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
 | 1 | — | El sistema recibe una combinación candidata de médico, fecha, hora y consultorio. |
-| 2 | — | El sistema consulta el estado vigente del médico y horario. |
+| 2 | — | El sistema consulta el estado vigente del médico y su horario de atención (incluidos días no hábiles). |
 | 3 | — | El sistema consulta el estado vigente del consultorio. |
-| 4 | — | El sistema verifica que no exista otra cita incompatible o solapada. |
-| 5 | — | El sistema devuelve el resultado de disponibilidad al proceso que solicitó la validación. |
+| 4 | — | El sistema verifica que el médico tenga menos de 7 fichas ese día, que la duración quepa en su horario y que el paciente no tenga otra cita ese día. |
+| 5 | — | El sistema verifica que no exista otra cita incompatible o solapada. |
+| 6 | — | El sistema devuelve el resultado de disponibilidad al proceso que solicitó la validación. |
 
 ### Diagrama de comportamiento UML
 
@@ -533,7 +553,8 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | --- | --- | --- |
 | 2a | El médico o el horario ya se encuentra ocupado. | El sistema marca la combinación como no disponible y evita su confirmación. |
 | 3a | El consultorio ya se encuentra ocupado. | El sistema marca la combinación como no disponible y evita su confirmación. |
-| 4a | Dos solicitudes intentan confirmar el mismo recurso y horario. | El sistema permite que únicamente una confirme el recurso; la otra debe continuar sin generar doble asignación. |
+| 4a | El médico ya tiene 7 fichas ese día o el paciente ya tiene una cita ese día. | El sistema marca la combinación como no disponible. |
+| 5a | Dos solicitudes intentan confirmar el mismo recurso y horario. | El sistema permite que únicamente una confirme el recurso; la otra debe continuar sin generar doble asignación. |
 
 ### Requisitos especiales (no funcionales específicos)
 
@@ -545,7 +566,11 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 ### Variaciones de tecnología y datos
 
-- El documento base no define límites de capacidad adicionales ni reglas específicas por especialidad; deberán documentarse si la CNS las establece.
+- Concurrencia: se garantiza en PostgreSQL con SELECT … FOR UPDATE SKIP LOCKED sobre la cola y una restricción UNIQUE (médico, fecha, hora) como respaldo (RNF-04).
+
+- Duración por cita (rango aceptado): Medicina General 30–45 min, Odontología 45–60 min, Pediatría 30–45 min. Cada médico tiene una duración fija configurable dentro del rango de su especialidad.
+
+- Cada médico debe atender entre 5 (meta de cumplimiento, supervisada por el administrador) y 7 fichas por día (cupo máximo que bloquea la asignación).
 
 <a id="cu-07"></a>
 
@@ -558,24 +583,24 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-07 |
 | Nombre del caso de uso: | Registrar Cita Confirmada |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
 | Campo | Detalle |
 | --- | --- |
 | Nombre del Caso de Uso: | CU-07: Registrar Cita Confirmada |
-| Actor Principal (Quién): | Sistema / Personal de Enfermería-Admisión |
+| Actor Principal (Quién): | Sistema (proceso automático) |
 | Nivel de Abstracción: | Subfunction |
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
 | Evento Disparador (Trigger): | Existe una asignación de cita validada y se solicita su confirmación. |
 | Precondiciones (Cuándo): | • La asignación de recursos fue validada como disponible.<br>• Se cuenta con paciente, especialidad, médico, fecha, hora y consultorio. |
-| Postcondiciones (Éxito): | • La cita queda almacenada con paciente, especialidad, médico, fecha, hora, consultorio y estado inicial.<br>• La cita queda disponible para consulta y seguimiento. |
+| Postcondiciones (Éxito): | • La cita queda almacenada con paciente, especialidad, médico, fecha, hora, consultorio, número de ficha y estado inicial PROGRAMADA.<br>• La solicitud de origen pasa a ASIGNADA.<br>• La cita queda disponible para consulta y seguimiento. |
 | Garantía Mínima (Fallo): | Si la asignación deja de ser válida antes de confirmar, la cita no se registra con recursos en conflicto. |
 | Actores Secundarios: | CU-06 Validar Disponibilidad de Recursos y CU-16 Generar Notificación de Cita. |
-| Descripción Breve (Qué/Para qué): | Registra de forma definitiva una cita previamente validada, asociando todos los datos necesarios para su seguimiento. Derivado de RF-07. |
+| Descripción Breve (Qué/Para qué): | Registra de forma definitiva una cita previamente validada, generando su número de ficha y asociando todos los datos necesarios para su seguimiento. Derivado de RF-07. |
 
 ### Modelo de contexto visual
 
@@ -598,10 +623,10 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
 | 1 | — | El sistema recibe una asignación validada con todos los datos requeridos. |
-| 2 | El personal confirma la cita cuando corresponda. | El sistema verifica que la asignación siga siendo válida antes de guardar. |
-| 3 | — | El sistema registra paciente, especialidad, médico, fecha, hora, consultorio y estado inicial. |
-| 4 | — | El sistema confirma el registro de la cita y la deja disponible para seguimiento. |
-| 5 | — | El sistema genera la notificación correspondiente mediante CU-16. |
+| 2 | — | El sistema verifica, dentro de una misma transacción, que la asignación siga siendo válida antes de guardar. |
+| 3 | — | El sistema genera el número de ficha y registra paciente, especialidad, médico, fecha, hora, consultorio y estado PROGRAMADA. |
+| 4 | — | El sistema confirma el registro, marca la solicitud como ASIGNADA y deja la cita disponible para seguimiento. |
+| 5 | — | El sistema genera la notificación (CU-16) y emite la actualización en tiempo real (WebSocket) a las pantallas afectadas. |
 
 ### Diagrama de comportamiento UML
 
@@ -626,7 +651,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 ### Variaciones de tecnología y datos
 
-- El documento base contempla “programada” como estado de una cita; se utiliza como referencia para el estado inicial del registro.
+- El estado inicial es PROGRAMADA. El número de ficha es secuencial por médico y día (propuesta pendiente de validar).
+
+- Cambio 04/11/2026: la confirmación es automática; ya no la realiza el personal de enfermería.
 
 <a id="cu-08"></a>
 
@@ -639,9 +666,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-08 |
 | Nombre del caso de uso: | Consultar Citas del Paciente |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
@@ -656,7 +683,7 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Postcondiciones (Éxito): | • El paciente visualiza únicamente sus propias citas.<br>• La consulta no modifica los datos de las citas. |
 | Garantía Mínima (Fallo): | Si no existen citas, el sistema informa que no hay registros para mostrar sin exponer información de otros pacientes. |
 | Actores Secundarios: | No se identifican sistemas externos en el documento base. |
-| Descripción Breve (Qué/Para qué): | Permite al paciente consultar cuándo, dónde y con quién será atendido, mostrando únicamente las citas que le pertenecen. Derivado de RF-08 y RU-03. |
+| Descripción Breve (Qué/Para qué): | Permite al paciente consultar cuándo, dónde y con quién será atendido (número de ficha, médico, especialidad, fecha, hora, consultorio y estado), mostrando únicamente sus citas, y desde allí cancelar (CU-11) o reprogramar (CU-10). Derivado de RF-08 y RU-03. |
 
 ### Modelo de contexto visual
 
@@ -679,8 +706,8 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 | --- | --- | --- |
 | 1 | El paciente abre la opción de consultar sus citas. | El sistema identifica al paciente autenticado. |
 | 2 | — | El sistema busca únicamente las citas asociadas a ese paciente. |
-| 3 | El paciente revisa la lista de citas. | El sistema muestra las citas encontradas con médico, especialidad, fecha, hora, consultorio y estado. |
-| 4 | El paciente selecciona una cita. | El sistema muestra el detalle permitido de la cita seleccionada. |
+| 3 | El paciente revisa la lista de citas. | El sistema muestra las citas con ficha, médico, especialidad, fecha, hora, consultorio y estado. |
+| 4 | El paciente selecciona una cita. | El sistema muestra el detalle permitido y las acciones disponibles: cancelar (CU-11) o reprogramar (CU-10) si está PROGRAMADA. |
 
 ### Diagrama de comportamiento UML
 
@@ -718,24 +745,24 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-09 |
 | Nombre del caso de uso: | Consultar Citas Registradas |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
 | Campo | Detalle |
 | --- | --- |
 | Nombre del Caso de Uso: | CU-09: Consultar Citas Registradas |
-| Actor Principal (Quién): | Personal de Enfermería / Admisión |
+| Actor Principal (Quién): | Personal de Enfermería / Admisión (y pantalla de sala de espera TV, solo lectura) |
 | Nivel de Abstracción: | User Goal (Objetivo de usuario) |
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
-| Evento Disparador (Trigger): | El personal autorizado necesita localizar una o más citas registradas. |
+| Evento Disparador (Trigger): | El personal necesita localizar fichas del día actual o una pantalla de sala de espera debe mostrar el listado de fichas del día. |
 | Precondiciones (Cuándo): | • El usuario se encuentra autenticado y autorizado.<br>• Existen citas registradas o criterios de búsqueda válidos. |
-| Postcondiciones (Éxito): | • Se presentan las citas coincidentes con el criterio seleccionado.<br>• La consulta no modifica los registros. |
+| Postcondiciones (Éxito): | • Se presentan las fichas del día actual coincidentes con el criterio seleccionado.<br>• La consulta no modifica los registros. |
 | Garantía Mínima (Fallo): | Si no existen coincidencias, el sistema informa que no se encontraron citas sin alterar la información almacenada. |
 | Actores Secundarios: | No se identifican sistemas externos en el documento base. |
-| Descripción Breve (Qué/Para qué): | Permite al personal autorizado consultar citas por paciente, médico, fecha, estado o consultorio para localizar rápidamente la información necesaria. Derivado de RF-09 y RU-06. |
+| Descripción Breve (Qué/Para qué): | Permite al personal consultar las fichas del día actual por paciente, médico, estado o consultorio. Una pantalla de TV en sala de espera muestra, solo lectura, el listado de fichas del día. No permite consultar ni modificar fechas posteriores. Derivado de RF-09 y RU-06. |
 
 ### Modelo de contexto visual
 
@@ -756,10 +783,10 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
-| 1 | El personal abre la opción de consulta de citas. | El sistema muestra los criterios de búsqueda habilitados. |
-| 2 | El personal selecciona un criterio: paciente, médico, fecha, estado o consultorio. | El sistema recibe el criterio y el valor de búsqueda. |
-| 3 | El personal ejecuta la consulta. | El sistema busca las citas coincidentes. |
-| 4 | El personal revisa los resultados. | El sistema presenta las citas que cumplen el criterio seleccionado. |
+| 1 | El personal abre la opción de consulta de fichas del día. | El sistema muestra los criterios de búsqueda habilitados (fecha fija: día actual). |
+| 2 | El personal selecciona un criterio: paciente, médico, estado o consultorio. | El sistema recibe el criterio y el valor de búsqueda. |
+| 3 | El personal ejecuta la consulta. | El sistema busca las fichas del día coincidentes. |
+| 4 | El personal revisa los resultados. | El sistema presenta las fichas que cumplen el criterio. |
 
 ### Diagrama de comportamiento UML
 
@@ -771,8 +798,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 | Paso Ref. | Condición de Desvío | Acción de Recuperación / Salida |
 | --- | --- | --- |
-| 3a | No existen citas que coincidan con el criterio. | El sistema informa que no se encontraron resultados. |
+| 3a | No existen fichas que coincidan con el criterio. | El sistema informa que no se encontraron resultados. |
 | 2a | El criterio de búsqueda está incompleto o no es válido. | El sistema solicita corregir el criterio antes de ejecutar la consulta. |
+| 2b | Se intenta consultar una fecha distinta del día actual. | El sistema no lo permite para este rol. |
 
 ### Requisitos especiales (no funcionales específicos)
 
@@ -784,7 +812,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 ### Variaciones de tecnología y datos
 
-- Los criterios definidos en el documento base son paciente, médico, fecha, estado y consultorio.
+- Panel de TV (solo lectura): muestra número de ficha, especialidad, médico, hora y estado de las fichas del día; no muestra datos clínicos. La autenticación de la pantalla queda pendiente.
+
+- Los criterios son paciente, médico, estado y consultorio; la fecha siempre es el día actual (cambio 04/11/2026).
 
 <a id="cu-10"></a>
 
@@ -797,24 +827,24 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-10 |
 | Nombre del caso de uso: | Reprogramar Cita |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
 | Campo | Detalle |
 | --- | --- |
 | Nombre del Caso de Uso: | CU-10: Reprogramar Cita |
-| Actor Principal (Quién): | Personal de Enfermería / Admisión |
+| Actor Principal (Quién): | Paciente |
 | Nivel de Abstracción: | User Goal (Objetivo de usuario) |
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
-| Evento Disparador (Trigger): | Existe una cita registrada que requiere modificación o reprogramación. |
-| Precondiciones (Cuándo): | • El personal se encuentra autenticado y autorizado.<br>• La cita a reprogramar existe. |
-| Postcondiciones (Éxito): | • La cita queda actualizada únicamente si la nueva combinación de recursos es válida.<br>• El cambio queda disponible para historial y notificación. |
-| Garantía Mínima (Fallo): | Si no existe disponibilidad compatible, la cita no se actualiza con una combinación en conflicto. |
-| Actores Secundarios: | CU-06 Validar Disponibilidad de Recursos, CU-16 Generar Notificación de Cita y CU-18 Consultar Historial de Cambios. |
-| Descripción Breve (Qué/Para qué): | Permite al personal autorizado modificar o reprogramar una cita, validando nuevamente médico, horario y consultorio antes de guardar los cambios. Derivado de RF-10 y RU-06. |
+| Evento Disparador (Trigger): | El paciente necesita cambiar el día de una cita programada. |
+| Precondiciones (Cuándo): | • El paciente está autenticado.<br>• Existe una cita programada del paciente. |
+| Postcondiciones (Éxito): | • La cita vigente queda CANCELADA (CU-11) y su cupo libre.<br>• Se registra una nueva solicitud para el siguiente día hábil con menor prioridad que las solicitudes de pacientes que no cancelaron. |
+| Garantía Mínima (Fallo): | El paciente es informado de que reprogramar implica cancelar la cita vigente antes de confirmar; si desiste, la cita se conserva. |
+| Actores Secundarios: | CU-11 Cancelar Cita, CU-04 Solicitar Cita Médica, CU-05 Asignar Cita Automáticamente, CU-16 Generar Notificación de Cita y CU-18 Consultar Historial de Cambios. |
+| Descripción Breve (Qué/Para qué): | Reprogramar equivale a cancelar la cita vigente (CU-11) y enviar una nueva solicitud (CU-04) que se atiende con menor prioridad para el siguiente día hábil con cupo. El personal de enfermería no reprograma citas. Derivado de RF-10 y RU-03. |
 
 ### Modelo de contexto visual
 
@@ -826,9 +856,9 @@ Identificación de quiénes se preocupan por este caso de uso y qué garantías 
 
 | Parte Interesada (Stakeholder) | Interés en este Caso de Uso (Garantía exigida) |
 | --- | --- |
-| Enfermería / Admisión | Ajustar citas cuando sea necesario sin provocar conflictos de horario. |
-| Paciente | Recibir información correcta sobre su cita reprogramada. |
-| Médico | Mantener una agenda actualizada y sin solapamientos. |
+| Paciente | Cambiar su cita sabiendo que se cancelará la actual. |
+| Hospital Obrero CNS | Liberar el cupo y dar prioridad a pacientes que no cancelaron. |
+| Médico | Mantener una agenda actualizada. |
 
 ### Escenario principal de éxito (camino feliz / Happy Path)
 
@@ -836,11 +866,10 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
-| 1 | El personal localiza y selecciona la cita a reprogramar. | El sistema muestra los datos actuales de la cita. |
-| 2 | El personal solicita la reprogramación. | El sistema habilito la nueva asignación de recursos. |
-| 3 | El personal confirma la opción propuesta o seleccionada según el proceso autorizado. | El sistema valida nuevamente médico, horario y consultorio mediante CU-06. |
-| 4 | El personal confirma el cambio. | El sistema guarda la nueva asignación y conserva el cambio para trazabilidad. |
-| 5 | — | El sistema genera la notificación correspondiente al paciente mediante CU-16. |
+| 1 | El paciente selecciona su cita programada y solicita reprogramarla. | El sistema muestra los datos de la cita y advierte que se cancelará. |
+| 2 | El paciente confirma. | El sistema cancela la cita mediante CU-11 y libera el cupo. |
+| 3 | — | El sistema registra una nueva solicitud para el siguiente día hábil con prioridad menor (CU-04/CU-05). |
+| 4 | — | El sistema procesa la solicitud (CU-05), genera la notificación (CU-16) y conserva el registro (CU-18). |
 
 ### Diagrama de comportamiento UML
 
@@ -852,20 +881,21 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 | Paso Ref. | Condición de Desvío | Acción de Recuperación / Salida |
 | --- | --- | --- |
-| 3a | La nueva combinación no está disponible. | El sistema no guarda los cambios y solicita utilizar otra disponibilidad. |
-| 3b | Un recurso se ocupa de forma concurrente durante la reprogramación. | El sistema impide la doble asignación y obliga a validar otra combinación. |
+| 2a | El paciente desiste de reprogramar. | El sistema no cancela la cita y la conserva PROGRAMADA. |
+| 3a | No existen cupos en el siguiente día hábil. | La solicitud queda EN_ESPERA y avanza al siguiente día hábil, hasta 15 días hábiles. |
+| 1a | La cita no está PROGRAMADA (ya ATENDIDA, CANCELADA o con asistencia confirmada). | El sistema no permite reprogramarla. |
 
 ### Requisitos especiales (no funcionales específicos)
 
-- **Consistencia:** Debe validarse disponibilidad vigente, conforme RNF-03.
+- **Prioridad:** las solicitudes de pacientes que no cancelaron se atienden antes que las que provienen de una reprogramación.
 
-- **Integridad:** Debe impedirse la doble asignación en operaciones concurrentes, conforme RNF-04.
+- **Confidencialidad:** solo el paciente titular de la cita puede reprogramarla.
 
-- **Confidencialidad:** Solo usuarios autorizados pueden modificar una cita.
+- **Trazabilidad:** la cancelación y la nueva solicitud quedan registradas (CU-18).
 
 ### Variaciones de tecnología y datos
 
-- El documento base no define si el paciente puede solicitar directamente una reprogramación; la función se asigna al personal de enfermería/admisión según RF-10 y su historia de usuario.
+- Cambio 04/11/2026: el actor pasa de enfermería a paciente y desaparece la reprogramación directa por el personal.
 
 <a id="cu-11"></a>
 
@@ -878,24 +908,24 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-11 |
 | Nombre del caso de uso: | Cancelar Cita |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
 | Campo | Detalle |
 | --- | --- |
 | Nombre del Caso de Uso: | CU-11: Cancelar Cita |
-| Actor Principal (Quién): | Personal de Enfermería / Admisión |
+| Actor Principal (Quién): | Paciente / Sistema (cancelación automática) |
 | Nivel de Abstracción: | User Goal (Objetivo de usuario) |
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
-| Evento Disparador (Trigger): | El personal autorizado solicita cancelar una cita activa. |
-| Precondiciones (Cuándo): | • El personal se encuentra autenticado y autorizado.<br>• Existe una cita activa que puede ser gestionada. |
-| Postcondiciones (Éxito): | • La cita queda con estado cancelado.<br>• El motivo de cancelación queda registrado.<br>• La operación queda disponible para historial y notificación. |
-| Garantía Mínima (Fallo): | Si no se registra el motivo o la cita no puede ser cancelada, el sistema no confirma la cancelación. |
+| Evento Disparador (Trigger): | El paciente decide cancelar su cita, o faltan 30 minutos para la hora de una cita cuya asistencia no fue confirmada por enfermería. |
+| Precondiciones (Cuándo): | • Existe una cita en estado PROGRAMADA.<br>• Para la cancelación por el paciente: el paciente está autenticado. |
+| Postcondiciones (Éxito): | • La cita queda CANCELADA y el registro de la cita se conserva (no se borra).<br>• Queda registrado el motivo (cancelada por el paciente / no confirmó asistencia).<br>• Se genera la notificación y el registro de historial. |
+| Garantía Mínima (Fallo): | Si la cita no puede cancelarse (ya ATENDIDA, CANCELADA o con asistencia confirmada), el sistema no modifica su estado. |
 | Actores Secundarios: | CU-16 Generar Notificación de Cita y CU-18 Consultar Historial de Cambios. |
-| Descripción Breve (Qué/Para qué): | Permite cancelar una cita registrada exigiendo el motivo de cancelación y conservando el registro de lo ocurrido. Derivado de RF-11 y RU-06. |
+| Descripción Breve (Qué/Para qué): | Permite al paciente cancelar su cita y define la cancelación automática: si enfermería no confirma la asistencia presencial hasta 30 minutos antes de la hora, el sistema cancela la cita. El cupo liberado no se reasigna automáticamente por ahora. Derivado de RF-11 y RU-03. |
 
 ### Modelo de contexto visual
 
@@ -907,8 +937,8 @@ Identificación de quiénes se preocupan por este caso de uso y qué garantías 
 
 | Parte Interesada (Stakeholder) | Interés en este Caso de Uso (Garantía exigida) |
 | --- | --- |
-| Enfermería / Admisión | Cancelar citas de forma controlada y con motivo registrado. |
-| Paciente | Conocer oportunamente la cancelación de una cita. |
+| Paciente | Cancelar su cita cuando no pueda asistir y ser avisado oportunamente. |
+| Enfermería / Admisión | Contar con fichas del día depuradas, sin intervenir en cancelaciones. |
 | Administración | Mantener trazabilidad de cancelaciones para control y análisis. |
 
 ### Escenario principal de éxito (camino feliz / Happy Path)
@@ -917,11 +947,9 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
-| 1 | El personal localiza y selecciona la cita activa. | El sistema muestra la información de la cita. |
-| 2 | El personal solicita cancelar la cita. | El sistema exige registrar el motivo de cancelación. |
-| 3 | El personal ingresa el motivo y confirma. | El sistema valida que exista un motivo. |
-| 4 | — | El sistema cambia el estado de la cita a cancelada y conserva el motivo. |
-| 5 | — | El sistema registra la operación para trazabilidad y genera la notificación correspondiente mediante CU-16. |
+| 1 | El paciente selecciona su cita programada y solicita cancelarla. | El sistema muestra la información de la cita. |
+| 2 | El paciente confirma la cancelación. | El sistema registra el motivo «Cancelada por el paciente» y cambia el estado a CANCELADA. |
+| 3 | — | El sistema conserva la cita, registra la operación (CU-18) y genera la notificación (CU-16). |
 
 ### Diagrama de comportamiento UML
 
@@ -933,20 +961,23 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 | Paso Ref. | Condición de Desvío | Acción de Recuperación / Salida |
 | --- | --- | --- |
-| 3a | El personal intenta confirmar sin registrar un motivo. | El sistema no cancela la cita y solicita ingresar el motivo requerido. |
-| 1a | La cita no existe o no está disponible como cita activa. | El sistema informa que la cancelación no puede ejecutarse sobre ese registro. |
+| A1 | Faltan 30 minutos para la hora de la cita y enfermería no confirmó la asistencia. | El sistema cancela automáticamente la cita (motivo «No confirmó asistencia», usuario responsable «Sistema»), la conserva y notifica al paciente. |
+| 1a | La cita no existe o no está PROGRAMADA. | El sistema informa que la cancelación no puede ejecutarse sobre ese registro. |
+| 2a | La cita ya tiene la asistencia confirmada o ya fue atendida. | El sistema no permite cancelarla. |
 
 ### Requisitos especiales (no funcionales específicos)
 
-- **Trazabilidad:** La cancelación debe conservar el motivo y la operación realizada.
+- **Trazabilidad:** la cancelación conserva el motivo, el usuario (o «Sistema») y el momento.
 
-- **Seguridad:** Solo personal autorizado puede cancelar citas.
+- **Seguridad:** solo el paciente titular de la cita puede cancelarla; la cancelación automática la ejecuta el sistema, no el personal.
 
-- **Confidencialidad:** La información de la cita debe mantenerse protegida conforme al rol.
+- **Prioridad:** quien cancela y vuelve a solicitar lo hace con menor prioridad (CU-10).
 
 ### Variaciones de tecnología y datos
 
-- El documento base no define un catálogo de motivos de cancelación; puede modelarse posteriormente si la institución lo requiere.
+- Motivos definidos por el sistema: CANCELADA_POR_PACIENTE y NO_CONFIRMO_ASISTENCIA (se retira el catálogo libre de motivos).
+
+- Cambio 04/11/2026: se retira la cancelación manual por enfermería/admisión; se agrega la cancelación automática.
 
 <a id="cu-12"></a>
 
@@ -959,24 +990,24 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-12 |
 | Nombre del caso de uso: | Actualizar Estado de Cita |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
 | Campo | Detalle |
 | --- | --- |
 | Nombre del Caso de Uso: | CU-12: Actualizar Estado de Cita |
-| Actor Principal (Quién): | Médico / Personal de Enfermería autorizado |
+| Actor Principal (Quién): | Personal de Enfermería (confirma asistencia) / Médico (finaliza la atención) / Sistema (cancelación automática) |
 | Nivel de Abstracción: | User Goal (Objetivo de usuario) |
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
-| Evento Disparador (Trigger): | Ocurre un evento de atención, cancelación u otra situación que requiere reflejar el estado actual de la cita. |
+| Evento Disparador (Trigger): | El paciente se presenta a confirmar su asistencia, el médico finaliza la atención o el sistema cancela por falta de confirmación. |
 | Precondiciones (Cuándo): | • El usuario se encuentra autenticado y autorizado.<br>• La cita existe y puede ser actualizada por el rol correspondiente. |
-| Postcondiciones (Éxito): | • La cita refleja el estado correspondiente al evento ocurrido.<br>• El cambio queda registrado para seguimiento. |
+| Postcondiciones (Éxito): | • La cita refleja el estado ASISTENCIA_CONFIRMADA, ATENDIDA o CANCELADA según el evento.<br>• El cambio queda registrado para seguimiento. |
 | Garantía Mínima (Fallo): | Si el usuario no está autorizado o el cambio no corresponde al estado de la cita, el sistema no aplica la actualización. |
-| Actores Secundarios: | CU-18 Consultar Historial de Cambios. |
-| Descripción Breve (Qué/Para qué): | Permite actualizar el estado de una cita para reflejar lo ocurrido durante el proceso de atención. Derivado de RF-12 y de su historia de usuario. |
+| Actores Secundarios: | CU-11 Cancelar Cita, CU-15 Registrar Datos de Atención y CU-18 Consultar Historial de Cambios. |
+| Descripción Breve (Qué/Para qué): | Actualiza el estado de la cita: PROGRAMADA → ASISTENCIA_CONFIRMADA (enfermería, presencial, hasta 30 minutos antes de la hora) → ATENDIDA (el médico registra el fin; no registra inicio); o CANCELADA. Enfermería solo opera sobre fichas del día actual. Derivado de RF-12. |
 
 ### Modelo de contexto visual
 
@@ -998,9 +1029,9 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
-| 1 | El usuario autorizado selecciona una cita. | El sistema muestra el estado actual de la cita. |
-| 2 | El usuario selecciona el nuevo estado conforme a lo ocurrido. | El sistema valida que el usuario tenga permiso para actualizarlo. |
-| 3 | El usuario confirma el cambio. | El sistema actualiza el estado de la cita. |
+| 1 | Enfermería o médico selecciona una cita del día. | El sistema muestra el estado actual y las acciones permitidas para su rol. |
+| 2 | Enfermería confirma que el paciente se presentó (hasta 30 min antes de la hora). | El sistema valida rol, fecha del día y plazo, y cambia la cita a ASISTENCIA_CONFIRMADA. |
+| 3 | El médico registra el fin de la atención. | El sistema valida que la cita estaba ASISTENCIA_CONFIRMADA y la cambia a ATENDIDA (con CU-15). |
 | 4 | — | El sistema conserva la operación para trazabilidad e informes posteriores. |
 
 ### Diagrama de comportamiento UML
@@ -1014,7 +1045,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Paso Ref. | Condición de Desvío | Acción de Recuperación / Salida |
 | --- | --- | --- |
 | 2a | El usuario no posee permiso para actualizar el estado. | El sistema rechaza la operación y mantiene el estado existente. |
-| 2b | El cambio solicitado no puede validarse para la situación actual. | El sistema no modifica la cita e informa que el estado no puede actualizarse con esa operación. |
+| 2b | El cambio no corresponde al estado actual (por ejemplo, ATENDIDA sin asistencia confirmada). | El sistema no modifica la cita e informa el motivo. |
+| 2c | La cita no es del día actual. | El sistema impide a enfermería modificarla. |
+| 2d | Ya pasó el plazo de 30 minutos antes de la hora. | La cita ya fue cancelada automáticamente; enfermería no puede confirmarla. |
 
 ### Requisitos especiales (no funcionales específicos)
 
@@ -1026,7 +1059,7 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 ### Variaciones de tecnología y datos
 
-- El RF-12 del documento base enumera los estados “programada, atendida, cancelada e inexistente”, mientras que la historia de usuario asociada menciona atención, cancelación o inasistencia. Esta diferencia debe validarse antes de aprobar la especificación definitiva.
+- Estados definidos el 04/11/2026: PROGRAMADA, ASISTENCIA_CONFIRMADA, ATENDIDA y CANCELADA. «Inexistente» e «inasistencia» ya no son estados (la inasistencia es una cancelación automática por falta de confirmación).
 
 <a id="cu-13"></a>
 
@@ -1039,9 +1072,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-13 |
 | Nombre del caso de uso: | Consultar Agenda Médica |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 15/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
@@ -1053,10 +1086,10 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
 | Evento Disparador (Trigger): | El médico necesita revisar las citas que tiene programadas. |
 | Precondiciones (Cuándo): | • El médico se encuentra autenticado.<br>• El sistema puede identificar las citas asignadas al médico. |
-| Postcondiciones (Éxito): | • El médico visualiza su agenda diaria o semanal.<br>• La consulta no modifica las citas. |
+| Postcondiciones (Éxito): | • El médico visualiza las citas del día actual (cantidad, número de ficha y hora).<br>• Puede consultar otras fechas con un botón/selector.<br>• La consulta no modifica las citas. |
 | Garantía Mínima (Fallo): | Si no existen citas en el período seleccionado, el sistema informa que no hay citas programadas sin mostrar información de otros médicos. |
 | Actores Secundarios: | No se identifican sistemas externos en el documento base. |
-| Descripción Breve (Qué/Para qué): | Permite al médico consultar su agenda diaria o semanal y conocer las citas que debe atender. Derivado de RF-13 y RU-08. |
+| Descripción Breve (Qué/Para qué): | Permite al médico consultar las citas del día actual y, mediante un botón, las de otras fechas. No se muestran todas las fechas a la vez. Derivado de RF-13 y RU-08. |
 
 ### Modelo de contexto visual
 
@@ -1077,10 +1110,10 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
-| 1 | El médico abre la opción de agenda. | El sistema identifica al médico autenticado. |
-| 2 | El médico selecciona vista diaria o semanal. | El sistema determina el período correspondiente. |
-| 3 | — | El sistema consulta las citas asignadas al médico dentro del período. |
-| 4 | El médico revisa la agenda. | El sistema muestra las citas comprendidas en la vista seleccionada. |
+| 1 | El médico abre la opción de agenda. | El sistema identifica al médico autenticado y consulta sus citas del día actual. |
+| 2 | — | El sistema calcula la cantidad de citas del día. |
+| 3 | El médico revisa la cantidad de citas, el número de ficha y la hora de cada paciente. | El sistema muestra las citas del día. |
+| 4 | El médico pulsa «otras fechas» y elige una fecha (opcional). | El sistema muestra las citas de la fecha elegida. |
 
 ### Diagrama de comportamiento UML
 
@@ -1099,13 +1132,15 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 - **Confidencialidad:** El médico debe ver únicamente las citas e información permitida para su rol.
 
-- **Usabilidad:** Debe disponer de vistas diaria y semanal, conforme RF-13.
+- **Usabilidad:** Vista del día actual por defecto y selector de otras fechas, conforme RF-13.
 
 - **Seguridad:** El acceso debe controlarse por rol, conforme RNF-01.
 
+- **Tiempo real:** La lista del día se actualiza por WebSocket, conforme RNF-08.
+
 ### Variaciones de tecnología y datos
 
-- El documento base define únicamente las vistas diaria y semanal; otros períodos o filtros no están especificados.
+- Cambio 04/11/2026: se elimina la vista semanal; se agrega el selector de otras fechas.
 
 <a id="cu-14"></a>
 
@@ -1118,9 +1153,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-14 |
 | Nombre del caso de uso: | Consultar Información Permitida del Paciente |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
@@ -1131,11 +1166,11 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Nivel de Abstracción: | User Goal (Objetivo de usuario) |
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
 | Evento Disparador (Trigger): | El médico necesita consultar información del paciente asociado a una cita que le fue asignada. |
-| Precondiciones (Cuándo): | • El médico se encuentra autenticado.<br>• Existe una cita asignada al médico y asociada al paciente consultado. |
-| Postcondiciones (Éxito): | • El médico visualiza únicamente la información básica y el historial permitido para su rol.<br>• La consulta no modifica los datos del paciente. |
+| Precondiciones (Cuándo): | • El médico se encuentra autenticado.<br>• El paciente consultado tiene una cita en la agenda del médico. |
+| Postcondiciones (Éxito): | • El médico visualiza el historial del paciente: nombre, citas pasadas con fecha y hora, atenciones y recetas anteriores.<br>• La consulta no modifica los datos (la receta nueva se agrega en CU-15). |
 | Garantía Mínima (Fallo): | Si el paciente no está asociado a una cita asignada al médico o la información no está permitida, el sistema impide la consulta. |
 | Actores Secundarios: | No se identifican sistemas externos en el documento base. |
-| Descripción Breve (Qué/Para qué): | Permite al médico acceder a la información permitida del paciente correspondiente a una cita asignada, sin exponer datos que no correspondan a su rol. Derivado de RF-14 y RU-09. |
+| Descripción Breve (Qué/Para qué): | Permite al médico consultar el historial del paciente (nombre, citas pasadas con fecha y hora, atenciones y recetas anteriores) solo de pacientes con cita en su agenda. Derivado de RF-14 y RU-09. |
 
 ### Modelo de contexto visual
 
@@ -1157,8 +1192,8 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
 | 1 | El médico selecciona una cita de su agenda. | El sistema verifica que la cita esté asignada al médico autenticado. |
-| 2 | El médico solicita consultar los datos del paciente. | El sistema identifica la información permitida para el rol. |
-| 3 | — | El sistema recupera únicamente la información básica y el historial autorizado asociado al paciente. |
+| 2 | El médico solicita consultar el historial del paciente. | El sistema identifica la información permitida para el rol. |
+| 3 | — | El sistema recupera el nombre, las citas pasadas con fecha y hora, las atenciones y las recetas anteriores del paciente. |
 | 4 | El médico revisa la información. | El sistema muestra los datos permitidos sin exponer información restringida. |
 
 ### Diagrama de comportamiento UML
@@ -1184,7 +1219,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 ### Variaciones de tecnología y datos
 
-- El documento base no detalla qué campos forman la “información básica” ni qué parte del historial está permitida; esa definición debe validarse con la CNS.
+- Historial permitido (definido el 04/11/2026): nombre del paciente, citas pasadas, atenciones con fecha y hora y recetas anteriores; solo de pacientes con cita en la agenda del médico.
+
+- Se distingue historial de citas, historial de atenciones e historial clínico; la receta nueva se agrega en CU-15.
 
 <a id="cu-15"></a>
 
@@ -1197,24 +1234,24 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-15 |
 | Nombre del caso de uso: | Registrar Datos de Atención |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
 | Campo | Detalle |
 | --- | --- |
 | Nombre del Caso de Uso: | CU-15: Registrar Datos de Atención |
-| Actor Principal (Quién): | Médico / Personal de Enfermería autorizado |
+| Actor Principal (Quién): | Médico |
 | Nivel de Abstracción: | User Goal (Objetivo de usuario) |
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
-| Evento Disparador (Trigger): | Una cita llega al proceso de atención y se requiere registrar sus datos operativos. |
-| Precondiciones (Cuándo): | • Existe una cita registrada.<br>• El usuario se encuentra autenticado y autorizado para registrar datos de atención. |
-| Postcondiciones (Éxito): | • La asistencia del paciente queda asociada a la cita.<br>• Se registran el tiempo de espera y el tiempo de atención contemplados por el proyecto. |
-| Garantía Mínima (Fallo): | Si la cita no existe o el usuario no está autorizado, el sistema no registra datos operativos sobre la cita. |
+| Evento Disparador (Trigger): | El médico atiende al paciente y registra la medicación o receta y el fin de la atención. |
+| Precondiciones (Cuándo): | • La cita está en estado ASISTENCIA_CONFIRMADA.<br>• El médico está autenticado y la cita pertenece a su agenda. |
+| Postcondiciones (Éxito): | • La medicación o receta queda registrada en el historial clínico del paciente.<br>• El sistema completa ID de afiliado, número de ficha, fecha y hora de la atención e identificación de la consulta.<br>• La cita pasa a ATENDIDA (CU-12) al registrar el fin. |
+| Garantía Mínima (Fallo): | Si la cita no está en ASISTENCIA_CONFIRMADA o no pertenece al médico, el sistema no registra la receta ni finaliza la cita. |
 | Actores Secundarios: | CU-12 Actualizar Estado de Cita puede utilizarse para reflejar que la atención fue realizada. |
-| Descripción Breve (Qué/Para qué): | Permite registrar la asistencia del paciente, el tiempo de espera y el tiempo de atención para conocer el comportamiento real del proceso de citas. Derivado de RF-15 y RU-10. |
+| Descripción Breve (Qué/Para qué): | Permite al médico registrar la medicación o receta y finalizar la cita. El sistema completa automáticamente ID de afiliado, número de ficha, fecha/hora e identificación de la consulta; el médico solo ingresa la medicación. Conserva la hora de confirmación y la de fin. Derivado de RF-15 y RU-10. |
 
 ### Modelo de contexto visual
 
@@ -1226,9 +1263,9 @@ Identificación de quiénes se preocupan por este caso de uso y qué garantías 
 
 | Parte Interesada (Stakeholder) | Interés en este Caso de Uso (Garantía exigida) |
 | --- | --- |
-| Médico / Enfermería | Registrar correctamente los datos operativos de la atención. |
-| Administración | Disponer de información para calcular tiempos e indicadores de gestión. |
-| Paciente | Mantener datos de atención asociados a su cita correspondiente. |
+| Médico | Registrar la receta sin llenar manualmente datos que el sistema ya conoce. |
+| Paciente | Contar con su historial clínico actualizado. |
+| Administración | Disponer de horas de confirmación y fin para indicadores. |
 
 ### Escenario principal de éxito (camino feliz / Happy Path)
 
@@ -1236,11 +1273,10 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
-| 1 | El usuario autorizado selecciona la cita que está siendo atendida. | El sistema muestra la información operativa disponible de la cita. |
-| 2 | El usuario registra la asistencia del paciente. | El sistema asocia el dato de asistencia a la cita. |
-| 3 | El usuario registra el tiempo de espera y el tiempo de atención. | El sistema valida y asocia los tiempos a la cita. |
-| 4 | El usuario confirma el registro. | El sistema guarda los datos operativos de atención. |
-| 5 | — | Cuando corresponde, el sistema permite actualizar el estado de la cita mediante CU-12. |
+| 1 | El médico selecciona la cita en atención. | El sistema muestra los datos autocompletados (afiliado, ficha, fecha/hora y consulta). |
+| 2 | El médico registra la medicación o receta. | El sistema valida los datos de la receta. |
+| 3 | — | El sistema agrega la receta al historial clínico del paciente. |
+| 4 | El médico registra el fin de la atención. | El sistema guarda la hora de fin y cambia la cita a ATENDIDA mediante CU-12. |
 
 ### Diagrama de comportamiento UML
 
@@ -1252,20 +1288,22 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 | Paso Ref. | Condición de Desvío | Acción de Recuperación / Salida |
 | --- | --- | --- |
-| 1a | La cita no existe o no corresponde a una atención gestionable por el usuario. | El sistema impide registrar datos de atención. |
-| 3a | Los datos operativos requeridos no pueden validarse. | El sistema no confirma el registro hasta corregir la información. |
+| 1a | La cita no existe, no es de la agenda del médico o no está en ASISTENCIA_CONFIRMADA. | El sistema impide registrar la receta y finalizar la cita. |
+| 2a | La medicación está vacía o no puede validarse. | El sistema no confirma el registro hasta corregir la información. |
 
 ### Requisitos especiales (no funcionales específicos)
 
-- **Integridad:** Los datos de atención deben quedar asociados a la cita correcta.
+- **Integridad:** La receta debe quedar asociada a la cita y al afiliado correctos.
 
 - **Confidencialidad:** La información del paciente debe mantenerse protegida conforme RNF-02.
 
-- **Seguridad:** Solo roles autorizados pueden registrar datos operativos de atención.
+- **Seguridad:** Solo el médico titular de la agenda puede registrar la receta.
 
 ### Variaciones de tecnología y datos
 
-- El documento base no define el mecanismo de medición de los tiempos de espera y atención; se especifica únicamente que deben registrarse
+- El médico no registra el inicio de la atención, solo el fin. El tiempo de espera y de atención por separado no es medible con este flujo (solo confirmación → fin); pendiente de validar frente a RF-20.
+
+- Cambio 04/11/2026: se incorpora el registro de receta/medicación y se retira el registro de asistencia (pasa a CU-12, por enfermería).
 
 <a id="cu-16"></a>
 
@@ -1278,9 +1316,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-16 |
 | Nombre del caso de uso: | Generar Notificación de Cita |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
@@ -1290,12 +1328,12 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Actor Principal (Quién): | Sistema (proceso automático) |
 | Nivel de Abstracción: | Subfunction |
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
-| Evento Disparador (Trigger): | Una cita es registrada, modificada o cancelada y la operación queda confirmada. |
-| Precondiciones (Cuándo): | • Existe una cita asociada a un paciente.<br>• La operación de registro, modificación o cancelación fue confirmada. |
+| Evento Disparador (Trigger): | Una cita es registrada o cancelada (por el paciente o automáticamente), o una solicitud en espera recibe cita, y la operación queda confirmada. |
+| Precondiciones (Cuándo): | • Existe una cita asociada a un paciente.<br>• La operación de registro o cancelación fue confirmada. |
 | Postcondiciones (Éxito): | • El sistema genera la notificación correspondiente para el paciente. |
 | Garantía Mínima (Fallo): | Si la notificación no puede generarse, la información confirmada de la cita no debe transformarse en una notificación contradictoria o incompleta. |
 | Actores Secundarios: | El documento base no define un servicio o canal externo de notificaciones. |
-| Descripción Breve (Qué/Para qué): | Genera información para el paciente cuando una cita se registra, modifica o cancela, permitiéndole conocer oportunamente su situación. Derivado de RF-16 y RU-04. |
+| Descripción Breve (Qué/Para qué): | Genera información para el paciente cuando una cita se registra (incluida una solicitud en espera que recibe cita) o se cancela (por el paciente o automáticamente). Derivado de RF-16 y RU-04. |
 
 ### Modelo de contexto visual
 
@@ -1317,10 +1355,10 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
-| 1 | — | El sistema detecta que una cita fue registrada, modificada o cancelada. |
+| 1 | — | El sistema detecta que una cita fue registrada o cancelada. |
 | 2 | — | El sistema identifica al paciente asociado y el tipo de operación confirmada. |
-| 3 | — | El sistema genera el contenido de la notificación correspondiente a la situación de la cita. |
-| 4 | El paciente recibe o consulta la información según el mecanismo que se defina. | El sistema deja disponible la notificación generada para el paciente. |
+| 3 | — | El sistema genera el contenido de la notificación correspondiente. |
+| 4 | El paciente recibe o consulta la notificación en la aplicación. | El sistema deja disponible la notificación y la envía en tiempo real (WebSocket). |
 
 ### Diagrama de comportamiento UML
 
@@ -1345,7 +1383,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 ### Variaciones de tecnología y datos
 
-- El documento base no define el canal de notificación (aplicación, mensajería, correo u otro); la elección queda pendiente de diseño.
+- Canal definido el 04/11/2026: notificación dentro de la aplicación y actualización por WebSocket.
+
+- Tipos: cita asignada, solicitud en espera que recibe cita, cita cancelada por el paciente y cita cancelada automáticamente.
 
 <a id="cu-17"></a>
 
@@ -1358,9 +1398,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-17 |
 | Nombre del caso de uso: | Generar Recordatorio de Cita |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
@@ -1370,12 +1410,12 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Actor Principal (Quién): | Sistema (proceso automático) |
 | Nivel de Abstracción: | Subfunction |
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
-| Evento Disparador (Trigger): | Se aproxima la fecha de una cita programada conforme a la configuración establecida. |
-| Precondiciones (Cuándo): | • Existe una cita programada.<br>• La cita continúa vigente antes del momento configurado para el recordatorio. |
-| Postcondiciones (Éxito): | • El sistema genera el recordatorio correspondiente para el paciente. |
-| Garantía Mínima (Fallo): | Si la cita deja de estar programada antes del momento del recordatorio, no se debe generar un recordatorio que contradiga su estado vigente. |
+| Evento Disparador (Trigger): | Faltan 45 minutos para la hora de una cita programada cuya asistencia no ha sido confirmada. |
+| Precondiciones (Cuándo): | • Existe una cita PROGRAMADA.<br>• La asistencia aún no fue confirmada por enfermería. |
+| Postcondiciones (Éxito): | • El paciente recibe el aviso de que perderá su cita si no confirma su asistencia en el hospital hasta 30 minutos antes de la hora. |
+| Garantía Mínima (Fallo): | Si la cita ya fue cancelada o confirmada antes del momento del aviso, no se genera un aviso que contradiga su estado vigente. |
 | Actores Secundarios: | El documento base no define un servicio o canal externo de recordatorios. |
-| Descripción Breve (Qué/Para qué): | Genera un recordatorio previo a la fecha programada de una cita para reducir la posibilidad de olvido por parte del paciente. Derivado de RF-17 y RU-04. |
+| Descripción Breve (Qué/Para qué): | Genera un aviso 45 minutos antes de la hora de la cita indicando que, si no confirma su asistencia presencial hasta 30 minutos antes, la cita se cancelará. Derivado de RF-17 y RU-04. |
 
 ### Modelo de contexto visual
 
@@ -1396,10 +1436,10 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
-| 1 | — | El sistema identifica una cita programada cuya fecha se aproxima según la configuración. |
-| 2 | — | El sistema verifica que la cita siga vigente y asociada al paciente. |
-| 3 | — | El sistema genera el recordatorio con la información necesaria de la cita. |
-| 4 | El paciente recibe o consulta el recordatorio según el mecanismo que se defina. | El sistema deja disponible el recordatorio generado. |
+| 1 | — | El sistema identifica una cita PROGRAMADA a 45 minutos de su hora. |
+| 2 | — | El sistema verifica que la cita siga vigente y sin asistencia confirmada. |
+| 3 | — | El sistema genera el aviso con la información de la cita y el plazo de confirmación. |
+| 4 | El paciente recibe o consulta el aviso en la aplicación. | El sistema deja disponible el aviso y lo envía en tiempo real. |
 
 ### Diagrama de comportamiento UML
 
@@ -1411,8 +1451,8 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 | Paso Ref. | Condición de Desvío | Acción de Recuperación / Salida |
 | --- | --- | --- |
-| 2a | La cita fue cancelada o modificada antes del momento del recordatorio. | El sistema no genera un recordatorio con información desactualizada; debe usar el estado vigente. |
-| 1a | La cita aún no se encuentra dentro del período configurado para recordatorio. | El sistema no genera el recordatorio en ese momento. |
+| 2a | La cita fue cancelada o la asistencia ya fue confirmada. | El sistema no genera el aviso. |
+| 1a | Aún no faltan 45 minutos para la hora de la cita. | El sistema no genera el aviso en ese momento. |
 
 ### Requisitos especiales (no funcionales específicos)
 
@@ -1424,7 +1464,7 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 ### Variaciones de tecnología y datos
 
-- El documento base no define con cuánta anticipación debe generarse el recordatorio ni el canal utilizado; ambos parámetros quedan pendientes de definición.
+- Anticipación definida el 04/11/2026: 45 minutos antes de la cita. Canal: aplicación y WebSocket.
 
 <a id="cu-18"></a>
 
@@ -1437,9 +1477,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-18 |
 | Nombre del caso de uso: | Consultar Historial de Cambios |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
@@ -1453,7 +1493,7 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Precondiciones (Cuándo): | • El usuario se encuentra autenticado y autorizado.<br>• Existe una cita con operaciones registradas o historial disponible. |
 | Postcondiciones (Éxito): | • El usuario visualiza las operaciones históricas permitidas de la cita.<br>• La consulta no modifica el historial. |
 | Garantía Mínima (Fallo): | Si el usuario no posee permisos o la cita no existe, el sistema no expone información del historial. |
-| Actores Secundarios: | Las operaciones de modificación, reprogramación y cancelación alimentan el historial conservado por el sistema. |
+| Actores Secundarios: | Las cancelaciones (por el paciente o automáticas, con usuario «Sistema»), las confirmaciones de asistencia y la finalización de la atención alimentan el historial. |
 | Descripción Breve (Qué/Para qué): | Permite consultar el historial de operaciones realizadas sobre una cita, identificando la modificación, el usuario responsable y la fecha/hora correspondiente. Derivado de RF-18. |
 
 ### Modelo de contexto visual
@@ -1496,7 +1536,7 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 ### Requisitos especiales (no funcionales específicos)
 
-- **Trazabilidad:** Las modificaciones, reprogramaciones y cancelaciones deben conservar la acción, usuario responsable y momento de ejecución.
+- **Trazabilidad:** Las cancelaciones, confirmaciones de asistencia y finalizaciones de atención deben conservar la acción, usuario responsable (o «Sistema») y momento de ejecución.
 
 - **Seguridad:** El historial solo debe ser accesible por roles autorizados.
 
@@ -1517,9 +1557,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-19 |
 | Nombre del caso de uso: | Generar Reportes de Citas |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
@@ -1531,10 +1571,10 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Alcance del Sistema: | SUD: Sistema de Gestión y Control de Citas Médicas |
 | Evento Disparador (Trigger): | El administrador solicita un reporte para supervisar el funcionamiento del proceso de atención. |
 | Precondiciones (Cuándo): | • El administrador se encuentra autenticado y autorizado.<br>• Existen datos de citas registrados para el criterio solicitado. |
-| Postcondiciones (Éxito): | • El sistema presenta información agrupada según el reporte seleccionado.<br>• La generación del reporte no modifica los registros de citas. |
+| Postcondiciones (Éxito): | • El sistema presenta información agrupada según el reporte seleccionado o la agenda de supervisión (solo lectura, tiempo real).<br>• La generación no modifica los registros de citas. |
 | Garantía Mínima (Fallo): | Si no existen datos para el criterio seleccionado, el sistema informa que no hay información para el reporte solicitado. |
 | Actores Secundarios: | No se identifican herramientas externas de reportes en el documento base. |
-| Descripción Breve (Qué/Para qué): | Permite generar reportes de citas programadas, atendidas y canceladas, así como reportes por médico, especialidad y consultorio. Derivado de RF-19 y RU-12. |
+| Descripción Breve (Qué/Para qué): | Permite generar reportes de citas programadas, atendidas y canceladas, por médico, especialidad y consultorio, y mostrar al administrador una agenda de supervisión (resumen por especialidad y médico; detalle por médico) en solo lectura y tiempo real. Derivado de RF-19 y RU-12. |
 
 ### Modelo de contexto visual
 
@@ -1555,10 +1595,10 @@ Secuencia paso a paso donde todas las validaciones son exitosas, en estilo de pi
 
 | Paso | Acción del Actor | Respuesta del Sistema |
 | --- | --- | --- |
-| 1 | El administrador accede al módulo de reportes. | El sistema muestra los tipos de reportes disponibles. |
-| 2 | El administrador selecciona el reporte o criterio requerido. | El sistema recibe el tipo de reporte y los criterios aplicables. |
-| 3 | El administrador solicita generar el reporte. | El sistema agrupa los datos de citas conforme al criterio seleccionado. |
-| 4 | El administrador revisa el resultado. | El sistema presenta el reporte solicitado. |
+| 1 | El administrador accede al módulo de reportes y supervisión. | El sistema muestra los reportes y la agenda de supervisión. |
+| 2 | El administrador abre la agenda de supervisión o selecciona un reporte. | El sistema muestra el resumen por especialidad (Medicina General, Odontología, Pediatría) con médico, horario y cantidad de fichas; los horarios no laborales aparecen sombreados. |
+| 3 | El administrador selecciona un médico. | El sistema muestra sus citas programadas con número de ficha, horario, estado y cumplimiento (mínimo 5 y máximo 7 fichas por día). |
+| 4 | El administrador revisa el resultado. | El sistema actualiza la información en tiempo real (WebSocket). |
 
 ### Diagrama de comportamiento UML
 
@@ -1570,20 +1610,25 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 | Paso Ref. | Condición de Desvío | Acción de Recuperación / Salida |
 | --- | --- | --- |
-| 3a | No existen datos para el criterio seleccionado. | El sistema informa que no hay información disponible para generar resultados con ese criterio. |
-| 1a | El usuario no posee permiso administrativo. | El sistema impide el acceso a la función de reportes. |
+| 3a | No existen datos para el criterio seleccionado. | El sistema informa que no hay información disponible con ese criterio. |
+| 1a | El usuario no posee permiso administrativo. | El sistema impide el acceso. |
+| 3b | El administrador intenta modificar una cita desde la agenda. | El sistema no lo permite: la agenda de supervisión es de solo lectura. |
 
 ### Requisitos especiales (no funcionales específicos)
 
 - **Seguridad:** La función debe restringirse a usuarios autorizados.
 
-- **Confidencialidad:** Los reportes deben respetar la información permitida para administración.
+- **Solo lectura:** El administrador observa y verifica el cumplimiento de citas y horarios; no modifica citas.
+
+- **Tiempo real:** La agenda se actualiza por WebSocket, conforme RNF-08.
 
 - **Escalabilidad:** El crecimiento del volumen de citas no debe alterar las reglas fundamentales de consolidación, conforme RNF-06.
 
 ### Variaciones de tecnología y datos
 
-- Los reportes definidos en el documento base incluyen citas programadas, atendidas, canceladas y agrupaciones por médico, especialidad y consultorio.
+- Los reportes incluyen citas programadas, atendidas, canceladas y agrupaciones por médico, especialidad y consultorio.
+
+- Cambio 04/11/2026: se agrega la agenda de supervisión del administrador.
 
 <a id="cu-20"></a>
 
@@ -1596,9 +1641,9 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 | Código de caso de uso: | CU-20 |
 | Nombre del caso de uso: | Consultar Indicadores de Gestión |
 | Proyecto: | Sistema de Gestión y Control de Citas Médicas - Hospital Obrero CNS |
-| Fecha de versión: | 08/10/2026 |
+| Fecha de versión: | 04/11/2026 |
 | Autor de artefacto: | Equipo del Proyecto CNS |
-| Estado de aprobación: | Borrador |
+| Estado de aprobación: | Borrador (modificado 04/11/2026) |
 
 ### Ficha del caso de uso (¿quién?, ¿qué?, ¿cuándo?)
 
@@ -1672,12 +1717,5 @@ Desviaciones del flujo principal debido a errores de validación, reglas del pro
 
 - El documento base identifica los indicadores a analizar, pero no define fórmulas, metas, períodos ni visualizaciones; esos elementos requieren validación posterior.
 
----
-
-## Observaciones para revisión del proyecto
-
-- El documento fuente deja sin ilustraciones las secciones de contexto visual y diagramas de comportamiento UML; deberán incorporarse posteriormente si forman parte del entregable.
-- En **CU-12**, el propio documento señala una diferencia entre los estados de cita de RF-12 y la referencia a inasistencia en su historia de usuario; la definición final debe validarse.
-- En **CU-20**, el apartado 20.3 «Partes interesadas y sus intereses» contiene nuevamente la ficha del caso, no una tabla de stakeholders.
-- El documento original no establece reglas detalladas de prioridad de asignación, parámetros de notificación o fórmulas de indicadores; se mantienen como pendientes de validación.
+- Cambio 04/11/2026: se agrega el cumplimiento del mínimo de 5 fichas por médico y día; las inasistencias se miden como cancelaciones automáticas por falta de confirmación; los tiempos de espera y atención quedan limitados al intervalo confirmación → fin (ver CU-15).
 
