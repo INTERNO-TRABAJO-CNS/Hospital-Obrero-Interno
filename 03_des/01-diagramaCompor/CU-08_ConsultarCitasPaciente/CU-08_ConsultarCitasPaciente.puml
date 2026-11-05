@@ -1,0 +1,48 @@
+@startuml CU-08_ConsultarCitasPaciente
+' Caso de uso CU-08: Consultar citas del paciente
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-08 · RN-19 · RN-20
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+title CU-08: Consultar citas del paciente\nDiagrama de actividad
+|Paciente|
+start
+:Abre la opción de consultar sus citas;
+|Aplicación móvil|
+:Solicita citas del paciente autenticado;
+|Sistema CNS / citas|
+:Busca únicamente citas asociadas al paciente;
+if (¿Hay citas registradas?) then (Sí)
+  ' Camino principal
+else (No / 2a)
+  :Muestra que no existen citas para el paciente [2a];
+  stop
+endif
+|Aplicación móvil|
+:Presenta médico, especialidad, fecha, hora, consultorio y estado;
+|Paciente|
+:Selecciona una cita para revisar detalle;
+|Sistema CNS / citas|
+if (¿La cita pertenece al paciente?) then (Sí)
+  ' Camino principal
+else (No / 4a)
+  :Rechaza acceso a datos ajenos [4a];
+  stop
+endif
+|Aplicación móvil|
+:Muestra el detalle permitido, sin modificar la cita;
+stop
+@enduml

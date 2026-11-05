@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1480" height="1448" viewBox="0 0 1480 1448" role="img" aria-label="CU-10: Reprogramar cita. Diagrama de actividad CNS">
+<defs><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8.8" markerHeight="8.8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#315F93"/></marker><marker id="arrow-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8.8" markerHeight="8.8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#C99226"/></marker></defs>
+<rect x="0" y="0" width="1480" height="1448" fill="#FFFFFF"/>
+<text x="740.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#0D0F15" font-size="22.5" font-weight="bold" text-anchor="middle">
+<tspan x="740.0" y="34.6">CU-10: Reprogramar cita</tspan>
+</text>
+<text x="740.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="15.4" font-weight="normal" text-anchor="middle">
+<tspan x="740.0" y="64.2">Diagrama de actividad • Sistema de Gestión y Control de Citas Médicas – Hospital Obrero CNS</tspan>
+</text>
+<path d="M36 80H1444" fill="none" stroke="#C6DCEC" stroke-width="1.15"/>
+<rect x="36" y="96" width="352" height="1267.0" fill="#FFFFFF"/>
+<path d="M36 96V1363.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="212.0" y="116.7">Paciente</tspan>
+</text>
+<rect x="388" y="96" width="352" height="1267.0" fill="#FAFCFE"/>
+<path d="M388 96V1363.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="564.0" y="116.7">Sistema CNS (Java)</tspan>
+</text>
+<rect x="740" y="96" width="352" height="1267.0" fill="#FFFFFF"/>
+<path d="M740 96V1363.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="916.0" y="116.7">Asignación (CU-05)</tspan>
+</text>
+<rect x="1092" y="96" width="352" height="1267.0" fill="#FFFFFF"/>
+<path d="M1092 96V1363.0" stroke="#315F93" stroke-width="1.1"/>
+<path d="M1107 125V1363.0" fill="none" stroke="#E4BD6E" stroke-width="0.85" stroke-dasharray="4 7"/>
+<text x="1268.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.8" font-weight="bold" text-anchor="middle">
+<tspan x="1268.0" y="114.7">Flujos alternativos / excepciones</tspan>
+</text>
+<path d="M212.0 166.0V196.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M212.0 262.0V277.0H564.0V297.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M564.0 410.0V440.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="581.0" y="428.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">Sí</text>
+<path d="M564.0 506.0V521.0H212.0V541.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M212.0 654.0V669.0H564.0V684.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="229.0" y="672.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">Sí</text>
+<path d="M564.0 750.0V780.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M564.0 862.0V877.0H916.0V892.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M916.0 958.0V993.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M916.0 1106.0V1136.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="933.0" y="1124.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">Sí</text>
+<path d="M916.0 1202.0V1217.0H564.0V1232.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M564.0 1298.0V1323.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M720.0 354.0H1107.0V364.2H1121.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="922.0" y="347.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">No / 1a</text>
+<path d="M368.0 598.0H1107.0V608.2H1121.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="746.0" y="591.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">No / 2a</text>
+<path d="M1072.0 1050.0H1107.0V1056.5H1121.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="1098.0" y="1043.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">No / 3a</text>
+<circle cx="212.0" cy="154.0" r="12" fill="#315F93" stroke="#254C78" stroke-width="1"/>
+<rect x="60.0" y="197.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="212.0" y="224.9">Selecciona su cita programada y pide</tspan>
+<tspan x="212.0" y="243.9">reprogramarla</tspan>
+</text>
+<polygon points="564.0,298.0 720.0,354.0 564.0,410.0 408.0,354.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="358.8">¿La cita está PROGRAMADA?</tspan>
+</text>
+<rect x="412.0" y="441.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="468.9">Advierte que se cancelará la cita</tspan>
+<tspan x="564.0" y="487.9">vigente</tspan>
+</text>
+<polygon points="212.0,542.0 368.0,598.0 212.0,654.0 56.0,598.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="212.0" y="602.8">¿Confirma?</tspan>
+</text>
+<rect x="412.0" y="685.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="712.9">Cancela la cita mediante CU-11 y</tspan>
+<tspan x="564.0" y="731.9">libera el cupo</tspan>
+</text>
+<rect x="412.0" y="781.0" width="304.0" height="81.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="807.4">Registra una nueva solicitud para el</tspan>
+<tspan x="564.0" y="826.4">siguiente día hábil con prioridad</tspan>
+<tspan x="564.0" y="845.4">menor</tspan>
+</text>
+<rect x="764.0" y="893.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="916.0" y="930.4">Procesa la nueva solicitud</tspan>
+</text>
+<polygon points="916.0,994.0 1072.0,1050.0 916.0,1106.0 760.0,1050.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="916.0" y="1054.8">¿Hay cupo?</tspan>
+</text>
+<rect x="764.0" y="1137.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="916.0" y="1164.9">Asigna la nueva cita y notifica</tspan>
+<tspan x="916.0" y="1183.9">mediante CU-16</tspan>
+</text>
+<rect x="412.0" y="1233.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="1260.9">Registra los cambios en el historial</tspan>
+<tspan x="564.0" y="1279.9">CU-18</tspan>
+</text>
+<circle cx="564.0" cy="1336.0" r="12" fill="#FFFFFF" stroke="#315F93" stroke-width="2"/><circle cx="564.0" cy="1336.0" r="7.4" fill="#315F93"/>
+<rect x="1124.0" y="334.2" width="296.0" height="90.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="1136.0" y="358.2" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa No / 1a</text>
+<text x="1136.0" y="377.2" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">No permite reprogramar [1a]</text>
+<text x="1136.0" y="411.2" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Fin de este flujo</text>
+<rect x="1124.0" y="578.2" width="296.0" height="90.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="1136.0" y="602.2" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa No / 2a</text>
+<text x="1136.0" y="621.2" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">Conserva la cita PROGRAMADA [2a]</text>
+<text x="1136.0" y="655.2" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Fin de este flujo</text>
+<rect x="1124.0" y="1026.5" width="296.0" height="107.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="1136.0" y="1050.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa No / 3a</text>
+<text x="1136.0" y="1069.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">Deja la solicitud EN_ESPERA hasta 15</text>
+<text x="1136.0" y="1086.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">días hábiles [3a]</text>
+<text x="1136.0" y="1120.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Continúa en el flujo principal</text>
+<path d="M36 1379.0H1444" stroke="#D3E2F2" stroke-width="1.05"/>
+<text x="36" y="1398.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#163C6B">Referencia: CU-10 | RF-10 · RN-07 · RN-09 · RN-11 · RN-12 · CU-06 · CU-16</text>
+<text x="36" y="1418.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.7" fill="#7085A1">Fuente: Especificación de casos de uso CNS y reglas del modelo del negocio.</text>
+</svg>
