@@ -1,0 +1,50 @@
+@startuml
+title CNS — Arquitectura de componentes · propuesta Sprint 2
+skinparam componentStyle rectangle
+actor Paciente
+actor "Enfermería/Secretaría" as Enfermera
+actor Medico
+actor Administrador
+package "Interfaz (canales por confirmar)" {
+ [Flutter UI] as Flutter
+ [Controladores/Estado UI] as UI
+ Flutter --> UI
+}
+package "Backend Java · Spring Boot" {
+ [API REST / Autorización] as REST
+ [MDL-01 Identidad] as M01
+ [MDL-02 Recursos y Agenda] as M02
+ [MDL-03 Solicitud y Cita] as M03
+ [MDL-04 Operaciones y Auditoría] as M04
+ [MDL-05 Consultas y Avisos] as M05
+ [Notificador WebSocket] as WS
+ REST --> M01
+ REST --> M03
+ REST --> M04
+ REST --> M05
+ M03 --> M01 : paciente
+ M03 --> M02 : disponibilidad
+ M04 --> M03 : modificación
+ M04 --> M02 : revalidación
+ M05 --> M01 : autorización
+ M05 --> M03 : lectura/eventos
+ M05 --> M04 : cambios
+ M05 --> WS : evento confirmado
+}
+database "PostgreSQL (DER existente)" as DB
+UI --> REST : HTTPS/JSON
+WS ..> UI : WSS (solo avisos)
+M01 --> DB
+M02 --> DB
+M03 --> DB : transacción atómica
+M04 --> DB
+M05 --> DB
+Paciente --> Flutter
+Enfermera --> Flutter : si usa canal móvil
+Medico --> Flutter : por confirmar
+Administrador --> Flutter : por confirmar
+note right of M03
+Único dueño de CitaMedica
+Lógica y asignación solo Java
+end note
+@enduml

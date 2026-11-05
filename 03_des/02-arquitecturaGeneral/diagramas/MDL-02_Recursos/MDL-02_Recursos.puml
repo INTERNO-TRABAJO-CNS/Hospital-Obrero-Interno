@@ -1,0 +1,16 @@
+@startuml
+title MDL-02 · Agenda y disponibilidad (provisional)
+class Medico
+class Especialidad
+class AgendaMedica
+class FranjaDisponible
+class Consultorio
+Medico -- Especialidad
+Medico -- AgendaMedica
+AgendaMedica o-- FranjaDisponible
+FranjaDisponible ..> Consultorio : candidato
+note bottom
+La disponibilidad se revalida al confirmar;
+este módulo no crea CitaMedica.
+end note
+@enduml

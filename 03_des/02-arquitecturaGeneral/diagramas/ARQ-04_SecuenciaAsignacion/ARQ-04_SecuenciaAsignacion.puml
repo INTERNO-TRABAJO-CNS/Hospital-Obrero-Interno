@@ -1,0 +1,39 @@
+@startuml
+title CNS — Solicitud → asignación de cita disponible más cercana
+actor Paciente
+participant "Flutter / vista autorizada" as UI
+participant "REST Controller" as API
+participant "M01 Identidad" as ID
+participant "M03 Motor Java" as Core
+participant "M02 Disponibilidad" as Recurso
+database "PostgreSQL" as DB
+participant "M05 Notificación" as Not
+participant "WebSocket" as WS
+Paciente -> UI : solicita por especialidad
+UI -> API : POST /solicitudes-cita
+API -> ID : validar afiliación / sesión
+ID --> API : pacienteId autorizado
+API -> Core : crear solicitud / asignar
+loop fecha-hora desde la más cercana
+ Core -> Recurso : siguiente combinación disponible
+ Recurso --> Core : candidato o ninguno
+ alt candidato encontrado
+  Core -> DB : BEGIN; revalidar y bloquear/constraint
+  alt recursos siguen libres
+   Core -> DB : INSERT cita PROGRAMADA + auditoría
+   Core -> DB : COMMIT
+   DB --> Core : confirmación
+   Core -> Not : evento de confirmación
+   Not -> WS : informar cambio confirmado
+   WS --> UI : refrescar (no confirma)
+   Core --> API : cita confirmada
+  else colisión concurrente
+   Core -> DB : ROLLBACK
+  end
+ else no existen más candidatos
+  Core --> API : no disponibilidad
+ end
+end
+API --> UI : resultado definitivo REST
+UI --> Paciente : cita / sin disponibilidad
+@enduml

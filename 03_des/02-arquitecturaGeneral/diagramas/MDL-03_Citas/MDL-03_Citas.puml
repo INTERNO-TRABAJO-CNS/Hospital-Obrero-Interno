@@ -1,0 +1,15 @@
+@startuml
+title MDL-03 · Solicitud y cita (dueño único)
+class SolicitudCita
+class CitaMedica { estado ; inicio ; fin ; version }
+class "PacienteRef (M01)" as PR
+class "RecursoRef (M02)" as RR
+PR --> SolicitudCita
+PR --> CitaMedica
+SolicitudCita --> CitaMedica : puede originar
+CitaMedica --> RR
+note bottom of CitaMedica
+PROGRAMADA / ATENDIDA / CANCELADA
+Guardado atómico Java + PostgreSQL
+end note
+@enduml
