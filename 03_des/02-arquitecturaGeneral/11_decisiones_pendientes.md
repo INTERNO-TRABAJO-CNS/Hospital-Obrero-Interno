@@ -16,7 +16,30 @@
 | DC-11 | La reasignación está **decidida como intención de alcance**, pero su aprobación documental/reglas permanecen pendientes | Control de cambios |
 | DC-12 | `develop` es base de features e integración mediante PR | Git |
 
+## Decisiones nuevas del 04/11/2026 (equipo)
+| ID | Decisión | Reemplaza / impacto |
+|---|---|---|
+| DC-13 | El paciente elige especialidad y día; el sistema asigna médico, hora y consultorio | Ajusta DC-04 / CU-04 |
+| DC-14 | Cola por orden de llegada; quien cancela o reprograma vuelve con prioridad menor | CU-04/05/10 |
+| DC-15 | NO HAY CUPOS → EN_ESPERA al siguiente día hábil, hasta 15 días hábiles (luego SIN_CUPO) | Cierra PV-03; ajusta DC-04 |
+| DC-16 | Estados de cita: PROGRAMADA, ASISTENCIA_CONFIRMADA, ATENDIDA, CANCELADA | **Reemplaza DC-05** |
+| DC-17 | Confirmación por enfermería hasta T-30; cancelación automática a T-30; aviso a T-45; la cita no se borra | **Reemplaza DC-08** (10 min); cierra PV-09 |
+| DC-18 | Máx. 7 fichas/médico/día, meta mínima 5; una cita por paciente por día | Cierra parte de PV-03 |
+| DC-19 | Duración: General 30–45, Odontología 45–60, Pediatría 30–45 min | Cierra PV-03 |
+| DC-20 | Solo el titular crea cuenta (valida tabla interna de afiliados); beneficiarios por afiliación del titular + CI | Cierra PV-07; ajusta DC-06/DC-07 |
+| DC-21 | El administrador gestiona catálogos (CRUD) y ve agenda de supervisión de solo lectura en tiempo real | **Reemplaza DC-09** (no administrar agendas); cierra PV-02 |
+| DC-22 | El médico solo registra el fin y la receta; consulta solo pacientes de su agenda | CU-13/14/15 |
+| DC-23 | Reprogramar = cancelar + nueva solicitud con prioridad menor | CU-10 |
+| DC-24 | El cupo liberado NO se reasigna automáticamente por ahora | Difiere DC-11 |
+| DC-25 | TV de solo lectura: listado de fichas del día | CU-09 |
+| DC-26 | App multiplataforma (celular, PC, TV) con Flutter; despliegue en AWS EC2 | PV-01, PV-11 |
+| DC-27 | Concurrencia con PostgreSQL (`FOR UPDATE SKIP LOCKED` + `UNIQUE`) | RNF-04 |
+| DC-28 | Rama de integración `feature/T100-algoritmos-ejecucion`; solo Benjamín integra en `develop`, `main` y T100 | Git; ajusta DC-12 |
+| DC-29 | Sprints: S1 1–22 oct; S2 23–29 oct; S3 30 oct–5 nov; S4 6–12 nov; S5 13–20 nov; S6 21–28 nov | Plan |
+
 ## Pendiente de validación (NO decidir arbitrariamente)
+> Actualizado 04/11/2026: PV-02, PV-03, PV-07, PV-09 quedan **resueltos** por DC-15…DC-21; PV-06 queda resuelto (el paciente cancela en la app, antes de ASISTENCIA_CONFIRMADA — supuesto por confirmar); PV-08 queda reemplazado por DC-16.
+
 | ID | Pregunta sin cerrar | Bloquea |
 |---|---|---|
 | PV-01 | ¿Qué roles utilizarán exactamente Flutter y cuáles otro canal? Respuesta de punto 16 contradictoria. | UI/plataforma |
@@ -31,6 +54,16 @@
 | PV-10 | ¿Cuál es el ERD/diagrama de clases REAL y cuáles sus nombres exactos? Ya diseñado, pero no adjunto en el material disponible. | Integración |
 | PV-11 | ¿Qué esquema de credenciales/auth y despliegue/hosting usarán? | Seguridad |
 | PV-12 | Para reasignación: prioridad, vigencia oferta, rango de fechas, reglas de elegibilidad y rechazos, formalización de cambio a RU/RF/HU/CU | Futuro cambio |
+
+## Pendientes nuevos (04/11/2026)
+| ID | Pregunta | Bloquea |
+|---|---|---|
+| PV-13 | Desempate entre dos médicos con la misma primera hora | CU-05 |
+| PV-14 | Numeración de ficha (propuesta: correlativo por médico y día) | CU-07 |
+| PV-15 | ¿El paciente puede cancelar tras ASISTENCIA_CONFIRMADA? (supuesto: no) | CU-11 |
+| PV-16 | Autenticación de la pantalla TV | CU-09 |
+| PV-17 | Tiempo de espera y de atención por separado (no medible hoy) | CU-19/20 |
+| PV-18 | Usuario y contraseña por enfermera: se hará más adelante | CU-01/12 |
 
 ## Tensiones documentales (no borrar silenciosamente)
 - RF-12 original lista «inexistente» y menciona inasistencia; equipo define ahora **tres estados**. Tramitar ajuste controlado de trazabilidad, manteniendo los CU originales intactos por ahora.

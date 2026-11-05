@@ -1,0 +1,58 @@
+@startuml CU-05_AsignarCitaAutomaticamente
+' Caso de uso CU-05: Asignar cita automáticamente
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-05 · RN-03 · RN-04 · RN-05 · RN-06 · RN-07 · CU-06 · CU-07
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-05: Asignar cita automáticamente\nDiagrama de actividad
+|Proceso automático (CU-05)|
+start
+:Toma la siguiente solicitud de la cola por orden de llegada y prioridad;
+|Agenda y recursos|
+:Consulta los médicos de la especialidad con menos de 7 fichas ese día;
+if (¿Hay cupo en el día de la solicitud?) then (Sí)
+  ' Camino principal
+else (No / 2a)
+  |Proceso automático (CU-05)|
+  :Informa NO HAY CUPOS y pasa la solicitud EN_ESPERA al siguiente día hábil [2a];
+  if (¿Quedan días hábiles dentro de los 15 permitidos?) then (Sí)
+    :Repite la búsqueda en el siguiente día hábil;
+  else (No / 2b)
+    :Marca la solicitud SIN_CUPO e informa al paciente [2b];
+  endif
+  stop
+endif
+|Validación (CU-06)|
+:Valida la combinación mediante CU-06;
+if (¿Sigue libre y sin solapamiento?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :Descarta la combinación y continúa con otra [3a];
+  stop
+endif
+if (¿Obtuvo el bloqueo de PostgreSQL frente a solicitudes simultáneas?) then (Sí)
+  ' Camino principal
+else (No / 3b)
+  :Continúa con la siguiente opción o pasa a espera [3b];
+  stop
+endif
+|Proceso automático (CU-05)|
+:Selecciona médico con cupo y hora según la duración de la especialidad;
+|Registro (CU-07)|
+:Recibe la asignación validada para su confirmación;
+stop
+@enduml

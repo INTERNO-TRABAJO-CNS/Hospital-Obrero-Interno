@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1128" height="1356" viewBox="0 0 1128 1356" role="img" aria-label="CU-03: Registrar y consultar pacientes. Diagrama de actividad CNS">
+<defs><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8.8" markerHeight="8.8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#315F93"/></marker><marker id="arrow-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8.8" markerHeight="8.8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#C99226"/></marker></defs>
+<rect x="0" y="0" width="1128" height="1356" fill="#FFFFFF"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#0D0F15" font-size="22.5" font-weight="bold" text-anchor="middle">
+<tspan x="564.0" y="34.6">CU-03: Registrar y consultar pacientes</tspan>
+</text>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="15.4" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="64.2">Diagrama de actividad • Sistema de Gestión y Control de Citas Médicas – Hospital Obrero CNS</tspan>
+</text>
+<path d="M36 80H1092" fill="none" stroke="#C6DCEC" stroke-width="1.15"/>
+<rect x="36" y="96" width="352" height="1175.0" fill="#FFFFFF"/>
+<path d="M36 96V1271.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="212.0" y="116.7">Titular o enfermería</tspan>
+</text>
+<rect x="388" y="96" width="352" height="1175.0" fill="#FAFCFE"/>
+<path d="M388 96V1271.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="564.0" y="116.7">Sistema CNS (Java)</tspan>
+</text>
+<rect x="740" y="96" width="352" height="1175.0" fill="#FFFFFF"/>
+<path d="M740 96V1271.0" stroke="#315F93" stroke-width="1.1"/>
+<path d="M755 125V1271.0" fill="none" stroke="#E4BD6E" stroke-width="0.85" stroke-dasharray="4 7"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.8" font-weight="bold" text-anchor="middle">
+<tspan x="916.0" y="114.7">Flujos alternativos / excepciones</tspan>
+</text>
+<path d="M212.0 166.0V196.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M212.0 262.0V277.0H564.0V292.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M564.0 358.0V393.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M564.0 510.0V540.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="581.0" y="528.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">Sí</text>
+<path d="M564.0 606.0V641.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M564.0 754.0V769.0H212.0V784.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="581.0" y="772.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">No / 2a</text>
+<path d="M212.0 850.0V865.0H564.0V885.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M564.0 998.0V1028.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="581.0" y="1016.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">Sí</text>
+<path d="M564.0 1110.0V1125.0H212.0V1140.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M212.0 1206.0V1231.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M720.0 452.0H755.0V458.5H769.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="746.0" y="445.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">No / 1b</text>
+<path d="M720.0 698.0H755.0V704.5H769.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="746.0" y="691.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">Sí / 1a</text>
+<path d="M720.0 942.0H755.0V948.5H769.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="746.0" y="935.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">No / 3a</text>
+<circle cx="212.0" cy="154.0" r="12" fill="#315F93" stroke="#254C78" stroke-width="1"/>
+<rect x="60.0" y="197.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="212.0" y="224.9">Ingresa el número de afiliado y, para</tspan>
+<tspan x="212.0" y="243.9">un beneficiario, su CI</tspan>
+</text>
+<rect x="412.0" y="293.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="320.9">Valida el afiliado contra la tabla</tspan>
+<tspan x="564.0" y="339.9">interna de afiliados</tspan>
+</text>
+<polygon points="564.0,394.0 720.0,452.0 564.0,510.0 408.0,452.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="448.3">¿El afiliado existe en la tabla</tspan>
+<tspan x="564.0" y="465.3">interna?</tspan>
+</text>
+<rect x="412.0" y="541.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="578.4">Busca si el paciente ya está registrado</tspan>
+</text>
+<polygon points="564.0,642.0 720.0,698.0 564.0,754.0 408.0,698.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="702.8">¿Paciente ya registrado?</tspan>
+</text>
+<rect x="60.0" y="785.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="212.0" y="812.9">Completa los datos requeridos y</tspan>
+<tspan x="212.0" y="831.9">confirma</tspan>
+</text>
+<polygon points="564.0,886.0 720.0,942.0 564.0,998.0 408.0,942.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="946.8">¿Datos completos y válidos?</tspan>
+</text>
+<rect x="412.0" y="1029.0" width="304.0" height="81.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="1055.4">Registra al paciente sin duplicar y crea</tspan>
+<tspan x="564.0" y="1074.4">su historial clínico en la primera</tspan>
+<tspan x="564.0" y="1093.4">atención</tspan>
+</text>
+<rect x="60.0" y="1141.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="212.0" y="1178.4">Consulta el registro del paciente</tspan>
+</text>
+<circle cx="212.0" cy="1244.0" r="12" fill="#FFFFFF" stroke="#315F93" stroke-width="2"/><circle cx="212.0" cy="1244.0" r="7.4" fill="#315F93"/>
+<rect x="772.0" y="428.5" width="296.0" height="107.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="784.0" y="452.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa No / 1b</text>
+<text x="784.0" y="471.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">No crea cuenta ni registro e informa que</text>
+<text x="784.0" y="488.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">el afiliado no fue encontrado [1b]</text>
+<text x="784.0" y="522.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Fin de este flujo</text>
+<rect x="772.0" y="674.5" width="296.0" height="107.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="784.0" y="698.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa Sí / 1a</text>
+<text x="784.0" y="717.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">Muestra el registro existente y evita</text>
+<text x="784.0" y="734.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">crear un duplicado [1a]</text>
+<text x="784.0" y="768.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Continúa en el flujo principal</text>
+<rect x="772.0" y="918.5" width="296.0" height="107.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="784.0" y="942.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa No / 3a</text>
+<text x="784.0" y="961.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">No registra y solicita completar o</text>
+<text x="784.0" y="978.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">corregir la información [3a]</text>
+<text x="784.0" y="1012.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Fin de este flujo</text>
+<path d="M36 1287.0H1092" stroke="#D3E2F2" stroke-width="1.05"/>
+<text x="36" y="1306.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#163C6B">Referencia: CU-03 | RF-03 · RN-01 · RN-02 · RN-20</text>
+<text x="36" y="1326.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.7" fill="#7085A1">Fuente: Especificación de casos de uso CNS y reglas del modelo del negocio.</text>
+</svg>

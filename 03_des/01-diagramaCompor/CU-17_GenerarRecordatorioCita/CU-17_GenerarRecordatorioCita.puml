@@ -1,0 +1,42 @@
+@startuml CU-17_GenerarRecordatorioCita
+' Caso de uso CU-17: Generar recordatorio de cita
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-17 · RN-15
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-17: Generar aviso previo de cita\nDiagrama de actividad
+|Proceso automático (CU-17)|
+start
+:Identifica citas PROGRAMADAS próximas a su hora;
+if (¿Faltan 45 minutos?) then (Sí)
+  ' Camino principal
+else (No / 1a)
+  :No genera el aviso todavía [1a];
+  stop
+endif
+|Sistema CNS (Java)|
+if (¿La cita sigue vigente y sin asistencia confirmada?) then (Sí)
+  ' Camino principal
+else (No / 2a)
+  :No genera el aviso [2a];
+  stop
+endif
+:Genera el aviso de cancelación si no confirma hasta 30 minutos antes;
+|Paciente|
+:Recibe el aviso en la aplicación;
+stop
+@enduml

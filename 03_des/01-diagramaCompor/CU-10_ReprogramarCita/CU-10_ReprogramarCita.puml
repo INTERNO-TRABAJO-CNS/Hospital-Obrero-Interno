@@ -1,0 +1,54 @@
+@startuml CU-10_ReprogramarCita
+' Caso de uso CU-10: Reprogramar cita
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-10 · RN-07 · RN-09 · RN-11 · RN-12 · CU-06 · CU-16
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-10: Reprogramar cita\nDiagrama de actividad
+|Paciente|
+start
+:Selecciona su cita programada y pide reprogramarla;
+|Sistema CNS (Java)|
+if (¿La cita está PROGRAMADA?) then (Sí)
+  ' Camino principal
+else (No / 1a)
+  :No permite reprogramar [1a];
+  stop
+endif
+:Advierte que se cancelará la cita vigente;
+|Paciente|
+if (¿Confirma?) then (Sí)
+  ' Camino principal
+else (No / 2a)
+  |Sistema CNS (Java)|
+  :Conserva la cita PROGRAMADA [2a];
+  stop
+endif
+|Sistema CNS (Java)|
+:Cancela la cita mediante CU-11 y libera el cupo;
+:Registra una nueva solicitud para el siguiente día hábil con prioridad menor;
+|Asignación (CU-05)|
+:Procesa la nueva solicitud;
+if (¿Hay cupo?) then (Sí)
+  :Asigna la nueva cita y notifica mediante CU-16;
+else (No / 3a)
+  :Deja la solicitud EN_ESPERA hasta 15 días hábiles [3a];
+endif
+|Sistema CNS (Java)|
+:Registra los cambios en el historial CU-18;
+stop
+@enduml

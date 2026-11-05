@@ -1,5 +1,7 @@
 # 00 · Índice — Issues MVC para cerrar el Sprint 2 y arrancar el Sprint 3
 
+> **Modificado 04/11/2026:** Sprint 3 = 30 oct–5 nov (antes 2–13 nov); Sprint 4 = 6–12 nov; Sprint 5 = 13–20 nov; Sprint 6 = 21–28 nov. Las tarjetas de implementación nuevas están en `06_proyect/Issues_T100/` (rama `feature/T100-algoritmos-ejecucion`). El reparto por CU cambió (ver `TRAZABILIDAD.md`); los responsables de abajo son los del plan original S2/S3.
+
 > Generado el 2026-10-29 a partir del estado real del repo (`develop` = `bdb5c23`). Cada tarjeta trae CU, RF/HU, criterio de aceptación **copiado de la matriz**, el diagrama de comportamiento con cada flujo `[Na]` mapeado a una capa/clase/prueba, y el contrato de clases según la pizarra del profe (`01_GUIA_MVC.md`).
 
 ## Cómo usar este paquete
@@ -44,13 +46,13 @@
 
 Se respetó el reparto del backlog existente (`07_Estimacion.md`, ~8 pts por persona en Sprint 3). Benjamín muestra menos puntos porque además integra los submodelos (S2-M03/S2-M06), mantiene `develop` y es revisor secundario. Único cambio: **CON-09 (CI, 3 pts) pasa de Benjamín a Alejandro**, que tenía la carga más baja (5 pts), para que Benjamín —integrador, revisor y autor del molde— deje de ser el cuello de botella.
 
-## Calendario sugerido del Sprint 3 (2 → 13 de noviembre)
+## Calendario sugerido del Sprint 3 (30 de octubre → 5 de noviembre) — fechas actualizadas 04/11/2026
 
 | Semana | Tarjetas | Resultado |
 |---|---|---|
 | Antes del 2/11 | **S2-IMP-01** y las 4 `S2-DOC-0x` | Molde MVC en `develop`; DER en el repo; submodelos cerrados |
-| 1 (2–6 nov) | S3-01, S3-02, S3-03, S3-04, S3-07, S3-10, S3-13 | Cada persona con una tarjeta propia que **no** depende de otra; backend con BD y errores; modelo de pacientes y auth probados sin BD |
-| 2 (9–13 nov) | S3-05, S3-06, S3-08, S3-09, S3-11, S3-12 + ejecución de aceptación | Slices completos; **demo el viernes 13**: login → admin crea usuario/rol → Admisión busca y registra paciente (y no duplica) |
+| 30 oct–2 nov | S3-01, S3-02, S3-03, S3-04, S3-07, S3-10, S3-13 | Cada persona con una tarjeta propia que **no** depende de otra; backend con BD y errores; modelo de pacientes y auth probados sin BD |
+| 3–5 nov (lo que no cierre pasa al Sprint 4) | S3-05, S3-06, S3-08, S3-09, S3-11, S3-12 + ejecución de aceptación | Slices completos; **demo al cierre del sprint (5 de noviembre)**: login → admin crea usuario/rol → Admisión busca y registra paciente (y no duplica) |
 
 ## Reglas de revisión (rotación, para que no revise todo una sola persona)
 
@@ -68,7 +70,7 @@ Se respetó el reparto del backlog existente (`07_Estimacion.md`, ~8 pts por per
 
 Nadie mergea su propio PR. Benjamín queda como revisor secundario opcional y como integrador de `develop` → `main` al cierre de cada sprint.
 
-## Sprint 4 (16–27 nov): se generan con la misma plantilla cuando Sprint 3 llegue al 70 %
+## Sprint 4 (6–12 nov) en adelante: ver `06_proyect/Issues_T100/` (issues T100-00…T100-15)
 
 | Backlog | Qué | Responsable (plan actual) | CU |
 |---|---|---|---|

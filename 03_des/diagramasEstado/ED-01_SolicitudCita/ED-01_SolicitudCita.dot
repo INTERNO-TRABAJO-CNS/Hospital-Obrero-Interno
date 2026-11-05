@@ -1,0 +1,26 @@
+digraph CNS {
+graph [layout=dot, rankdir=TB, bgcolor="white", pad="0.32", margin="0.08", nodesep="0.85", ranksep="0.90", splines=true, labelloc=t, label="", fontname="DejaVu Sans", fontsize=25, fontcolor="#1E1E1E", outputorder=edgesfirst, overlap=false];
+node [fontname="DejaVu Sans",fontsize=18, fontcolor="#222222", shape=box, style="rounded,filled", fillcolor="#FFFFFF", color="#292929", penwidth=1.65, margin="0.22,0.15"];
+edge [fontname="DejaVu Sans", fontsize=12, fontcolor="#242424", color="#292929", penwidth=1.4, arrowsize=0.9];
+title [shape=box, label="Diagrama de estados: SolicitudCita", style="rounded", fontsize=24, penwidth=1.4, margin="0.16,0.10"];
+title -> start [style=invis, weight=50];
+start [shape=circle, style=filled, fillcolor="#222222", fixedsize=true, width=0.31, height=0.31, label=""];
+pendiente [label="Pendiente"];
+espera [label="En espera"];
+asignada [label="Asignada"];
+sincupo [label="Sin cupo"];
+invalida [label="Rechazada"];
+start -> pendiente [label="solicitud de especialidad y día\n(CU-04)"];
+pendiente -> invalida [label="datos inválidos"];
+pendiente -> asignada [label="hay cupo en el día solicitado\n(CU-05/07)"];
+pendiente -> espera [label="NO HAY CUPOS en el día solicitado"];
+espera -> asignada [label="hay cupo en un día hábil siguiente\n(CU-05/07)"];
+espera -> espera [minlen=1, label="sin cupo, avanza al siguiente día\nhábil"];
+espera -> sincupo [label="se agotaron los 15 días hábiles"];
+end_1 [shape=doublecircle, style=filled, fillcolor="#222222", color="#222222", fixedsize=true, width=0.37, height=0.37, label="", penwidth=1.4];
+invalida -> end_1 [];
+end_2 [shape=doublecircle, style=filled, fillcolor="#222222", color="#222222", fixedsize=true, width=0.37, height=0.37, label="", penwidth=1.4];
+sincupo -> end_2 [];
+end_3 [shape=doublecircle, style=filled, fillcolor="#222222", color="#222222", fixedsize=true, width=0.37, height=0.37, label="", penwidth=1.4];
+asignada -> end_3 [];
+}

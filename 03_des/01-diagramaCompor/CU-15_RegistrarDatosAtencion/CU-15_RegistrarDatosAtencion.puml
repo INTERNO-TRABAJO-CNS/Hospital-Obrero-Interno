@@ -1,0 +1,48 @@
+@startuml CU-15_RegistrarDatosAtencion
+' Caso de uso CU-15: Registrar datos de atención
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-15 · RN-22 · CU-12
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-15: Registrar datos de atención\nDiagrama de actividad
+|Médico|
+start
+:Selecciona la cita en atención;
+|Sistema CNS (Java)|
+if (¿Cita de su agenda y en ASISTENCIA_CONFIRMADA?) then (Sí)
+  ' Camino principal
+else (No / 1a)
+  :Impide registrar la receta y finalizar la cita [1a];
+  stop
+endif
+:Muestra los datos autocompletados de afiliado, ficha, fecha, hora y consulta;
+|Médico|
+:Registra la medicación o receta;
+|Sistema CNS (Java)|
+if (¿Receta válida?) then (Sí)
+  ' Camino principal
+else (No / 2a)
+  :No confirma hasta corregir la información [2a];
+  stop
+endif
+:Agrega la receta al historial clínico;
+|Médico|
+:Registra el fin de la atención;
+|Control de estados / historial|
+:Guarda la hora de fin y cambia la cita a ATENDIDA mediante CU-12;
+stop
+@enduml

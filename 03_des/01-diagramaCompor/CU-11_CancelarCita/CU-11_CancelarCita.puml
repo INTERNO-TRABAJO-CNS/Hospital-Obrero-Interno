@@ -1,0 +1,48 @@
+@startuml CU-11_CancelarCita
+' Caso de uso CU-11: Cancelar cita
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-11 · RN-10 · RN-11 · RN-12 · CU-16 · CU-18
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-11: Cancelar cita\nDiagrama de actividad
+|Paciente o sistema|
+start
+if (¿Quién origina la cancelación?) then (Paciente)
+  :Selecciona su cita programada y pide cancelarla;
+  |Sistema CNS (Java)|
+  if (¿Cita PROGRAMADA sin asistencia confirmada?) then (Sí)
+    |Paciente o sistema|
+    :Confirma la cancelación;
+    |Sistema CNS (Java)|
+    :Registra el motivo Cancelada por el paciente;
+  else (No / 1a-2a)
+    :Informa que la cancelación no puede ejecutarse [1a-2a];
+    stop
+  endif
+else (Sistema / A1)
+  |Proceso automático|
+  :Detecta que faltan 30 minutos y enfermería no confirmó la asistencia [A1];
+  |Sistema CNS (Java)|
+  :Registra el motivo No confirmó asistencia con usuario Sistema [A1];
+endif
+|Sistema CNS (Java)|
+:Cambia el estado a CANCELADA y conserva la cita;
+:Registra la operación en el historial CU-18;
+|Notificaciones (CU-16)|
+:Genera la notificación al paciente;
+stop
+@enduml

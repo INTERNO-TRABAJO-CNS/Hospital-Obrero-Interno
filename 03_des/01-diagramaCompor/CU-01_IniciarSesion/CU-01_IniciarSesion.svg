@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1339" height="1120" viewBox="0 0 1339 1120" role="img" aria-label="CU-01 Iniciar sesión. Diagrama de actividad con carriles y flujos alternativos">
+<defs>
+  <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#315F93"/></marker>
+  <marker id="arrow-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#C99226"/></marker>
+</defs>
+<rect width="1339" height="1120" fill="white"/>
+<rect x="35" y="96" width="315" height="958" fill="#FFFFFF" />
+<rect x="350" y="96" width="315" height="958" fill="#FAFCFE" />
+<rect x="665" y="96" width="315" height="958" fill="#FFFFFF" />
+<rect x="980" y="96" width="325" height="958" fill="#FFFFFF" />
+<g font-family="DejaVu Sans, Arial, sans-serif" text-anchor="middle">
+<text x="669.5" y="36" font-size="23" font-weight="bold" fill="#111111">CU-01: Iniciar sesión</text>
+<text x="669.5" y="64" font-size="15" fill="#163C6B">Diagrama de actividad • Sistema de Gestión y Control de Citas Médicas – Hospital Obrero CNS</text>
+</g>
+<path d="M35 79.5H1304" stroke="#CCDFEF" stroke-width="1.2"/>
+<path d="M35 96V1054M350 96V1054M665 96V1054M980 96V1054" fill="none" stroke="#315F93" stroke-width="1.35"/>
+<path d="M995 121V1054" fill="none" stroke="#E9C77E" stroke-width="1" stroke-dasharray="4 7"/>
+<g font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.8" font-weight="bold" text-anchor="middle">
+ <text x="192.5" y="108">Usuario autorizado</text>
+ <text x="507.5" y="108">Aplicación móvil /</text><text x="507.5" y="125">interfaz</text>
+ <text x="822.5" y="108">Sistema CNS /</text><text x="822.5" y="125">autenticación</text>
+ <text x="1135" y="105">Flujos alternativos / excepciones</text>
+</g>
+
+<circle cx="192.5" cy="144.5" r="12" fill="#315F93" stroke="#234C79" stroke-width="1"/>
+<rect x="54" y="181" width="276" height="68" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="15" text-anchor="middle">
+<tspan x="192.0" y="210.9">Selecciona iniciar sesión e</tspan>
+<tspan x="192.0" y="229.1">ingresa credenciales</tspan>
+</text>
+<rect x="369" y="278" width="276" height="68" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="15" text-anchor="middle">
+<tspan x="507.0" y="307.9">Envía las credenciales para su</tspan>
+<tspan x="507.0" y="326.1">validación</tspan>
+</text>
+<polygon points="822,374 963,427 822,480 681,427" fill="white" stroke="#315F93" stroke-width="1.5"/>
+<text font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.4" text-anchor="middle">
+<tspan x="822" y="432.0">¿Credenciales válidas?</tspan>
+</text>
+<rect x="1014" y="391" width="266" height="72" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.0"/>
+<text font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" font-weight="bold" x="1024" y="416" fill="#805509">Alternativa 2a</text>
+<text font-family="DejaVu Sans, Arial, sans-serif" font-size="13.4" x="1024" y="436" fill="#152536">
+<tspan x="1024" y="436">Rechaza el acceso e informa que no</tspan>
+<tspan x="1024" y="454">fue posible autenticar [2a]</tspan>
+</text>
+<rect x="685" y="509" width="275" height="68" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="15" text-anchor="middle">
+<tspan x="822.5" y="538.9">Identifica el rol del usuario</tspan>
+<tspan x="822.5" y="557.1">autenticado</tspan>
+</text>
+<polygon points="822,606 963,659 822,712 681,659" fill="white" stroke="#315F93" stroke-width="1.5"/>
+<text font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.4" text-anchor="middle">
+<tspan x="822" y="654.9">¿Tiene permisos para la</tspan>
+<tspan x="822" y="673.1">función?</tspan>
+</text>
+<rect x="1014" y="622" width="266" height="72" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.0"/>
+<text font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" font-weight="bold" x="1024" y="647" fill="#805509">Alternativa 3a</text>
+<text font-family="DejaVu Sans, Arial, sans-serif" font-size="13.4" x="1024" y="667" fill="#152536">
+<tspan x="1024" y="667">Bloquea funciones no autorizadas</tspan>
+<tspan x="1024" y="685">[3a]</tspan>
+</text>
+<rect x="685" y="740" width="275" height="68" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="15" text-anchor="middle">
+<tspan x="822.5" y="769.9">Aplica los permisos asignados al</tspan>
+<tspan x="822.5" y="788.1">rol</tspan>
+</text>
+<rect x="369" y="837" width="276" height="68" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="15" text-anchor="middle">
+<tspan x="507.0" y="866.9">Muestra únicamente funciones e</tspan>
+<tspan x="507.0" y="885.1">información autorizadas</tspan>
+</text>
+<rect x="54" y="934" width="276" height="68" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="15" text-anchor="middle">
+<tspan x="192.0" y="963.9">Ingresa a las opciones habilitadas</tspan>
+<tspan x="192.0" y="982.1">para su rol</tspan>
+</text>
+<path d="M192.5 156.5V180" fill="none" stroke="#315F93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<path d="M192.5 249V262H507V277" fill="none" stroke="#315F93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<path d="M507 346V359H822V374" fill="none" stroke="#315F93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<path d="M822 480V508" fill="none" stroke="#315F93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<path d="M963 427H1012" fill="none" stroke="#C99226" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-gold)"/>
+<path d="M822 577V606" fill="none" stroke="#315F93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<path d="M963 659H1012" fill="none" stroke="#C99226" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-gold)"/>
+<path d="M822 712V739" fill="none" stroke="#315F93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<path d="M822 808V821H507V836" fill="none" stroke="#315F93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<path d="M507 905V918H192.5V933" fill="none" stroke="#315F93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<path d="M192.5 1002V1027" fill="none" stroke="#315F93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<circle cx="192.5" cy="1040" r="12" fill="white" stroke="#315F93" stroke-width="2"/><circle cx="192.5" cy="1040" r="7.5" fill="#315F93"/>
+<g font-family="DejaVu Sans, Arial, sans-serif" font-size="12" fill="#173F70">
+<text x="844" y="497">Sí</text><text x="971" y="421" fill="#92660D">No</text>
+<text x="844" y="728">Sí</text><text x="971" y="653" fill="#92660D">No</text>
+</g>
+<path d="M35 1062H1304" stroke="#C7DCED" stroke-width="1.15"/>
+<text font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" x="35" y="1081" fill="#173F70">Referencia: CU-01 | RF-01 · RN-16 · RN-20</text>
+<text font-family="DejaVu Sans, Arial, sans-serif" font-size="10.5" x="35" y="1102" fill="#6C819D">Fuente: Especificación de casos de uso CNS y reglas del modelo del negocio.</text>
+</svg>

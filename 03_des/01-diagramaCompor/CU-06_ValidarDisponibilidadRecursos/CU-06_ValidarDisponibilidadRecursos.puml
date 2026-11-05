@@ -1,0 +1,54 @@
+@startuml CU-06_ValidarDisponibilidadRecursos
+' Caso de uso CU-06: Validar disponibilidad de recursos
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-06 · RN-05 · RN-06 · RN-07 · RN-21
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-06: Validar disponibilidad de recursos\nDiagrama de actividad
+|Proceso de validación (CU-06)|
+start
+:Recibe combinación candidata de médico, fecha, hora y consultorio;
+|Agenda y recursos|
+if (¿Médico y horario libres?) then (Sí)
+  ' Camino principal
+else (No / 2a)
+  :Marca la combinación como no disponible [2a];
+  stop
+endif
+if (¿Consultorio libre?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :Marca la combinación como no disponible [3a];
+  stop
+endif
+if (¿Médico con menos de 7 fichas y paciente sin otra cita ese día?) then (Sí)
+  ' Camino principal
+else (No / 4a)
+  :Marca la combinación como no disponible [4a];
+  stop
+endif
+|Base de datos (PostgreSQL)|
+if (¿Sin cita solapada ni solicitud simultánea ganadora?) then (Sí)
+  ' Camino principal
+else (No / 5a)
+  :Permite que solo una confirme y la otra continúa sin doble asignación [5a];
+  stop
+endif
+|Proceso de validación (CU-06)|
+:Devuelve la disponibilidad al proceso solicitante;
+stop
+@enduml

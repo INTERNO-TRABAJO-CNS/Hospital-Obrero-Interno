@@ -1,0 +1,17 @@
+@startuml
+title CNS — Ciclo de vida de CitaMedica (v2, 04/11/2026)
+[*] --> PROGRAMADA : asignación validada (CU-07)
+PROGRAMADA --> ASISTENCIA_CONFIRMADA : enfermería confirma hasta 30 min antes (CU-12)
+PROGRAMADA --> CANCELADA : el paciente cancela (CU-11)
+PROGRAMADA --> CANCELADA : cancelación automática a 30 min sin confirmación (CU-11)
+ASISTENCIA_CONFIRMADA --> ATENDIDA : el médico registra receta y fin (CU-15)
+ATENDIDA --> [*]
+CANCELADA --> [*]
+note right of PROGRAMADA
+Reprogramar = cancelar + nueva solicitud con prioridad menor (CU-10).
+«Inasistencia» no es estado: es la cancelación automática.
+end note
+note bottom of CANCELADA
+La cita se conserva. El cupo no se reasigna automáticamente por ahora.
+end note
+@enduml

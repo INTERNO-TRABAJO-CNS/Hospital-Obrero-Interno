@@ -1,0 +1,28 @@
+@startuml ED-04_AtencionOperativa
+' CNS — diagrama de estados UML 2.x a partir de casos de uso del ZIP
+' Casos relacionados: CU-12, CU-15
+hide empty description
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 17
+skinparam ArrowColor #292929
+skinparam StateBorderColor #292929
+skinparam StateBackgroundColor white
+skinparam StateFontColor #222222
+skinparam StateBorderThickness 1.6
+skinparam roundcorner 18
+top to bottom direction
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title Diagrama de estados: AtencionOperativa
+state "Esperando llegada" as sinllegada
+state "Asistencia confirmada" as confirmada
+state "Finalizada" as finalizada
+state "Cancelada automática" as cancelada
+[*] --> sinllegada : cita del día PROGRAMADA
+sinllegada --> confirmada : enfermería confirma la llegada hasta 30 min antes (CU-12)
+sinllegada --> cancelada : 30 min antes sin confirmación (CU-11 automática)
+confirmada --> finalizada : el médico registra la receta y el fin de la atención (CU-15)
+finalizada --> [*]
+cancelada --> [*]
+' NOTA: el médico solo registra el fin. Tiempo de espera y de atención por separado no son medibles; solo confirmación → fin.
+@enduml

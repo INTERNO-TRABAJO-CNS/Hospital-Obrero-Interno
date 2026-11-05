@@ -1,0 +1,50 @@
+@startuml CU-13_ConsultarAgendaMedica
+' Caso de uso CU-13: Consultar agenda médica
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-13 · RN-18 · RN-20
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-13: Consultar agenda médica\nDiagrama de actividad
+|Médico|
+start
+:Abre la agenda médica;
+|Sistema CNS (Java)|
+if (¿Usuario autenticado como médico?) then (Sí)
+  ' Camino principal
+else (No / 1a)
+  :Impide el acceso a la agenda médica restringida [1a];
+  stop
+endif
+:Busca las citas del día actual del médico autenticado;
+if (¿Existen citas hoy?) then (Sí)
+  |Interfaz de agenda|
+  :Muestra cantidad de citas, número de ficha y hora;
+else (No / 3a)
+  :Informa que no hay citas programadas [3a];
+endif
+|Médico|
+if (¿Desea ver otra fecha?) then (Sí)
+  :Pulsa otras fechas y elige una fecha;
+  |Sistema CNS (Java)|
+  :Muestra las citas de la fecha elegida;
+else (No)
+  ' Camino principal
+endif
+|Médico|
+:Revisa su agenda sin modificar registros;
+stop
+@enduml

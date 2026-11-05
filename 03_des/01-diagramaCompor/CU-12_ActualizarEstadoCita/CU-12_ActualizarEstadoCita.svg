@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1480" height="1152" viewBox="0 0 1480 1152" role="img" aria-label="CU-12: Actualizar estado de cita. Diagrama de actividad CNS">
+<defs><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8.8" markerHeight="8.8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#315F93"/></marker><marker id="arrow-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8.8" markerHeight="8.8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#C99226"/></marker></defs>
+<rect x="0" y="0" width="1480" height="1152" fill="#FFFFFF"/>
+<text x="740.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#0D0F15" font-size="22.5" font-weight="bold" text-anchor="middle">
+<tspan x="740.0" y="34.6">CU-12: Actualizar estado de cita</tspan>
+</text>
+<text x="740.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="15.4" font-weight="normal" text-anchor="middle">
+<tspan x="740.0" y="64.2">Diagrama de actividad • Sistema de Gestión y Control de Citas Médicas – Hospital Obrero CNS</tspan>
+</text>
+<path d="M36 80H1444" fill="none" stroke="#C6DCEC" stroke-width="1.15"/>
+<rect x="36" y="96" width="352" height="971.0" fill="#FFFFFF"/>
+<path d="M36 96V1067.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="212.0" y="116.7">Enfermería o médico</tspan>
+</text>
+<rect x="388" y="96" width="352" height="971.0" fill="#FAFCFE"/>
+<path d="M388 96V1067.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="564.0" y="116.7">Sistema CNS (Java)</tspan>
+</text>
+<rect x="740" y="96" width="352" height="971.0" fill="#FFFFFF"/>
+<path d="M740 96V1067.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="916.0" y="116.7">Control de estados / historial</tspan>
+</text>
+<rect x="1092" y="96" width="352" height="971.0" fill="#FFFFFF"/>
+<path d="M1092 96V1067.0" stroke="#315F93" stroke-width="1.1"/>
+<path d="M1107 125V1067.0" fill="none" stroke="#E4BD6E" stroke-width="0.85" stroke-dasharray="4 7"/>
+<text x="1268.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.8" font-weight="bold" text-anchor="middle">
+<tspan x="1268.0" y="114.7">Flujos alternativos / excepciones</tspan>
+</text>
+<path d="M212.0 166.0V196.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M212.0 262.0V277.0H564.0V292.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M564.0 358.0V393.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M564.0 510.0V545.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="581.0" y="528.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">Sí</text>
+<path d="M564.0 658.0V693.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="581.0" y="676.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">Enfermería</text>
+<path d="M564.0 810.0V840.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="581.0" y="828.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">Sí</text>
+<path d="M564.0 906.0V921.0H916.0V936.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M916.0 1002.0V1027.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M720.0 452.0H1107.0V458.5H1121.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="922.0" y="445.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">No / 2a</text>
+<path d="M720.0 602.0H1107.0V592.0H1121.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="922.0" y="595.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">Médico</text>
+<path d="M720.0 752.0H1107.0V799.0H1121.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="922.0" y="745.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">No / 2c-2d</text>
+<circle cx="212.0" cy="154.0" r="12" fill="#315F93" stroke="#254C78" stroke-width="1"/>
+<rect x="60.0" y="197.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="212.0" y="234.4">Selecciona una cita del día</tspan>
+</text>
+<rect x="412.0" y="293.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="320.9">Muestra el estado actual y las</tspan>
+<tspan x="564.0" y="339.9">acciones permitidas para su rol</tspan>
+</text>
+<polygon points="564.0,394.0 720.0,452.0 564.0,510.0 408.0,452.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="448.3">¿El rol puede actualizar el</tspan>
+<tspan x="564.0" y="465.3">estado?</tspan>
+</text>
+<polygon points="564.0,546.0 720.0,602.0 564.0,658.0 408.0,602.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="606.8">¿Quién actualiza?</tspan>
+</text>
+<polygon points="564.0,694.0 720.0,752.0 564.0,810.0 408.0,752.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="748.3">¿Cita del día actual y hasta 30</tspan>
+<tspan x="564.0" y="765.3">minutos antes de su hora?</tspan>
+</text>
+<rect x="412.0" y="841.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="868.9">Confirma la asistencia y cambia a</tspan>
+<tspan x="564.0" y="887.9">ASISTENCIA_CONFIRMADA</tspan>
+</text>
+<rect x="764.0" y="937.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="916.0" y="964.9">Conserva la operación para</tspan>
+<tspan x="916.0" y="983.9">seguimiento y reportes</tspan>
+</text>
+<circle cx="916.0" cy="1040.0" r="12" fill="#FFFFFF" stroke="#315F93" stroke-width="2"/><circle cx="916.0" cy="1040.0" r="7.4" fill="#315F93"/>
+<rect x="1124.0" y="428.5" width="296.0" height="107.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="1136.0" y="452.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa No / 2a</text>
+<text x="1136.0" y="471.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">Rechaza el cambio y conserva el estado</text>
+<text x="1136.0" y="488.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">anterior [2a]</text>
+<text x="1136.0" y="522.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Fin de este flujo</text>
+<rect x="1124.0" y="562.0" width="296.0" height="185.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="1136.0" y="586.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa Médico</text>
+<text x="1136.0" y="605.0" font-family="DejaVu Sans, Arial, sans-serif" font-weight="bold" font-size="12.0" fill="#654713">Decisión: ¿Cita en</text>
+<text x="1136.0" y="622.0" font-family="DejaVu Sans, Arial, sans-serif" font-weight="bold" font-size="12.0" fill="#654713">ASISTENCIA_CONFIRMADA?</text>
+<text x="1136.0" y="645.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">Sí → Registra el fin de la atención y</text>
+<text x="1136.0" y="662.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">cambia a ATENDIDA</text>
+<text x="1136.0" y="683.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">No / 2b → No modifica la cita e informa</text>
+<text x="1136.0" y="700.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">estado inválido [2b]</text>
+<text x="1136.0" y="734.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Continúa si cumple; si no, finaliza</text>
+<rect x="1124.0" y="769.0" width="296.0" height="107.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="1136.0" y="793.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa No / 2c-2d</text>
+<text x="1136.0" y="812.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">Rechaza porque no es del día o ya fue</text>
+<text x="1136.0" y="829.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">cancelada automáticamente [2c-2d]</text>
+<text x="1136.0" y="863.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Fin de este flujo</text>
+<path d="M36 1083.0H1444" stroke="#D3E2F2" stroke-width="1.05"/>
+<text x="36" y="1102.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#163C6B">Referencia: CU-12 | RF-12 · RN-13 · RN-22 · RN-24</text>
+<text x="36" y="1122.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.7" fill="#7085A1">Fuente: Especificación de casos de uso CNS y reglas del modelo del negocio.</text>
+</svg>

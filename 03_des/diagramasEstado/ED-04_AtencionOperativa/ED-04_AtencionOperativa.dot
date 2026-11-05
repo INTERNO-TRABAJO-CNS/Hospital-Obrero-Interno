@@ -1,0 +1,20 @@
+digraph CNS {
+graph [layout=dot, rankdir=TB, bgcolor="white", pad="0.32", margin="0.08", nodesep="0.85", ranksep="0.90", splines=true, labelloc=t, label="", fontname="DejaVu Sans", fontsize=25, fontcolor="#1E1E1E", outputorder=edgesfirst, overlap=false];
+node [fontname="DejaVu Sans",fontsize=18, fontcolor="#222222", shape=box, style="rounded,filled", fillcolor="#FFFFFF", color="#292929", penwidth=1.65, margin="0.22,0.15"];
+edge [fontname="DejaVu Sans", fontsize=12, fontcolor="#242424", color="#292929", penwidth=1.4, arrowsize=0.9];
+title [shape=box, label="Diagrama de estados: AtencionOperativa", style="rounded", fontsize=24, penwidth=1.4, margin="0.16,0.10"];
+title -> start [style=invis, weight=50];
+start [shape=circle, style=filled, fillcolor="#222222", fixedsize=true, width=0.31, height=0.31, label=""];
+sinllegada [label="Esperando llegada"];
+confirmada [label="Asistencia confirmada"];
+finalizada [label="Finalizada"];
+cancelada [label="Cancelada automática"];
+start -> sinllegada [label="cita del día PROGRAMADA"];
+sinllegada -> confirmada [label="enfermería confirma la llegada hasta\n30 min antes (CU-12)"];
+sinllegada -> cancelada [label="30 min antes sin confirmación (CU-11\nautomática)"];
+confirmada -> finalizada [label="el médico registra la receta y el\nfin de la atención (CU-15)"];
+end_1 [shape=doublecircle, style=filled, fillcolor="#222222", color="#222222", fixedsize=true, width=0.37, height=0.37, label="", penwidth=1.4];
+finalizada -> end_1 [];
+end_2 [shape=doublecircle, style=filled, fillcolor="#222222", color="#222222", fixedsize=true, width=0.37, height=0.37, label="", penwidth=1.4];
+cancelada -> end_2 [];
+}
