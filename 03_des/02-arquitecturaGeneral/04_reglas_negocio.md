@@ -1,38 +1,51 @@
-# ARQ-04 — Reglas de negocio y asignación automática
+# ARQ-04 — Reglas de negocio y asignación automática (v2 — 04/11/2026)
 
-## Reglas confirmadas (26/10/2026)
-**RN-01.** El paciente solicita por especialidad, sin escoger médico, fecha, hora ni consultorio (CU-04).
+> **Modificado 04/11/2026.** Sustituye la versión del 26/10/2026. Cambios y motivos en `06_proyect/CAMBIOS_04-11-2026.md`. Las reglas marcadas «(cambia)» contradecían decisiones nuevas del equipo.
 
-**RN-02.** El motor Java busca la **fecha y hora disponibles más cercanas** compatibles con especialidad, médico, turno y consultorio. Si hoy no hay, continúa al **siguiente día disponible y/o hábil**. El calendario institucional de días hábiles/feriados es PENDIENTE DE VALIDACIÓN.
+## Reglas vigentes
+**RN-01 (cambia).** El paciente solicita **especialidad y día**; no escoge médico, hora ni consultorio (CU-04). Especialidades: Consultorio Familiar (general), Odontología y Pediatría.
 
-**RN-03.** En cada combinación, el backend verifica disponibilidad **vigente**. En la confirmación de CU-07 se debe impedir la carrera entre solicitudes (RNF-03/RNF-04).
+**RN-02 (cambia).** El sistema asigna médico, hora y consultorio. Las solicitudes se atienden por **orden de llegada** (cola). Las de pacientes que cancelaron o reprogramaron entran con **prioridad menor**. Si no hay cupo en el día pedido, el sistema informa **NO HAY CUPOS** y deja la solicitud **EN_ESPERA** para el siguiente día hábil.
 
-**RN-04.** Si no existe combinación válida en el período de búsqueda, informa indisponibilidad y no crea cita. El horizonte máximo de búsqueda es **PENDIENTE DE VALIDACIÓN**; no inventar una lista de espera vigente.
+**RN-03.** En cada combinación el backend verifica la disponibilidad vigente. La confirmación (CU-07) evita la carrera entre solicitudes simultáneas con PostgreSQL: `SELECT … FOR UPDATE SKIP LOCKED` y restricción `UNIQUE(médico, fecha, hora)`.
 
-**RN-05.** El paciente se registra/identifica por `numeroAseguradoCNS` obligatorio; CI es dato secundario. Se permite auto-registro de cuenta, con procedimiento de verificación de afiliación **por definir**.
+**RN-04 (cambia).** La búsqueda llega como máximo a **15 días hábiles**. Si no hay cupo en ese rango la solicitud pasa a **SIN_CUPO** y se informa al paciente. No se crea cita ficticia.
 
-**RN-06.** Secretaría/enfermería verifica llegada y puede cancelar por inasistencia después de una tolerancia de **10 minutos respecto de la hora programada**. La cancelación requiere autorización, motivo y auditoría; no se presume automática sin intervención.
+**RN-05 (cambia).** Solo el **asegurado titular** crea cuenta, y el registro se valida contra la **tabla interna de afiliados**. Los beneficiarios no son afiliados: se atienden con la afiliación del titular y su CI. La primera vez se crea su historial clínico.
 
-**RN-07.** Estados persistidos: PROGRAMADA, ATENDIDA y CANCELADA. Inasistencia es circunstancia/motivo, no estado nuevo.
+**RN-06 (cambia).** Enfermería confirma la asistencia del paciente (en el hospital) **hasta 30 minutos antes** de la cita. Si no la confirma, el sistema **cancela automáticamente a T-30** (motivo «No confirmó asistencia»). Se envía un aviso a **T-45**. La cita **nunca se borra**: queda CANCELADA.
 
-**RN-08.** El administrador supervisa cumplimiento mediante reportes/indicadores; gestiona usuarios y roles en CU-02. No administrar agendas por defecto.
+**RN-07 (cambia).** Estados de cita: **PROGRAMADA, ASISTENCIA_CONFIRMADA, ATENDIDA, CANCELADA**. Estados de solicitud: **PENDIENTE, EN_ESPERA, ASIGNADA, SIN_CUPO**.
 
-**RN-09.** WebSocket comunica cambios luego de confirmación persistente; no ejecuta reservas ni define ganadores.
+**RN-08 (cambia).** El administrador mantiene los catálogos (médicos, especialidades, consultorios, horarios, cupos, días no hábiles, pacientes, usuarios) y supervisa una **agenda de solo lectura en tiempo real** por WebSocket.
 
-## Proceso principal (Java, diseño; no código)
-1. Registrar `SolicitudCita` autenticada e identificar `Paciente` por su afiliación.
-2. Buscar la **primera fecha/hora compatible** a partir del punto de inicio definido; filtrar por médico habilitado, especialidad, agenda y consultorio.
-3. Evaluar restricciones de superposición, estado y autorizaciones.
-4. Bloquear/revalidar disponibilidad con mecanismo de concurrencia respaldado por PostgreSQL.
-5. Confirmar `CitaMedica` y su relación con recursos en **una transacción**; persistir evento de auditoría.
-6. Solo después del commit, poner en cola evento para notificación y difundir cambio de agenda por WebSocket.
-7. Si aparece conflicto simultáneo, descartar esa opción y probar la siguiente; si agota las opciones, comunicar sin disponibilidad.
+**RN-09.** WebSocket comunica cambios luego del commit; no ejecuta reservas ni define ganadores.
 
-> Criterio secundario de desempate (dos médicos con idéntica primera hora), horario de inicio y duración de cita: **PENDIENTE DE VALIDACIÓN**. Elegir la hora más próxima no define por sí solo esos parámetros.
+**RN-10 (nueva).** Un paciente no puede tener **más de una cita el mismo día**, ni siquiera en especialidades distintas.
 
-## Cambio aprobado en intención, PENDIENTE DE APROBACIÓN DOCUMENTAL
-**Reasignación tras cancelación/inasistencia:** el equipo desea incorporarla, pero no está formalmente incorporada a RF/CU del Sprint 1. NO codificar como funcionalidad base del Sprint 2. Ver [decisiones](11_decisiones_pendientes.md) y [secuencia futura](diagramas/ARQ-06_SecuenciaReasignacion_PENDIENTE.puml).
+**RN-11 (nueva).** Cada médico atiende **máximo 7 fichas por día**; la **meta mínima es 5**.
 
-Comportamiento propuesto: enfermería cancela/libera cupo; motor Java identifica citas del día siguiente sin mover citas del día actual; hace ofertas simultáneas según prioridad todavía no aprobada; pacientes aceptan voluntariamente en buzón; backend confirma atómicamente primera aceptación válida, invalida las otras; libera la cita anterior para posible cadena. No quitar cita previa por solo haber ofertado, y no permitir doble adjudicación.
+**RN-12 (nueva).** Duración por ficha: Consultorio General 30–45 min; Odontología 45–60 min; Pediatría 30–45 min.
 
-**Pendientes críticos:** criterio de prioridad, tiempo de aceptación, ventana futura, elegibilidad de pacientes cercanos, rechazos, disponibilidad sin conexión, la validación exacta del punto +10 minutos y proceso formal de aprobación.
+**RN-13 (nueva).** El médico solo registra el **fin** de la atención y agrega la receta/medicación al historial clínico; no inicia la cita.
+
+**RN-14 (nueva).** Reprogramar = cancelar la cita vigente (CU-11) y crear una **nueva solicitud** con prioridad menor para el siguiente día hábil.
+
+**RN-15 (nueva).** El cupo liberado por una cancelación **no se reasigna automáticamente** (decisión 04/11/2026; queda para una etapa posterior).
+
+**RN-16 (nueva).** La pantalla de TV es de **solo lectura** y muestra únicamente el listado de fichas del día.
+
+## Proceso principal (Java; diseño)
+1. Registrar `SolicitudCita` (PENDIENTE) con su orden de llegada.
+2. Tomar la siguiente de la cola (prioridad normal antes que la de quien canceló).
+3. Buscar en el día pedido un médico de la especialidad con menos de 7 fichas, hora según duración, consultorio libre y paciente sin otra cita ese día.
+4. Bloquear y revalidar con PostgreSQL (`FOR UPDATE SKIP LOCKED`; `UNIQUE` como red de seguridad).
+5. En **una transacción**: crear `CitaMedica` PROGRAMADA con número de ficha, marcar la solicitud ASIGNADA, escribir `CambioCita`.
+6. Tras el commit: notificar (CU-16) y emitir el cambio por WebSocket.
+7. Sin cupo: EN_ESPERA → siguiente día hábil, hasta 15 días hábiles; luego SIN_CUPO.
+
+## Pendientes de validar (abiertos)
+- Criterio de desempate entre dos médicos con la misma primera hora.
+- Numeración de ficha (propuesta: correlativo por médico y día).
+- ¿Puede el paciente cancelar después de ASISTENCIA_CONFIRMADA? (supuesto actual: no).
+- Tiempo de espera y de atención por separado no son medibles con los datos actuales (solo confirmación → fin).

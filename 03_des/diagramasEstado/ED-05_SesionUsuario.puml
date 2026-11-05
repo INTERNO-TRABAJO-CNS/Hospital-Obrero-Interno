@@ -1,0 +1,27 @@
+@startuml ED-05_SesionUsuario
+' CNS — diagrama de estados UML 2.x a partir de casos de uso del ZIP
+' Casos relacionados: CU-01
+hide empty description
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 17
+skinparam ArrowColor #292929
+skinparam StateBorderColor #292929
+skinparam StateBackgroundColor white
+skinparam StateFontColor #222222
+skinparam StateBorderThickness 1.6
+skinparam roundcorner 18
+top to bottom direction
+title Diagrama de estados: SesionUsuario
+state "Sin sesión" as sin
+state "Validando credenciales" as validando
+state "Autenticada" as autenticada
+state "Cerrada" as cerrada
+[*] --> sin : acceso al sistema
+sin --> validando : ingresar credenciales (CU-01)
+validando --> sin : credenciales inválidas
+validando --> autenticada : credenciales válidas y rol autorizado
+autenticada --> cerrada : cerrar sesión
+cerrada --> [*]
+' NOTA: No se agrega bloqueo de cuenta ni caducidad automática porque tales reglas no figuran en el material revisado.
+@enduml

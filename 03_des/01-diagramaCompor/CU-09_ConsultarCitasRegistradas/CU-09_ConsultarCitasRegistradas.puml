@@ -1,0 +1,46 @@
+@startuml CU-09_ConsultarCitasRegistradas
+' Caso de uso CU-09: Consultar citas registradas
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-09 · RN-16 · RN-20
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-09: Consultar citas registradas\nDiagrama de actividad
+|Enfermería o pantalla TV|
+start
+:Abre la consulta de fichas del día;
+|Sistema CNS (Java)|
+:Muestra los criterios paciente, médico, estado y consultorio con la fecha del día actual;
+|Enfermería o pantalla TV|
+:Selecciona el criterio y su valor;
+|Sistema CNS (Java)|
+if (¿Criterio válido y fecha del día actual?) then (Sí)
+  ' Camino principal
+else (No / 2a-2b)
+  :Solicita corregir el criterio o rechaza fechas distintas al día actual [2a-2b];
+  stop
+endif
+:Busca las fichas del día;
+if (¿Hay coincidencias?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :Informa que no se encontraron resultados [3a];
+  stop
+endif
+|Enfermería o pantalla TV|
+:Revisa el listado de fichas en solo lectura;
+stop
+@enduml

@@ -1,0 +1,28 @@
+@startuml ED-03_CupoAgenda
+' CNS — diagrama de estados UML 2.x a partir de casos de uso del ZIP
+' Casos relacionados: CU-05, CU-06, CU-10, CU-11, CU-15
+hide empty description
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 17
+skinparam ArrowColor #292929
+skinparam StateBorderColor #292929
+skinparam StateBackgroundColor white
+skinparam StateFontColor #222222
+skinparam StateBorderThickness 1.6
+skinparam roundcorner 18
+top to bottom direction
+title Diagrama de estados: CupoAgenda
+state "Disponible" as libre
+state "Reservado" as reservado
+state "Utilizado" as usado
+state "Cerrado sin uso" as cierre
+[*] --> libre : publicar agenda
+libre --> reservado : asignación sin conflicto (CU-05/06)
+reservado --> libre : cancelación o cambio, si el cupo sigue vigente
+reservado --> usado : atención realizada (CU-15)
+reservado --> cierre : horario agotado sin uso
+usado --> [*]
+cierre --> [*]
+' NOTA: Un cupo no debe asignarse dos veces. La oferta automática de cupos liberados es un cambio pendiente, no incluido aquí.
+@enduml

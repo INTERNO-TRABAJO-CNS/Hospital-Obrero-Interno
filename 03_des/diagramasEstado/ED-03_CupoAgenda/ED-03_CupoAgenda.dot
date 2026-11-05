@@ -1,0 +1,19 @@
+digraph CNS {
+graph [layout=dot, rankdir=TB, bgcolor="white", pad="0.32", margin="0.08", nodesep="0.85", ranksep="0.90", splines=true, labelloc=t, label="", fontname="DejaVu Sans", fontsize=25, fontcolor="#1E1E1E", outputorder=edgesfirst, overlap=false];
+node [fontname="DejaVu Sans",fontsize=18, fontcolor="#222222", shape=box, style="rounded,filled", fillcolor="#FFFFFF", color="#292929", penwidth=1.65, margin="0.22,0.15"];
+edge [fontname="DejaVu Sans", fontsize=12, fontcolor="#242424", color="#292929", penwidth=1.4, arrowsize=0.9];
+title [shape=box, label="Diagrama de estados: CupoAgenda (por médico y día)", style="rounded", fontsize=24, penwidth=1.4, margin="0.16,0.10"];
+title -> start [style=invis, weight=50];
+start [shape=circle, style=filled, fillcolor="#222222", fixedsize=true, width=0.31, height=0.31, label=""];
+libre [label="Con cupo"];
+completo [label="Completo (7 fichas)"];
+cierre [label="Cerrado"];
+start -> libre [label="agenda del médico publicada para el\ndía"];
+libre -> libre [minlen=1, label="se asigna una ficha y quedan menos\nde 7 (CU-05/07)"];
+libre -> completo [label="se asigna la ficha 7"];
+completo -> libre [label="una cancelación libera una ficha\n(CU-11)"];
+libre -> cierre [label="termina el día"];
+completo -> cierre [label="termina el día"];
+end_1 [shape=doublecircle, style=filled, fillcolor="#222222", color="#222222", fixedsize=true, width=0.37, height=0.37, label="", penwidth=1.4];
+cierre -> end_1 [];
+}

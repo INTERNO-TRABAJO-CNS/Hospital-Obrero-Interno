@@ -1,0 +1,51 @@
+@startuml CU-12_ActualizarEstadoCita
+' Caso de uso CU-12: Actualizar estado de cita
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-12 · RN-13 · RN-22 · RN-24
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-12: Actualizar estado de cita\nDiagrama de actividad
+|Enfermería o médico|
+start
+:Selecciona una cita del día;
+|Sistema CNS (Java)|
+:Muestra el estado actual y las acciones permitidas para su rol;
+if (¿El rol puede actualizar el estado?) then (Sí)
+  ' Camino principal
+else (No / 2a)
+  :Rechaza el cambio y conserva el estado anterior [2a];
+  stop
+endif
+if (¿Quién actualiza?) then (Enfermería)
+  if (¿Cita del día actual y hasta 30 minutos antes de su hora?) then (Sí)
+    :Confirma la asistencia y cambia a ASISTENCIA_CONFIRMADA;
+  else (No / 2c-2d)
+    :Rechaza porque no es del día o ya fue cancelada automáticamente [2c-2d];
+    stop
+  endif
+else (Médico)
+  if (¿Cita en ASISTENCIA_CONFIRMADA?) then (Sí)
+    :Registra el fin de la atención y cambia a ATENDIDA;
+  else (No / 2b)
+    :No modifica la cita e informa estado inválido [2b];
+    stop
+  endif
+endif
+|Control de estados / historial|
+:Conserva la operación para seguimiento y reportes;
+stop
+@enduml

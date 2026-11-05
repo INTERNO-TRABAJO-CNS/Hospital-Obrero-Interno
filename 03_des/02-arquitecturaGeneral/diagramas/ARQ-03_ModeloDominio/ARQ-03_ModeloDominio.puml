@@ -1,0 +1,155 @@
+@startuml
+title CNS — Diagrama conceptual de clases v2 (04/11/2026, NO representa DER validado)
+skinparam classAttributeIconSize 0
+enum EstadoCita {
+ PROGRAMADA
+ ASISTENCIA_CONFIRMADA
+ ATENDIDA
+ CANCELADA
+}
+enum EstadoSolicitud {
+ PENDIENTE
+ EN_ESPERA
+ ASIGNADA
+ SIN_CUPO
+}
+enum RolUsuario {
+ PACIENTE
+ MEDICO
+ ENFERMERIA
+ ADMINISTRADOR
+}
+package "Identidad · Matías (CU-01, CU-03)" {
+ class Persona {
+ +personaId
+ +nombres
+ +apellidos
+ +ci
+}
+ class Afiliado {
+ +numeroAfiliado
+ +activo
+}
+ class Paciente {
+ +pacienteId
+ +esTitular
+}
+ class Usuario {
+ +usuarioId
+ +username
+ +passwordHash
+ +rol : RolUsuario
+}
+ Persona "1" -- "0..1" Paciente
+ Persona "1" -- "0..1" Usuario
+ Paciente "*" --> "1" Afiliado : titular o beneficiario
+}
+package "Recursos y catálogos · Benjamín (CU-02, CU-06)" {
+ class Especialidad {
+ +especialidadId
+ +nombre
+ +duracionMinMin
+ +duracionMaxMin
+}
+ class Medico {
+ +medicoId
+ +duracionCitaMin
+ +cupoMaximoDia = 7
+ +cupoMinimoDia = 5
+}
+ class Consultorio { +consultorioId }
+ class AgendaMedica {
+ +agendaId
+ +fecha
+}
+ class FranjaDisponible {
+ +franjaId
+ +inicio
+ +fin
+}
+ class DiaNoHabil {
+ +fecha
+ +descripcion
+}
+ Medico "*" -- "1" Especialidad : validar cardinalidad
+ Medico "1" -- "*" AgendaMedica
+ AgendaMedica "1" o-- "*" FranjaDisponible
+}
+package "Solicitudes y citas · Benjamín (CU-04, 05, 07) · Matías (CU-10)" {
+ class SolicitudCita {
+ +solicitudId
+ +ordenLlegada
+ +fechaSolicitud
+ +diaSolicitado
+ +prioridad
+ +estado : EstadoSolicitud
+}
+ class CitaMedica {
+ +citaId
+ +numeroFicha
+ +fecha
+ +horaInicio
+ +horaFin
+ +estado : EstadoCita
+ +motivoCancelacion
+ +horaFinAtencion
+ +version
+}
+}
+package "Operaciones · Alejandro (CU-09, 12, 13) · Alex (CU-11, 18)" {
+ class RegistroLlegada {
+ +llegadaId
+ +fechaHora
+ +enfermeriaId
+}
+ class CambioCita {
+ +cambioId
+ +accion
+ +usuarioResponsable
+ +fechaHora
+ +motivo
+}
+}
+package "Historial clínico · Alex (CU-14) · Abigail (CU-15)" {
+ class HistorialClinico { +historialId }
+ class Receta {
+ +recetaId
+ +medicacion
+ +fechaHora
+ +numeroFicha
+ +consultaId
+}
+}
+package "Comunicación · Abigail (CU-16, CU-17)" {
+ class Notificacion {
+ +notificacionId
+ +tipo
+ +mensaje
+ +fechaHora
+}
+ class Recordatorio {
+ +recordatorioId
+ +minutosAntes = 45
+}
+}
+Paciente "1" -- "*" SolicitudCita
+Paciente "1" -- "*" CitaMedica
+Paciente "1" -- "1" HistorialClinico
+SolicitudCita "1" -- "0..1" CitaMedica : origen
+CitaMedica "*" --> "1" Medico
+CitaMedica "*" --> "1" Especialidad
+CitaMedica "*" --> "1" Consultorio
+CitaMedica "*" --> "1" AgendaMedica
+CitaMedica "1" -- "*" CambioCita
+CitaMedica "1" -- "0..1" RegistroLlegada
+CitaMedica "1" -- "0..1" Receta
+HistorialClinico "1" -- "*" Receta
+CitaMedica "1" -- "*" Notificacion
+CitaMedica "1" -- "0..1" Recordatorio
+note right of CitaMedica
+Se elimina DatosAtencion: se separa en
+RegistroLlegada (CU-12), Receta (CU-15)
+y horaFinAtencion en CitaMedica.
+Un paciente no puede tener 2 citas el mismo día.
+end note
+@enduml

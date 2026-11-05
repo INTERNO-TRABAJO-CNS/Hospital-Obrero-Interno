@@ -1,11 +1,13 @@
 # ARQ-13 — Integración por Benjamín
 
-## Distribución de revisión (no reasigna cuestiones funcionales)
-1. **Alejandro**: entrega MDL-01, UML y contratos de paciente/roles.
-2. **Alex**: entrega MDL-02, UML y reglas de agenda/recursos.
-3. **Benjamín**: entrega MDL-03 y **únicamente él** consolida `03_modelo_dominio.md`, `05_contratos_entre_modulos.md` y diagramas ARQ integrados tras revisión.
-4. **Matías**: entrega MDL-04 y requisitos para recepción, cancelación y auditoría.
-5. **Abigal**: entrega MDL-05 y vistas/notificaciones/indicadores.
+> Modificado 04/11/2026: el trabajo de implementación se integra en `feature/T100-algoritmos-ejecucion` (solo código funcional). **Solo Benjamín integra** en esa rama, en `develop` y en `main`.
+
+## Reparto vigente (04/11/2026)
+1. **Benjamín**: CU-02, 05, 06, 07, 19, 20 — catálogos, asignación y reportes; integra.
+2. **Matías**: CU-01, 03, 04, 08, 10 — login, pacientes, solicitud, mis citas, reprogramar.
+3. **Alejandro**: CU-09 (+TV), 12, 13 — listado de fichas, confirmar asistencia, agenda médica.
+4. **Alex**: CU-11, 14, 18 — cancelar (+automática), historial del paciente, historial de cambios.
+5. **Abigail**: CU-15, 16, 17 — receta/fin de atención, notificaciones, aviso T-45.
 
 ## Criterio de entrega de cada integrante
 - [ ] Casos CU/RF/HU correctos y enlazados; revisar escenario principal y alternativo del Word oficial.
@@ -40,3 +42,7 @@ git commit -m "docs(S2): definir submodelo MDL-0X"
 git push -u origin feature/S2-M0X-tema
 ```
 **Sustituir `0X` por 01–05 y el nombre de rama real**. Crear PR manual en GitHub `feature/...` → `develop`, solicitar revisión. Benjamín crea rama de integración desde `develop` **después de merges**, y hace commit solo de archivos transversales. Para evitar conflictos, los otros compañeros no modifican el mismo `03_modelo_dominio.md`.
+
+
+## Flujo T100 (04/11/2026)
+Cada issue `T100-NN` crea `feature/T100-NN-tema` desde `feature/T100-algoritmos-ejecucion`, abre PR hacia esa rama y lo integra solo Benjamín. Antes de empezar: `git fetch` y `git merge origin/develop` en T100. Nadie integra su propio PR.

@@ -1,0 +1,28 @@
+@startuml ED-03_CupoAgenda
+' CNS — diagrama de estados UML 2.x a partir de casos de uso del ZIP
+' Casos relacionados: CU-05, CU-06, CU-10, CU-11, CU-15
+hide empty description
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 17
+skinparam ArrowColor #292929
+skinparam StateBorderColor #292929
+skinparam StateBackgroundColor white
+skinparam StateFontColor #222222
+skinparam StateBorderThickness 1.6
+skinparam roundcorner 18
+top to bottom direction
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title Diagrama de estados: CupoAgenda (por médico y día)
+state "Con cupo" as libre
+state "Completo (7 fichas)" as completo
+state "Cerrado" as cierre
+[*] --> libre : agenda del médico publicada para el día
+libre --> libre : se asigna una ficha y quedan menos de 7 (CU-05/07)
+libre --> completo : se asigna la ficha 7
+completo --> libre : una cancelación libera una ficha (CU-11)
+libre --> cierre : termina el día
+completo --> cierre : termina el día
+cierre --> [*]
+' NOTA: el cupo liberado por una cancelación NO se reasigna automáticamente (decisión 04/11/2026). Meta de cumplimiento: mínimo 5 fichas por día.
+@enduml

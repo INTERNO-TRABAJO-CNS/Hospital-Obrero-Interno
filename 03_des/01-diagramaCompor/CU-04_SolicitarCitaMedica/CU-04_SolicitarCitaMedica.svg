@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1832" height="1570" viewBox="0 0 1832 1570" role="img" aria-label="CU-04: Solicitar cita médica. Diagrama de actividad CNS">
+<defs><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8.8" markerHeight="8.8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#315F93"/></marker><marker id="arrow-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8.8" markerHeight="8.8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#C99226"/></marker></defs>
+<rect x="0" y="0" width="1832" height="1570" fill="#FFFFFF"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#0D0F15" font-size="22.5" font-weight="bold" text-anchor="middle">
+<tspan x="916.0" y="34.6">CU-04: Solicitar cita médica</tspan>
+</text>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="15.4" font-weight="normal" text-anchor="middle">
+<tspan x="916.0" y="64.2">Diagrama de actividad • Sistema de Gestión y Control de Citas Médicas – Hospital Obrero CNS</tspan>
+</text>
+<path d="M36 80H1796" fill="none" stroke="#C6DCEC" stroke-width="1.15"/>
+<rect x="36" y="96" width="352" height="1389.0" fill="#FFFFFF"/>
+<path d="M36 96V1485.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="212.0" y="116.7">Paciente</tspan>
+</text>
+<rect x="388" y="96" width="352" height="1389.0" fill="#FAFCFE"/>
+<path d="M388 96V1485.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="564.0" y="116.7">Aplicación Flutter</tspan>
+</text>
+<rect x="740" y="96" width="352" height="1389.0" fill="#FFFFFF"/>
+<path d="M740 96V1485.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="916.0" y="116.7">Sistema CNS (Java)</tspan>
+</text>
+<rect x="1092" y="96" width="352" height="1389.0" fill="#FAFCFE"/>
+<path d="M1092 96V1485.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="1268.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="1268.0" y="116.7">Asignación (CU-05)</tspan>
+</text>
+<rect x="1444" y="96" width="352" height="1389.0" fill="#FFFFFF"/>
+<path d="M1444 96V1485.0" stroke="#315F93" stroke-width="1.1"/>
+<path d="M1459 125V1485.0" fill="none" stroke="#E4BD6E" stroke-width="0.85" stroke-dasharray="4 7"/>
+<text x="1620.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.8" font-weight="bold" text-anchor="middle">
+<tspan x="1620.0" y="114.7">Flujos alternativos / excepciones</tspan>
+</text>
+<path d="M212.0 166.0V196.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M212.0 262.0V277.0H564.0V292.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M564.0 358.0V373.0H212.0V388.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M212.0 454.0V469.0H916.0V489.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M916.0 602.0V617.0H212.0V632.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="933.0" y="620.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">Sí</text>
+<path d="M212.0 698.0V713.0H916.0V733.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M916.0 884.0V899.0H212.0V914.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="933.0" y="902.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">Sí</text>
+<path d="M212.0 980.0V995.0H916.0V1010.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M916.0 1076.0V1091.0H1268.0V1106.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M1268.0 1172.0V1207.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M1268.0 1324.0V1339.0H916.0V1354.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="1285.0" y="1342.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">Sí</text>
+<path d="M916.0 1420.0V1433.0H1268.0V1445.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M1072.0 546.0H1459.0V552.5H1473.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="1274.0" y="539.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">No / 2a</text>
+<path d="M1072.0 809.0H1459.0V815.5H1473.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="1274.0" y="802.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">No / 3a</text>
+<path d="M1424.0 1266.0H1473.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="1450.0" y="1259.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">No / 5a</text>
+<circle cx="212.0" cy="154.0" r="12" fill="#315F93" stroke="#254C78" stroke-width="1"/>
+<rect x="60.0" y="197.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="212.0" y="234.4">Ingresa a la opción solicitar cita</tspan>
+</text>
+<rect x="412.0" y="293.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="320.9">Muestra las especialidades Consultorio</tspan>
+<tspan x="564.0" y="339.9">Familiar, Odontología y Pediatría</tspan>
+</text>
+<rect x="60.0" y="389.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="212.0" y="426.4">Selecciona la especialidad</tspan>
+</text>
+<polygon points="916.0,490.0 1072.0,546.0 916.0,602.0 760.0,546.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="916.0" y="550.8">¿Especialidad válida?</tspan>
+</text>
+<rect x="60.0" y="633.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="212.0" y="670.4">Selecciona el día de atención</tspan>
+</text>
+<polygon points="916.0,734.0 1072.0,809.0 916.0,884.0 760.0,809.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="916.0" y="796.8">¿Día hábil dentro de los 15</tspan>
+<tspan x="916.0" y="813.8">días hábiles y sin otra cita ese</tspan>
+<tspan x="916.0" y="830.8">día?</tspan>
+</text>
+<rect x="60.0" y="915.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="212.0" y="942.9">Confirma la solicitud sin elegir médico</tspan>
+<tspan x="212.0" y="961.9">ni hora</tspan>
+</text>
+<rect x="764.0" y="1011.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="916.0" y="1038.9">Registra la solicitud en la cola con su</tspan>
+<tspan x="916.0" y="1057.9">orden de llegada</tspan>
+</text>
+<rect x="1116.0" y="1107.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="1268.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="1268.0" y="1134.9">Procesa la solicitud en orden de</tspan>
+<tspan x="1268.0" y="1153.9">llegada</tspan>
+</text>
+<polygon points="1268.0,1208.0 1424.0,1266.0 1268.0,1324.0 1112.0,1266.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="1268.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="1268.0" y="1262.3">¿Hay cupo para el día</tspan>
+<tspan x="1268.0" y="1279.3">solicitado?</tspan>
+</text>
+<rect x="764.0" y="1355.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="916.0" y="1382.9">Muestra la cita asignada con ficha,</tspan>
+<tspan x="916.0" y="1401.9">médico, hora y consultorio</tspan>
+</text>
+<circle cx="1268.0" cy="1458.0" r="12" fill="#FFFFFF" stroke="#315F93" stroke-width="2"/><circle cx="1268.0" cy="1458.0" r="7.4" fill="#315F93"/>
+<rect x="1476.0" y="522.5" width="296.0" height="107.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="1488.0" y="546.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa No / 2a</text>
+<text x="1488.0" y="565.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">Solicita seleccionar una especialidad</text>
+<text x="1488.0" y="582.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">válida [2a]</text>
+<text x="1488.0" y="616.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Fin de este flujo</text>
+<rect x="1476.0" y="785.5" width="296.0" height="107.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="1488.0" y="809.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa No / 3a</text>
+<text x="1488.0" y="828.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">No permite confirmar y solicita elegir</text>
+<text x="1488.0" y="845.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">otro día [3a]</text>
+<text x="1488.0" y="879.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Fin de este flujo</text>
+<rect x="1476.0" y="1238.7" width="296.0" height="124.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="1488.0" y="1262.7" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa No / 5a</text>
+<text x="1488.0" y="1281.7" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">Muestra NO HAY CUPOS y deja la</text>
+<text x="1488.0" y="1298.7" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">solicitud EN_ESPERA para el siguiente</text>
+<text x="1488.0" y="1315.7" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">día hábil [5a]</text>
+<text x="1488.0" y="1349.7" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Continúa en el flujo principal</text>
+<path d="M36 1501.0H1796" stroke="#D3E2F2" stroke-width="1.05"/>
+<text x="36" y="1520.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#163C6B">Referencia: CU-04 | RF-04 · RN-01 · RN-03 · CU-05</text>
+<text x="36" y="1540.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.7" fill="#7085A1">Fuente: Especificación de casos de uso CNS y reglas del modelo del negocio.</text>
+</svg>

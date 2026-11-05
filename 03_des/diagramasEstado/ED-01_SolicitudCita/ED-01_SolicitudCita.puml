@@ -1,0 +1,33 @@
+@startuml ED-01_SolicitudCita
+' CNS — diagrama de estados UML 2.x a partir de casos de uso del ZIP
+' Casos relacionados: CU-04, CU-05, CU-06, CU-07
+hide empty description
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 17
+skinparam ArrowColor #292929
+skinparam StateBorderColor #292929
+skinparam StateBackgroundColor white
+skinparam StateFontColor #222222
+skinparam StateBorderThickness 1.6
+skinparam roundcorner 18
+top to bottom direction
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title Diagrama de estados: SolicitudCita
+state "Pendiente" as pendiente
+state "En espera" as espera
+state "Asignada" as asignada
+state "Sin cupo" as sincupo
+state "Rechazada" as invalida
+[*] --> pendiente : solicitud de especialidad y día (CU-04)
+pendiente --> invalida : datos inválidos
+pendiente --> asignada : hay cupo en el día solicitado (CU-05/07)
+pendiente --> espera : NO HAY CUPOS en el día solicitado
+espera --> asignada : hay cupo en un día hábil siguiente (CU-05/07)
+espera --> espera : sin cupo, avanza al siguiente día hábil
+espera --> sincupo : se agotaron los 15 días hábiles
+invalida --> [*]
+sincupo --> [*]
+asignada --> [*]
+' NOTA: «En espera» es la lista de espera de solicitudes sin cupo. Una cita cancelada NO vuelve a esta lista: el paciente envía una nueva solicitud con prioridad menor (CU-10).
+@enduml

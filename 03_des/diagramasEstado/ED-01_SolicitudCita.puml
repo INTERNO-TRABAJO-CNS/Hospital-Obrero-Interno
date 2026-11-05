@@ -1,0 +1,32 @@
+@startuml ED-01_SolicitudCita
+' CNS — diagrama de estados UML 2.x a partir de casos de uso del ZIP
+' Casos relacionados: CU-04, CU-05, CU-06, CU-07
+hide empty description
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 17
+skinparam ArrowColor #292929
+skinparam StateBorderColor #292929
+skinparam StateBackgroundColor white
+skinparam StateFontColor #222222
+skinparam StateBorderThickness 1.6
+skinparam roundcorner 18
+top to bottom direction
+title Diagrama de estados: SolicitudCita
+state "Recibida" as recibida
+state "En validación" as validando
+state "Buscando cupo" as buscando
+state "Rechazada" as invalida
+state "Sin cupo" as sincupo
+state "Asignada" as asignada
+[*] --> recibida : solicitud de especialidad (CU-04)
+recibida --> validando : verificar datos
+validando --> invalida : datos inválidos
+validando --> buscando : solicitud válida
+buscando --> sincupo : sin recursos disponibles (CU-06)
+buscando --> asignada : asignación registrada (CU-05/07)
+invalida --> [*]
+sincupo --> [*]
+asignada --> [*]
+' NOTA: "Sin cupo" termina este intento; el ZIP no establece una lista de espera automática.
+@enduml

@@ -1,0 +1,19 @@
+digraph CNS {
+graph [layout=dot, rankdir=TB, bgcolor="white", pad="0.32", margin="0.08", nodesep="0.78", ranksep="0.88", splines=true, labelloc=t, label="", fontname="DejaVu Sans", fontsize=25, fontcolor="#1E1E1E", outputorder=edgesfirst];
+node [fontname="DejaVu Sans",fontsize=18, fontcolor="#222222", shape=box, style="rounded,filled", fillcolor="#FFFFFF", color="#292929", penwidth=1.65, margin="0.22,0.15"];
+edge [fontname="DejaVu Sans", fontsize=12, fontcolor="#242424", color="#292929", penwidth=1.4, arrowsize=0.9];
+title [shape=box, label="Diagrama de estados: NotificacionCita", style="rounded", fontsize=24, penwidth=1.4, margin="0.16,0.10"];
+title -> start [style=invis, weight=50];
+start [shape=circle, style=filled, fillcolor="#222222", fixedsize=true, width=0.31, height=0.31, label=""];
+end [shape=doublecircle, style=filled, fillcolor="#222222", color="#222222", fixedsize=true, width=0.37, height=0.37, label="", penwidth=1.4];
+generada [label="Generada"];
+pendiente [label="Pendiente de emisión"];
+emitida [label="Emitida"];
+fallida [label="Fallida"];
+start -> generada [label="alta, cambio o cancelación de cita"];
+generada -> pendiente [label="preparar notificación (CU-16)"];
+pendiente -> emitida [label="emisión exitosa"];
+pendiente -> fallida [label="fallo de emisión"];
+emitida -> end [];
+fallida -> end [];
+}

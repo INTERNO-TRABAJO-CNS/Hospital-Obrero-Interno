@@ -1,0 +1,45 @@
+@startuml CU-14_ConsultarDatosPaciente
+' Caso de uso CU-14: Consultar información permitida del paciente
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-14 · RN-18 · RN-20
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-14: Consultar historial del paciente\nDiagrama de actividad
+|Médico|
+start
+:Selecciona una cita de su agenda;
+|Sistema CNS (Java)|
+if (¿La cita está en la agenda del médico?) then (Sí)
+  ' Camino principal
+else (No / 1a)
+  :Impide acceder al historial del paciente [1a];
+  stop
+endif
+|Médico|
+:Solicita el historial del paciente;
+|Sistema CNS (Java)|
+:Recupera nombre, citas pasadas con fecha y hora, atenciones y recetas anteriores;
+if (¿Datos autorizados para el rol?) then (Sí)
+  ' Camino principal
+else (No / 3a)
+  :No muestra el dato restringido [3a];
+endif
+:Muestra el historial permitido;
+|Médico|
+:Revisa la información sin modificarla;
+stop
+@enduml

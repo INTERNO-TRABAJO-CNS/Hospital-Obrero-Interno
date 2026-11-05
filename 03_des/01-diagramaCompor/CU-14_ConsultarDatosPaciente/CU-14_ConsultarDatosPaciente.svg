@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1128" height="1112" viewBox="0 0 1128 1112" role="img" aria-label="CU-14: Consultar historial del paciente. Diagrama de actividad CNS">
+<defs><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8.8" markerHeight="8.8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#315F93"/></marker><marker id="arrow-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8.8" markerHeight="8.8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#C99226"/></marker></defs>
+<rect x="0" y="0" width="1128" height="1112" fill="#FFFFFF"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#0D0F15" font-size="22.5" font-weight="bold" text-anchor="middle">
+<tspan x="564.0" y="34.6">CU-14: Consultar historial del paciente</tspan>
+</text>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="15.4" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="64.2">Diagrama de actividad • Sistema de Gestión y Control de Citas Médicas – Hospital Obrero CNS</tspan>
+</text>
+<path d="M36 80H1092" fill="none" stroke="#C6DCEC" stroke-width="1.15"/>
+<rect x="36" y="96" width="352" height="931.0" fill="#FFFFFF"/>
+<path d="M36 96V1027.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="212.0" y="116.7">Médico</tspan>
+</text>
+<rect x="388" y="96" width="352" height="931.0" fill="#FAFCFE"/>
+<path d="M388 96V1027.0" stroke="#315F93" stroke-width="1.1"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.7" font-weight="bold" text-anchor="middle">
+<tspan x="564.0" y="116.7">Sistema CNS (Java)</tspan>
+</text>
+<rect x="740" y="96" width="352" height="931.0" fill="#FFFFFF"/>
+<path d="M740 96V1027.0" stroke="#315F93" stroke-width="1.1"/>
+<path d="M755 125V1027.0" fill="none" stroke="#E4BD6E" stroke-width="0.85" stroke-dasharray="4 7"/>
+<text x="916.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#163C6B" font-size="13.8" font-weight="bold" text-anchor="middle">
+<tspan x="916.0" y="114.7">Flujos alternativos / excepciones</tspan>
+</text>
+<path d="M212.0 166.0V196.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M212.0 262.0V277.0H564.0V297.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M564.0 414.0V429.0H212.0V444.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="581.0" y="432.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">Sí</text>
+<path d="M212.0 510.0V525.0H564.0V540.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M564.0 622.0V657.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M564.0 770.0V800.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<text x="581.0" y="788.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.8" fill="#1D4E86">Sí</text>
+<path d="M564.0 866.0V881.0H212.0V896.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M212.0 962.0V987.0" fill="none" stroke="#315F93" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M720.0 356.0H755.0V362.5H769.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="746.0" y="349.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">No / 1a</text>
+<path d="M720.0 714.0H755.0V724.2H769.0" fill="none" stroke="#C99226" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-gold)"/>
+<text x="746.0" y="707.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.6" fill="#9D7015" text-anchor="middle">No / 3a</text>
+<circle cx="212.0" cy="154.0" r="12" fill="#315F93" stroke="#254C78" stroke-width="1"/>
+<rect x="60.0" y="197.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="212.0" y="234.4">Selecciona una cita de su agenda</tspan>
+</text>
+<polygon points="564.0,298.0 720.0,356.0 564.0,414.0 408.0,356.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="352.3">¿La cita está en la agenda del</tspan>
+<tspan x="564.0" y="369.3">médico?</tspan>
+</text>
+<rect x="60.0" y="445.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="212.0" y="482.4">Solicita el historial del paciente</tspan>
+</text>
+<rect x="412.0" y="541.0" width="304.0" height="81.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="567.4">Recupera nombre, citas pasadas con</tspan>
+<tspan x="564.0" y="586.4">fecha y hora, atenciones y recetas</tspan>
+<tspan x="564.0" y="605.4">anteriores</tspan>
+</text>
+<polygon points="564.0,658.0 720.0,714.0 564.0,770.0 408.0,714.0" fill="#FFFFFF" stroke="#315F93" stroke-width="1.45"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="718.8">¿Datos autorizados para el rol?</tspan>
+</text>
+<rect x="412.0" y="801.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="564.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="564.0" y="838.4">Muestra el historial permitido</tspan>
+</text>
+<rect x="60.0" y="897.0" width="304.0" height="65.0" rx="17" ry="17" fill="#E9F2FB" stroke="#315F93" stroke-width="1.15"/>
+<text x="212.0" font-family="DejaVu Sans, Arial, sans-serif" fill="#152536" font-size="14.5" font-weight="normal" text-anchor="middle">
+<tspan x="212.0" y="934.4">Revisa la información sin modificarla</tspan>
+</text>
+<circle cx="212.0" cy="1000.0" r="12" fill="#FFFFFF" stroke="#315F93" stroke-width="2"/><circle cx="212.0" cy="1000.0" r="7.4" fill="#315F93"/>
+<rect x="772.0" y="332.5" width="296.0" height="107.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="784.0" y="356.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa No / 1a</text>
+<text x="784.0" y="375.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">Impide acceder al historial del paciente</text>
+<text x="784.0" y="392.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">[1a]</text>
+<text x="784.0" y="426.5" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Fin de este flujo</text>
+<rect x="772.0" y="694.2" width="296.0" height="90.0" rx="11" ry="11" fill="#FFF8E6" stroke="#C99226" stroke-width="1.1"/>
+<text x="784.0" y="718.2" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" font-weight="bold" fill="#805509">Alternativa No / 3a</text>
+<text x="784.0" y="737.2" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#152536">No muestra el dato restringido [3a]</text>
+<text x="784.0" y="771.2" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.8" font-style="italic" fill="#916D21">Continúa en el flujo principal</text>
+<path d="M36 1043.0H1092" stroke="#D3E2F2" stroke-width="1.05"/>
+<text x="36" y="1062.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#163C6B">Referencia: CU-14 | RF-14 · RN-18 · RN-20</text>
+<text x="36" y="1082.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.7" fill="#7085A1">Fuente: Especificación de casos de uso CNS y reglas del modelo del negocio.</text>
+</svg>

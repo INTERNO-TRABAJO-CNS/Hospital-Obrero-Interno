@@ -1,0 +1,25 @@
+digraph CNS {
+graph [layout=dot, rankdir=TB, bgcolor="white", pad="0.32", margin="0.08", nodesep="0.78", ranksep="0.88", splines=true, labelloc=t, label="", fontname="DejaVu Sans", fontsize=25, fontcolor="#1E1E1E", outputorder=edgesfirst];
+node [fontname="DejaVu Sans",fontsize=18, fontcolor="#222222", shape=box, style="rounded,filled", fillcolor="#FFFFFF", color="#292929", penwidth=1.65, margin="0.22,0.15"];
+edge [fontname="DejaVu Sans", fontsize=12, fontcolor="#242424", color="#292929", penwidth=1.4, arrowsize=0.9];
+title [shape=box, label="Diagrama de estados: CitaMedica", style="rounded", fontsize=24, penwidth=1.4, margin="0.16,0.10"];
+title -> start [style=invis, weight=50];
+start [shape=circle, style=filled, fillcolor="#222222", fixedsize=true, width=0.31, height=0.31, label=""];
+end [shape=doublecircle, style=filled, fillcolor="#222222", color="#222222", fixedsize=true, width=0.37, height=0.37, label="", penwidth=1.4];
+programada [label="Programada"];
+espera [label="En espera"];
+atencion [label="En atención"];
+atendida [label="Atendida"];
+cancelada [label="Cancelada"];
+inasistencia [label="Inasistencia"];
+start -> programada [label="cita asignada y registrada (CU-07)"];
+programada -> programada [label="reprogramación válida (CU-10)", constraint=false, minlen=1];
+programada -> espera [label="enfermería registra llegada\n(CU-15)"];
+espera -> atencion [label="médico inicia atención"];
+atencion -> atendida [label="médico finaliza atención"];
+programada -> cancelada [label="secretaría cancela (CU-11)"];
+programada -> inasistencia [label="secretaría registra ausencia\n(CU-12)"];
+atendida -> end [];
+cancelada -> end [];
+inasistencia -> end [];
+}

@@ -1,0 +1,47 @@
+@startuml CU-19_GenerarReportesCitas
+' Caso de uso CU-19: Generar reportes de citas
+' Fuentes: Especificación de casos de uso CNS y Modelo del Negocio del Hospital Obrero
+' Referencias: RF-19 · RN-23 · RN-20
+' Los elementos marcados como pendientes NO son reglas implementadas.
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 15
+skinparam ArrowColor #234C79
+skinparam activity {
+  BackgroundColor #EAF2FB
+  BorderColor #35628E
+  FontColor #152536
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #35628E
+  ArrowColor #234C79
+  StartColor #35628E
+  EndColor #35628E
+}
+' Modificado 04/11/2026: ver 06_proyect/CAMBIOS_04-11-2026.md
+title CU-19: Generar reportes y agenda de supervisión\nDiagrama de actividad
+|Administrador|
+start
+:Abre reportes y agenda de supervisión;
+|Sistema CNS (Java)|
+if (¿Tiene permiso administrativo?) then (Sí)
+  ' Camino principal
+else (No / 1a)
+  :Impide el acceso [1a];
+  stop
+endif
+:Muestra el resumen por especialidad con médico, horario y cantidad de fichas;
+|Administrador|
+:Selecciona un médico o un reporte;
+|Sistema CNS (Java)|
+if (¿Existen datos para el criterio?) then (Sí)
+  :Muestra el detalle con número de ficha, horario, estado y cumplimiento;
+else (No / 3a)
+  :Informa que no hay información disponible [3a];
+  stop
+endif
+:Actualiza la vista en tiempo real por WebSocket;
+:Si se intenta modificar una cita, no lo permite porque la agenda es de solo lectura [3b];
+|Administrador|
+:Observa y verifica el cumplimiento de citas y horarios;
+stop
+@enduml
