@@ -20,6 +20,8 @@ class ManejadorErroresTest {
         assertEquals(404, estado("NO_ENCONTRADA"));
         assertEquals(409, estado("ESTADO_NO_PERMITE"));
         assertEquals(409, estado("CITA_DUPLICADA_EN_DIA"));
+        assertEquals(409, estado("CAMBIO_AFECTA_CITAS"));
+        assertEquals(409, estado("HORARIO_SOLAPADO"));
     }
 
     @Test
