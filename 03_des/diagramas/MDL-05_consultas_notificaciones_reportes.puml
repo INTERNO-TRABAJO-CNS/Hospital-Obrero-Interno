@@ -1,0 +1,83 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam ArrowColor #2F5D8A
+skinparam packageStyle rectangle
+
+title MDL-05 · Consultas, notificaciones, recordatorios, reportes e indicadores
+
+package "M01 Identidad" as M01 {
+  interface "autorizarLecturaCitas(actorId,pacienteId)" as IAuth
+}
+
+package "M02/M03/M04" as MCore {
+  interface "obtenerProyeccionAutorizada(filtros,actorId)" as IRead
+  interface "publicarEventoConfirmado(eventoId,tipo,citaId,timestamp)" as IEvent
+}
+
+package "M05 Consultas y comunicación" as M05 {
+  class "ConsultaDeCitas\n<<DTO lectura>>" as Consulta
+  class "Notificacion\n<<comunicación>>" as Notif
+  class "Recordatorio\n<<comunicación>>" as Rec
+  class "Reporte\n<<proyección>>" as Rep
+  class "Indicador\n<<cálculo derivado>>" as Ind
+
+  class "ServicioConsultasM05" as SConsulta
+  class "ServicioNotificacionesM05" as SNotif
+  class "ServicioReportesM05" as SRep
+}
+
+package "Controladores conceptuales" as CTRL {
+  class "ConsultasPacienteController\n(CU-08)" as C8
+  class "ConsultasCitasController\n(CU-09)" as C9
+  class "NotificacionesController\n(CU-16)" as C16
+  class "RecordatoriosController\n(CU-17 interno)" as C17
+  class "ReportesCitasController\n(CU-19)" as C19
+  class "IndicadoresGestionController\n(CU-20)" as C20
+}
+
+IAuth --> SConsulta
+IRead --> SConsulta
+IRead --> SRep
+IEvent --> SNotif
+
+SConsulta --> Consulta
+SNotif --> Notif
+SNotif --> Rec
+SRep --> Rep
+SRep --> Ind
+
+C8 --> SConsulta
+C9 --> SConsulta
+C16 --> SNotif
+C17 --> SNotif
+C19 --> SRep
+C20 --> SRep
+
+note bottom of SConsulta
+CU-08: filtra por paciente autenticado.
+CU-09: filtros por paciente/médico/fecha/estado/consultorio.
+No expone datos sensibles no autorizados.
+end note
+
+note bottom of SNotif
+Eventos confirmados: cita.confirmada,
+cita.reprogramada, cita.cancelada,
+cita.estado_actualizado (o equivalente autorizado).
+Idempotencia/deduplicación por eventoId.
+end note
+
+note bottom of SRep
+CU-19 agrupa por estado/médico/especialidad/consultorio.
+CU-20 solo categorías de indicadores;
+sin fórmulas definitivas en S2-M05.
+end note
+
+note top of CTRL
+REST = fuente autoritativa.
+WS = difusión post-confirmación.
+Si WS cae: no revierte ni duplica cita;
+cliente reconecta y consulta REST.
+end note
+
+@enduml
