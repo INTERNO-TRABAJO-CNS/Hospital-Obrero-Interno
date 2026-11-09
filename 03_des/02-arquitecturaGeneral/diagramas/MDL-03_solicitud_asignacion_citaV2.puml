@@ -1,0 +1,138 @@
+@startuml MDL03_Modelo_Solicitud_Asignacion
+' Diagrama UML conceptual - sin implementacion ni decision sobre SQL
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+title MDL-03 - Modelo central de solicitudes y citas (conceptual)
+
+package "M01 - Identidad y pacientes\n(Alejandro; referencias externas)" #E8F2FF {
+  class Paciente <<M01>> {
+    +pacienteId
+  }
+  interface "IAutorizacionPaciente" as IAuth <<contrato M01>> {
+    +verificarPacienteAutorizado(...)
+  }
+}
+
+package "M02 - Recursos y agenda\n(Alex; referencias externas)" #E8F6F0 {
+  class Especialidad <<M02>> {
+    +especialidadId
+  }
+  class Medico <<M02>> {
+    +medicoId
+  }
+  class Consultorio <<M02>> {
+    +consultorioId
+  }
+  class AgendaMedica <<M02>> {
+    +agendaId
+  }
+  class FranjaDisponible <<M02>> {
+    +intervaloInicioFin
+  }
+  interface "IDisponibilidadRecursos" as IDisp <<contrato M02>> {
+    +verificarEspecialidad(...)
+    +buscarCandidataCompatible(...)
+    +validarDisponibilidadVigente(...)
+  }
+}
+
+package "M03 - Solicitud y asignacion\n(Benjamin; unico propietario)" #FFF4DA {
+  class SolicitudCita <<entidad M03>> {
+    +solicitudId : Identificador
+    +pacienteId : Referencia M01
+    +especialidadId : Referencia M02
+    +fechaSolicitud : FechaHora [propuesta]
+  }
+
+  class CitaMedica <<entidad M03>> {
+    +citaId : Identificador
+    +pacienteId : Referencia M01
+    +especialidadId : Referencia M02
+    +medicoId : Referencia M02
+    +consultorioId : Referencia M02
+    +agendaId : Referencia M02 [propuesta]
+    +fecha : Fecha
+    +hora : Hora
+    +franjaAsignada : Intervalo [por acordar]
+    +estado = PROGRAMADA
+    +solicitudId : Referencia [propuesta]
+  }
+
+  class "NucleoAsignacionCitas" as Nucleo <<servicio de dominio>> {
+    +solicitar(...)
+    +asignarProxima(...)
+    +confirmarAtomico(...)
+    +obtenerCita(...)
+    +aplicarCambioAtomico(...)
+  }
+
+  class "CandidatoAsignacion" as Candidato <<objeto de valor, NO cita>> {
+    +medico / consultorio / agenda
+    +fecha / hora / franja
+    +resultado preliminar
+  }
+
+  class "CitaConfirmada" as Evento <<evento, tras commit>> {
+    +citaId
+  }
+}
+
+package "M04 - Operaciones e historial (Matias)" #F6EDFA {
+  interface "IOperacionesCita" as IOps <<consumidor M04>> {
+    +pedirCambioAutorizado(...)
+  }
+}
+
+package "M05 - Consultas y comunicacion (Abigal)" #E9F7F9 {
+  interface "IEventosConfirmacion" as IEventos <<consumidor M05>> {
+    +recibirCitaConfirmada(...)
+  }
+}
+
+Paciente "1" <-- "0..*" SolicitudCita : solicitante
+Especialidad "1" <-- "0..*" SolicitudCita : requerida
+SolicitudCita "1" --> "0..1" CitaMedica : origen propuesto
+Paciente "1" <-- "0..*" CitaMedica : titular
+Especialidad "1" <-- "0..*" CitaMedica : asignada
+Medico "1" <-- "0..*" CitaMedica : atiende
+Consultorio "1" <-- "0..*" CitaMedica : asignado
+AgendaMedica "0..1" <-- "0..*" CitaMedica : ref. propuesta
+FranjaDisponible "0..1" <-- "0..*" CitaMedica : ref. por pactar
+
+Nucleo ..> SolicitudCita : registra
+Nucleo ..> CitaMedica : confirma / modifica
+Nucleo ..> Candidato : evalua
+Nucleo ..> IAuth : consulta permisos
+Nucleo ..> IDisp : obtiene y revalida
+IOps ..> Nucleo : invoca contrato
+Nucleo ..> Evento : emite tras commit
+Evento ..> IEventos : entrega
+
+note right of SolicitudCita
+  No reserva recursos.
+  No se define estadoSolicitud:
+  no hay catalogo aprobado.
+end note
+
+note right of CitaMedica
+  Se crea solo con recursos revalidados
+  y operacion atomica exitosa.
+  Estados posteriores pertenecen
+  al ciclo de vida coordinado con M04.
+end note
+
+note bottom of Nucleo
+  Java concentra las reglas.
+  REST solo transporta solicitudes.
+  PostgreSQL impide doble asignacion
+  mediante proteccion transaccional.
+end note
+
+legend bottom
+  <<entidad M03>> = propiedad exclusiva de M03
+  <<M01>>, <<M02>> = referencias de otros modulos (no duplicar)
+  Cardinalidades con "propuesta" / "por pactar" requieren cotejo con DER.
+  Este modelo no fija tipos Java, endpoints, prioridad ni SQL definitivos.
+endlegend
+@enduml

@@ -1,0 +1,48 @@
+@startuml MDL03_Flujo_Solicitud_Asignacion
+skinparam shadowing false
+skinparam activityBorderColor #445566
+title MDL-03 - Flujo CU-04 -> CU-05 -> CU-06 -> CU-07
+start
+:Flutter/REST recibe solicitud por especialidad (CU-04);
+:M03 solicita verificacion de identidad\ny habilitacion a M01;
+if (Actor autorizado y\nespecialidad valida?) then (Si)
+  :M03 registra SolicitudCita; 
+  note right
+    Registrar solicitud NO reserva recurso
+    ni equivale a cita confirmada.
+  end note
+else (No)
+  :Rechazar datos o autorizacion;
+  stop
+endif
+
+:M03 solicita candidatos compatibles a M02 (CU-05);
+while (Existe candidata disponible?) is (Si)
+  :M02 ejecuta CU-06:\nvalida medico, agenda/franja y consultorio;
+  if (Combinacion preliminar valida?) then (Si)
+    :M03 inicia confirmacion transaccional (CU-07);
+    :Revalidar recursos vigentes\ny proteger contra concurrencia;
+    if (Datos completos y sin colision?) then (Si)
+      :Persistir CitaMedica con estado PROGRAMADA;
+      :Confirmar transaccion (commit);
+      :Generar hecho CitaConfirmada para M05\nsolo despues del commit;
+      :Responder cita confirmada;
+      stop
+    else (No)
+      :Descartar candidata / rollback sin cita;
+    endif
+  else (No)
+    :Descartar candidata ocupada;
+  endif
+  :Pedir otra candidata compatible a M02;
+endwhile (No)
+:Informar que no existe asignacion disponible;
+:Conservar distincion: solicitud registrada,\npero ninguna cita confirmada;
+note right
+  No se implementa cola de espera,
+  prioridad clinica ni adelanto
+  automatico de cupos.
+  Horizonte de busqueda pendiente.
+end note
+stop
+@enduml
