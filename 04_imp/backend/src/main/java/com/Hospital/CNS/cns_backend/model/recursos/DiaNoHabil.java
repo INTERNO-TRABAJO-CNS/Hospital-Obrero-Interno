@@ -29,6 +29,10 @@ public final class DiaNoHabil {
         return new DiaNoHabil(nuevoId, fecha, descripcion, activo);
     }
 
+    public DiaNoHabil conActivo(boolean nuevoActivo) {
+        return new DiaNoHabil(id, fecha, descripcion, nuevoActivo);
+    }
+
     /** Fecha y descripcion presentes. */
     public boolean datosBasicosValidos() {
         return fecha != null && Medico.hayTexto(descripcion);

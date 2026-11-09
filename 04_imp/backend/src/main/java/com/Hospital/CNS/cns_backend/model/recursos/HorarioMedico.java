@@ -38,6 +38,10 @@ public final class HorarioMedico {
         return new HorarioMedico(nuevoId, medicoId, consultorioId, diaSemana, horaInicio, horaFin, activo);
     }
 
+    public HorarioMedico conActivo(boolean nuevoActivo) {
+        return new HorarioMedico(id, medicoId, consultorioId, diaSemana, horaInicio, horaFin, nuevoActivo);
+    }
+
     /** Medico y consultorio indicados, dia y horas presentes, y inicio menor que fin. */
     public boolean isValid() {
         return medicoId > 0 && consultorioId > 0 && diaSemana != null

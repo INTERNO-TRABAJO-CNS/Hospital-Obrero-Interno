@@ -92,9 +92,24 @@ public class CatalogoService {
         return nuevo.aDTO();
     }
 
+    /** Solo cambia el nombre: no toca la agenda, por eso no se revisan citas. */
+    public ConsultorioDTO modificarConsultorio(int id, ConsultorioDTO d) {
+        Consultorio actual = Consultorio.desde(consultorioExistente(id));
+        if (d == null || !Consultorio.desde(d).isValid()) {
+            throw new DominioException("DATOS_INVALIDOS", "El consultorio necesita un nombre");
+        }
+        String nombre = d.nombre().trim();
+        boolean cambiaNombre = !nombre.equalsIgnoreCase(actual.getNombre());
+        if (cambiaNombre && consultorios.existeActivoConNombre(nombre)) {
+            throw new DominioException("CONSULTORIO_DUPLICADO", "Ya existe un consultorio con ese nombre");
+        }
+        Consultorio nuevo = new Consultorio(id, nombre, actual.isActivo());
+        consultorios.store(nuevo.aDTO());
+        return nuevo.aDTO();
+    }
+
     public void darDeBajaConsultorio(int id) {
-        Consultorio actual = Consultorio.desde(consultorios.porId(id)
-                .orElseThrow(() -> noEncontrada("Consultorio no encontrado")));
+        Consultorio actual = Consultorio.desde(consultorioExistente(id));
         if (!actual.isActivo()) {
             return;
         }
@@ -111,27 +126,28 @@ public class CatalogoService {
     // ----------------------------------------------------------------- horarios
 
     public HorarioDTO definirHorario(HorarioDTO d) {
-        if (d == null || !HorarioMedico.desde(d).isValid()) {
-            throw new DominioException("DATOS_INVALIDOS",
-                    "El horario necesita medico, consultorio, dia y una hora de inicio anterior a la de fin");
-        }
-        HorarioMedico nuevo = HorarioMedico.desde(d);
-        medicos.porId(nuevo.getMedicoId()).filter(MedicoDTO::activo)
-                .orElseThrow(() -> noEncontrada("Medico no encontrado o dado de baja"));
-        consultorios.porId(nuevo.getConsultorioId()).filter(ConsultorioDTO::activo)
-                .orElseThrow(() -> noEncontrada("Consultorio no encontrado o dado de baja"));
-
-        for (HorarioDTO existente : horarios.delMedico(nuevo.getMedicoId())) {
-            verificarSinSolape(nuevo, existente, "El medico ya tiene un horario que se cruza con ese");
-        }
-        for (HorarioDTO existente : horarios.delConsultorio(nuevo.getConsultorioId())) {
-            verificarSinSolape(nuevo, existente, "El consultorio ya esta ocupado en ese horario");
-        }
-
-        HorarioMedico guardado = new HorarioMedico(horarios.nextIdentity(), nuevo.getMedicoId(),
-                nuevo.getConsultorioId(), d.diaSemana(), d.horaInicio(), d.horaFin(), true);
+        HorarioMedico nuevo = horarioValido(d, 0);
+        HorarioMedico guardado = nuevo.conId(horarios.nextIdentity()).conActivo(true);
         horarios.store(guardado.aDTO());
         return guardado.aDTO();
+    }
+
+    /** [3b] No se cambia una franja mientras su medico o su consultorio tengan citas PROGRAMADAS. */
+    public HorarioDTO modificarHorario(long id, HorarioDTO d) {
+        HorarioMedico actual = HorarioMedico.desde(horarioExistente(id));
+        HorarioMedico nuevo = horarioValido(d, id).conId(id).conActivo(actual.isActivo());
+        verificarHorarioSinCitas(actual, "El horario tiene citas programadas: no se puede modificar");
+        horarios.store(nuevo.aDTO());
+        return nuevo.aDTO();
+    }
+
+    public void darDeBajaHorario(long id) {
+        HorarioMedico actual = HorarioMedico.desde(horarioExistente(id));
+        if (!actual.isActivo()) {
+            return;
+        }
+        verificarHorarioSinCitas(actual, "El horario tiene citas programadas: no se puede dar de baja");
+        horarios.store(actual.conActivo(false).aDTO());
     }
 
     public List<HorarioDTO> listarHorarios() {
@@ -141,26 +157,28 @@ public class CatalogoService {
     // ---------------------------------------------------------- dias no habiles
 
     public DiaNoHabilDTO registrarDiaNoHabil(DiaNoHabilDTO d) {
-        if (d == null || !DiaNoHabil.desde(d).datosBasicosValidos()) {
-            throw new DominioException("DATOS_INVALIDOS", "El dia no habil necesita fecha y descripcion");
-        }
-        DiaNoHabil nuevo = DiaNoHabil.desde(d);
-        LocalDate hoy = reloj.ahora().toLocalDate();
-        if (!nuevo.fechaFutura(hoy)) {
-            throw new DominioException("VALIDACION_FECHA", "El dia no habil debe ser una fecha futura");
-        }
-        if (diasNoHabiles.existeActivoEnFecha(nuevo.getFecha())) {
-            throw new DominioException("DIA_NO_HABIL_DUPLICADO", "Esa fecha ya esta registrada como dia no habil");
-        }
-        boolean hayProgramadas = citas.delDia(nuevo.getFecha()).stream()
-                .anyMatch(c -> c.estado() == EstadoCita.PROGRAMADA);
-        if (hayProgramadas) {
-            throw afectaCitas("Hay citas programadas ese dia: no se puede marcar como no habil");
-        }
-        DiaNoHabilDTO guardado = nuevo.conId(diasNoHabiles.nextIdentity()).aDTO();
-        DiaNoHabilDTO activo = new DiaNoHabilDTO(guardado.diaNoHabilId(), guardado.fecha(), guardado.descripcion(), true);
+        DiaNoHabil nuevo = diaNoHabilValido(d, true);
+        DiaNoHabilDTO activo = nuevo.conId(diasNoHabiles.nextIdentity()).conActivo(true).aDTO();
         diasNoHabiles.store(activo);
         return activo;
+    }
+
+    /** Si cambia la fecha se revalida como un registro nuevo (futura, sin duplicado y sin citas ese dia). */
+    public DiaNoHabilDTO modificarDiaNoHabil(long id, DiaNoHabilDTO d) {
+        DiaNoHabilDTO actual = diasNoHabiles.porId(id).orElseThrow(() -> noEncontrada("Dia no habil no encontrado"));
+        boolean cambiaFecha = d != null && d.fecha() != null && !d.fecha().equals(actual.fecha());
+        DiaNoHabil nuevo = diaNoHabilValido(d, cambiaFecha);
+        DiaNoHabilDTO guardado = nuevo.conId(id).conActivo(actual.activo()).aDTO();
+        diasNoHabiles.store(guardado);
+        return guardado;
+    }
+
+    /** Quitar un dia no habil solo agrega disponibilidad: no afecta citas programadas. */
+    public void darDeBajaDiaNoHabil(long id) {
+        DiaNoHabilDTO actual = diasNoHabiles.porId(id).orElseThrow(() -> noEncontrada("Dia no habil no encontrado"));
+        if (actual.activo()) {
+            diasNoHabiles.store(DiaNoHabil.desde(actual).conActivo(false).aDTO());
+        }
     }
 
     public List<DiaNoHabilDTO> listarDiasNoHabiles() {
@@ -191,8 +209,72 @@ public class CatalogoService {
         return medicos.porId(id).orElseThrow(() -> noEncontrada("Medico no encontrado"));
     }
 
-    private static void verificarSinSolape(HorarioMedico nuevo, HorarioDTO existente, String mensaje) {
-        if (existente.activo() && nuevo.seSolapaCon(HorarioMedico.desde(existente))) {
+    private ConsultorioDTO consultorioExistente(int id) {
+        return consultorios.porId(id).orElseThrow(() -> noEncontrada("Consultorio no encontrado"));
+    }
+
+    private HorarioDTO horarioExistente(long id) {
+        return horarios.porId(id).orElseThrow(() -> noEncontrada("Horario no encontrado"));
+    }
+
+    /**
+     * Datos completos, medico y consultorio activos y sin cruce con otra franja activa.
+     * {@code idPropio} es el horario que se modifica (0 al crear) y no cuenta como cruce consigo mismo.
+     */
+    private HorarioMedico horarioValido(HorarioDTO d, long idPropio) {
+        if (d == null || !HorarioMedico.desde(d).isValid()) {
+            throw new DominioException("DATOS_INVALIDOS",
+                    "El horario necesita medico, consultorio, dia y una hora de inicio anterior a la de fin");
+        }
+        HorarioMedico nuevo = HorarioMedico.desde(d);
+        medicos.porId(nuevo.getMedicoId()).filter(MedicoDTO::activo)
+                .orElseThrow(() -> noEncontrada("Medico no encontrado o dado de baja"));
+        consultorios.porId(nuevo.getConsultorioId()).filter(ConsultorioDTO::activo)
+                .orElseThrow(() -> noEncontrada("Consultorio no encontrado o dado de baja"));
+
+        for (HorarioDTO existente : horarios.delMedico(nuevo.getMedicoId())) {
+            verificarSinSolape(nuevo, existente, idPropio, "El medico ya tiene un horario que se cruza con ese");
+        }
+        for (HorarioDTO existente : horarios.delConsultorio(nuevo.getConsultorioId())) {
+            verificarSinSolape(nuevo, existente, idPropio, "El consultorio ya esta ocupado en ese horario");
+        }
+        return nuevo;
+    }
+
+    private void verificarHorarioSinCitas(HorarioMedico horario, String mensaje) {
+        if (citas.contarProgramadasDelMedico(horario.getMedicoId()) > 0
+                || citas.contarProgramadasEnConsultorio(horario.getConsultorioId()) > 0) {
+            throw afectaCitas(mensaje);
+        }
+    }
+
+    /** {@code revisarFecha}: al crear o al cambiar la fecha se exige futura, sin duplicado y sin citas. */
+    private DiaNoHabil diaNoHabilValido(DiaNoHabilDTO d, boolean revisarFecha) {
+        if (d == null || !DiaNoHabil.desde(d).datosBasicosValidos()) {
+            throw new DominioException("DATOS_INVALIDOS", "El dia no habil necesita fecha y descripcion");
+        }
+        DiaNoHabil dia = DiaNoHabil.desde(d);
+        if (!revisarFecha) {
+            return dia;
+        }
+        LocalDate hoy = reloj.ahora().toLocalDate();
+        if (!dia.fechaFutura(hoy)) {
+            throw new DominioException("VALIDACION_FECHA", "El dia no habil debe ser una fecha futura");
+        }
+        if (diasNoHabiles.existeActivoEnFecha(dia.getFecha())) {
+            throw new DominioException("DIA_NO_HABIL_DUPLICADO", "Esa fecha ya esta registrada como dia no habil");
+        }
+        boolean hayProgramadas = citas.delDia(dia.getFecha()).stream()
+                .anyMatch(c -> c.estado() == EstadoCita.PROGRAMADA);
+        if (hayProgramadas) {
+            throw afectaCitas("Hay citas programadas ese dia: no se puede marcar como no habil");
+        }
+        return dia;
+    }
+
+    private static void verificarSinSolape(HorarioMedico nuevo, HorarioDTO existente, long idPropio, String mensaje) {
+        if (existente.activo() && existente.horarioId() != idPropio
+                && nuevo.seSolapaCon(HorarioMedico.desde(existente))) {
             throw new DominioException("HORARIO_SOLAPADO", mensaje);
         }
     }

@@ -92,6 +92,21 @@ public class AdminCatalogoController {
         return catalogo.crearConsultorio(datos);
     }
 
+    @PutMapping("/consultorios/{id}")
+    public ConsultorioDTO modificarConsultorio(@RequestHeader HttpHeaders cabeceras,
+                                               @PathVariable("id") int id, @RequestBody ConsultorioDTO datos) {
+        exigirAdministrador(cabeceras);
+        return catalogo.modificarConsultorio(id, datos);
+    }
+
+    /** Baja logica. */
+    @DeleteMapping("/consultorios/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void darDeBajaConsultorio(@RequestHeader HttpHeaders cabeceras, @PathVariable("id") int id) {
+        exigirAdministrador(cabeceras);
+        catalogo.darDeBajaConsultorio(id);
+    }
+
     // ----------------------------------------------------------------- horarios
 
     @GetMapping("/horarios")
@@ -107,6 +122,21 @@ public class AdminCatalogoController {
         return catalogo.definirHorario(datos);
     }
 
+    @PutMapping("/horarios/{id}")
+    public HorarioDTO modificarHorario(@RequestHeader HttpHeaders cabeceras,
+                                       @PathVariable("id") long id, @RequestBody HorarioDTO datos) {
+        exigirAdministrador(cabeceras);
+        return catalogo.modificarHorario(id, datos);
+    }
+
+    /** Baja logica. */
+    @DeleteMapping("/horarios/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void darDeBajaHorario(@RequestHeader HttpHeaders cabeceras, @PathVariable("id") long id) {
+        exigirAdministrador(cabeceras);
+        catalogo.darDeBajaHorario(id);
+    }
+
     // ---------------------------------------------------------- dias no habiles
 
     @GetMapping("/dias-no-habiles")
@@ -120,6 +150,21 @@ public class AdminCatalogoController {
     public DiaNoHabilDTO registrarDiaNoHabil(@RequestHeader HttpHeaders cabeceras, @RequestBody DiaNoHabilDTO datos) {
         exigirAdministrador(cabeceras);
         return catalogo.registrarDiaNoHabil(datos);
+    }
+
+    @PutMapping("/dias-no-habiles/{id}")
+    public DiaNoHabilDTO modificarDiaNoHabil(@RequestHeader HttpHeaders cabeceras,
+                                             @PathVariable("id") long id, @RequestBody DiaNoHabilDTO datos) {
+        exigirAdministrador(cabeceras);
+        return catalogo.modificarDiaNoHabil(id, datos);
+    }
+
+    /** Baja logica. */
+    @DeleteMapping("/dias-no-habiles/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void darDeBajaDiaNoHabil(@RequestHeader HttpHeaders cabeceras, @PathVariable("id") long id) {
+        exigirAdministrador(cabeceras);
+        catalogo.darDeBajaDiaNoHabil(id);
     }
 
     // ------------------------------------------------------------------ interno

@@ -193,7 +193,67 @@ class AdminCatalogoControllerTest {
                 .andExpect(jsonPath("$.length()").value(1));
     }
 
+    @Test
+    void consultorio_put200_delete204() throws Exception {
+        crearConsultorio("Consultorio 1");
+
+        mvc.perform(admin(put("/api/v1/admin/consultorios/1")).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nombre\":\"Consultorio 1A\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nombre").value("Consultorio 1A"));
+        mvc.perform(admin(delete("/api/v1/admin/consultorios/1"))).andExpect(status().isNoContent());
+
+        mvc.perform(admin(get("/api/v1/admin/consultorios")))
+                .andExpect(jsonPath("$[0].activo").value(false));
+    }
+
+    @Test
+    void horario_put200_delete204() throws Exception {
+        crearMedicoPediatra();
+        crearConsultorio("Consultorio 1");
+        mvc.perform(admin(post("/api/v1/admin/horarios")).contentType(MediaType.APPLICATION_JSON)
+                        .content(HORARIO_LUNES))
+                .andExpect(status().isCreated());
+
+        mvc.perform(admin(put("/api/v1/admin/horarios/1")).contentType(MediaType.APPLICATION_JSON)
+                        .content(HORARIO_LUNES.replace("12:00", "12:30")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.horaFin").value("12:30:00"));
+        mvc.perform(admin(delete("/api/v1/admin/horarios/1"))).andExpect(status().isNoContent());
+    }
+
+    @Test
+    void horario_delete_conCitasProgramadas_409() throws Exception {
+        crearMedicoPediatra();
+        crearConsultorio("Consultorio 1");
+        mvc.perform(admin(post("/api/v1/admin/horarios")).contentType(MediaType.APPLICATION_JSON)
+                        .content(HORARIO_LUNES))
+                .andExpect(status().isCreated());
+        citas.store(new CitaDTO(1, 1, "Paciente", "A1", 1, "Dr Perez", TipoEspecialidad.PEDIATRIA, 1,
+                LocalDate.of(2026, 11, 16), LocalTime.of(9, 0), 1, EstadoCita.PROGRAMADA));
+
+        mvc.perform(admin(delete("/api/v1/admin/horarios/1")))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.codigo").value("CAMBIO_AFECTA_CITAS"));
+    }
+
+    @Test
+    void diaNoHabil_put200_delete204() throws Exception {
+        mvc.perform(admin(post("/api/v1/admin/dias-no-habiles")).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"fecha\":\"2026-12-25\",\"descripcion\":\"Navidad\"}"))
+                .andExpect(status().isCreated());
+
+        mvc.perform(admin(put("/api/v1/admin/dias-no-habiles/1")).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"fecha\":\"2026-12-25\",\"descripcion\":\"Navidad (feriado)\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descripcion").value("Navidad (feriado)"));
+        mvc.perform(admin(delete("/api/v1/admin/dias-no-habiles/1"))).andExpect(status().isNoContent());
+    }
+
     // ----------------------------------------------------------------- ayudas
+
+    private static final String HORARIO_LUNES = "{\"medicoId\":1,\"consultorioId\":1,\"diaSemana\":\"MONDAY\","
+            + "\"horaInicio\":\"08:00\",\"horaFin\":\"12:00\"}";
 
     private static MockHttpServletRequestBuilder admin(MockHttpServletRequestBuilder peticion) {
         return peticion.header("X-Usuario-Id", "1").header("X-Rol", "ADMINISTRADOR").header("X-Persona-Id", "1");
