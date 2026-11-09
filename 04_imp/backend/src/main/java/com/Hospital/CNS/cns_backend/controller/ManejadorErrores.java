@@ -19,7 +19,7 @@ import com.Hospital.CNS.cns_backend.model.compartido.DominioException;
  * 400  DATOS_INVALIDOS, ENCABEZADO_FALTANTE, ENCABEZADO_INVALIDO, ROL_INVALIDO
  * 403  ACCESO_DENEGADO, NO_ES_DEL_PACIENTE, NO_ES_DE_SU_AGENDA
  * 404  NO_ENCONTRADA
- * 409  ESTADO_NO_PERMITE, CITA_DUPLICADA_EN_DIA, HORARIO_OCUPADO
+ * 409  ESTADO_NO_PERMITE, CITA_DUPLICADA_EN_DIA, HORARIO_OCUPADO, CAMBIO_AFECTA_CITAS, HORARIO_SOLAPADO
  * 422  cualquier otro codigo (regla de negocio incumplida)
  * </pre>
  *
@@ -36,7 +36,7 @@ public class ManejadorErrores {
             Set.of("ACCESO_DENEGADO", "NO_ES_DEL_PACIENTE", "NO_ES_DE_SU_AGENDA");
     private static final Set<String> CODIGOS_404 = Set.of("NO_ENCONTRADA");
     private static final Set<String> CODIGOS_409 =
-            Set.of("ESTADO_NO_PERMITE", "CITA_DUPLICADA_EN_DIA", "HORARIO_OCUPADO");
+            Set.of("ESTADO_NO_PERMITE", "CITA_DUPLICADA_EN_DIA", "HORARIO_OCUPADO", "CAMBIO_AFECTA_CITAS", "HORARIO_SOLAPADO");
 
     /** Cuerpo de todas las respuestas de error. */
     public record ErrorRespuesta(String codigo, String mensaje) {

@@ -53,6 +53,18 @@ class ApiClient {
         ));
   }
 
+  Future<Map<String, dynamic>> put(String ruta, [Map<String, dynamic>? cuerpo]) {
+    return _enviar(() => _cliente.put(
+          _uri(ruta),
+          headers: _cabeceras(),
+          body: jsonEncode(cuerpo ?? <String, dynamic>{}),
+        ));
+  }
+
+  Future<Map<String, dynamic>> delete(String ruta) {
+    return _enviar(() => _cliente.delete(_uri(ruta), headers: _cabeceras()));
+  }
+
   Map<String, String> _cabeceras() => {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
