@@ -7,13 +7,14 @@ import '../services/auth_api.dart';
 class LoginController extends ChangeNotifier {
   LoginController(this._authApi);
 
+  SesionDto? sesion;
   final AuthApi _authApi;
   bool isLoading = false;
   String? errorMessage;
-  SesionDto? sesion;
 
   Future<void> login(String usuario, String clave) async {
     errorMessage = null;
+    sesion = null;
     if (usuario.trim().isEmpty || clave.isEmpty) {
       errorMessage = 'Completa usuario y clave.';
       notifyListeners();

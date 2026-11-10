@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../controllers/login_controller.dart';
+import '../models/sesion_dto.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key, required this.controller});
+  const LoginPage({super.key, required this.controller, this.onAuthenticated});
 
   final LoginController controller;
+  final ValueChanged<SesionDto>? onAuthenticated;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -14,6 +16,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   late final TextEditingController _usuarioController;
   late final TextEditingController _claveController;
+  bool _authenticationReported = false;
 
   @override
   void initState() {
@@ -31,7 +34,14 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _onControllerChanged() => setState(() {});
+  void _onControllerChanged() {
+    final session = widget.controller.sesion;
+    if (session != null && !_authenticationReported) {
+      _authenticationReported = true;
+      widget.onAuthenticated?.call(session);
+    }
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {

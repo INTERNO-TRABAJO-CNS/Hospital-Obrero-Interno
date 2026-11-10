@@ -4,7 +4,7 @@ La tabla se deriva de la **matriz de 20 casos de uso** del documento CNS. Los no
 
 | Requisito | CU | Nombre | Referente RF (planificación) | Issues propuestos (no números GitHub) | Casos de prueba | Estado de evidencia |
 |---|---|---|---|---|---|---|
-| RF-01 | CU-01 | Iniciar sesión | Alejandro | CON-03 / CON-07 / CON-09 / CON-30 / GitHub #56 / feature/S3-10-flutter-base | CP-CNS-04A / CP-CNS-04B | Implementación base Flutter; PR pendiente |
+| RF-01 | CU-01 | Iniciar sesión | Alejandro | CON-03 / CON-07 / CON-09 / CON-30 / GitHub #56 / #57 / feature/S3-10-flutter-base / feature/S3-11-cu01-login-flutter | CP-CNS-04A / CP-CNS-04B / CP-CNS-07A / CP-CNS-07B | Base Flutter + login y menú por permisos; PR pendiente |
 | RF-02 | CU-02 | Gestionar usuarios, roles y permisos | Alejandro | CON-03 / CON-05 / CON-09 | CP por definir | No verificado |
 | RF-03 | CU-03 | Registrar y consultar pacientes | Alejandro | CON-06 / CON-08 / CON-09 | CP por definir | No verificado |
 | RF-04 | CU-04 | Solicitar cita médica | Alejandro | CON-13 / CON-17 / CON-20 / CON-30 / CON-32 | CP por definir | No verificado |

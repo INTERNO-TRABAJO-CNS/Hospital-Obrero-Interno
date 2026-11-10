@@ -35,4 +35,10 @@ La prueba usa `FakeAuthApi`, por lo que no necesita backend. La aplicacion real 
 
 La eleccion de `ChangeNotifier` mantiene la base sin introducir una libreria de estado antes de que el equipo cierre esa decision. Las reglas de negocio y autorizacion permanecen en el backend.
 
+## Inicio de sesion y menu
+
+`LoginController` mantiene la sesion en memoria durante la ejecucion. Cuando `AuthApi` autentica correctamente, `LoginPage` abre `MenuPage`. El menu muestra unicamente las opciones cuyos permisos aparecen en `SesionDto.permisos`; la autorizacion definitiva permanece en el backend.
+
+El boton de cerrar sesion elimina el flujo actual y vuelve a la pantalla de login. No se persiste la sesion entre arranques, porque esa decision corresponde a S3-08/PV-11.
+
 El contrato REST de `auth/login` sigue la propuesta documentada en `03_des/02-arquitecturaGeneral/06_contratos_rest_api.md`; los nombres definitivos deben actualizarse cuando el backend publique sus DTOs.
