@@ -88,7 +88,7 @@ class AdminCatalogoControllerTest {
 
     @Test
     void listarMedicos_conEspecialidadInvalida_400() throws Exception {
-        mvc.perform(admin(get("/api/v1/admin/medicos")).param("especialidad", "CARDIOLOGIA"))
+        mvc.perform(admin(get("/api/v1/admin/medicos")).param("especialidad", "ONCOLOGIA"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.codigo").value("DATOS_INVALIDOS"));
     }

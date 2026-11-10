@@ -1,0 +1,97 @@
+import 'package:flutter/foundation.dart';
+
+import '../core/api_client.dart';
+import '../models/auth/paciente.dart';
+import '../models/auth/sesion.dart';
+import '../services/auth_service.dart';
+import '../services/paciente_service.dart';
+
+/// Controlador de la sesion (MVC): login, registro del titular y del beneficiario.
+///
+/// Solo valida formato y llama a los services; las reglas las aplica el backend.
+/// Cada accion devuelve `null` si salio bien o el mensaje para mostrar.
+class SesionController extends ChangeNotifier {
+  SesionController({required AuthService auth, required PacienteService pacientes, ApiClient? api})
+      : _auth = auth,
+        _pacientes = pacientes,
+        _api = api;
+
+  final AuthService _auth;
+  final PacienteService _pacientes;
+
+  /// Cliente compartido: al entrar se le ponen los headers temporales del usuario.
+  final ApiClient? _api;
+
+  Sesion? sesion;
+  bool cargando = false;
+
+  /// Afiliacion del titular que inicio sesion (para registrar beneficiarios).
+  String? numeroAfiliado;
+
+  bool get autenticado => sesion != null;
+
+  Future<String?> entrar(String usuario, String clave) async {
+    if (usuario.trim().isEmpty || clave.isEmpty) {
+      return 'Ingrese usuario y contraseña.';
+    }
+    return _ejecutar(() async {
+      sesion = await _auth.login(usuario, clave);
+      _api
+        ?..usuarioId = sesion!.usuarioId
+        ..rol = sesion!.rol.codigo
+        ..personaId = sesion!.personaId;
+    });
+  }
+
+  /// Crea la cuenta del titular y entra con ella.
+  Future<String?> registrarTitular(RegistroTitular datos) async {
+    if (datos.numeroAfiliado.trim().isEmpty || datos.ci.trim().isEmpty || datos.usuario.trim().isEmpty) {
+      return 'Complete número de afiliado, CI y usuario.';
+    }
+    if (datos.clave.length < 6) {
+      return 'La contraseña debe tener al menos 6 caracteres.';
+    }
+    final error = await _ejecutar(() async {
+      final titular = await _pacientes.registrarTitular(datos);
+      numeroAfiliado = titular.numeroAfiliado;
+    });
+    if (error != null) {
+      return error;
+    }
+    return entrar(datos.usuario, datos.clave);
+  }
+
+  Future<String?> registrarBeneficiario(RegistroBeneficiario datos) {
+    if (datos.ci.trim().isEmpty || datos.nombres.trim().isEmpty || datos.apellidos.trim().isEmpty) {
+      return Future.value('Complete CI, nombres y apellidos.');
+    }
+    if (datos.fechaNacimiento.isAfter(DateTime.now())) {
+      return Future.value('La fecha de nacimiento no puede ser futura.');
+    }
+    return _ejecutar(() => _pacientes.registrarBeneficiario(datos));
+  }
+
+  void salir() {
+    sesion = null;
+    numeroAfiliado = null;
+    _api
+      ?..usuarioId = null
+      ..rol = null
+      ..personaId = null;
+    notifyListeners();
+  }
+
+  Future<String?> _ejecutar(Future<void> Function() accion) async {
+    cargando = true;
+    notifyListeners();
+    try {
+      await accion();
+      return null;
+    } on ApiException catch (e) {
+      return e.mensaje;
+    } finally {
+      cargando = false;
+      notifyListeners();
+    }
+  }
+}

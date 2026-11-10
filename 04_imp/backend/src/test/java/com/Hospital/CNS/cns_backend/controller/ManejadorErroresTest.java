@@ -25,6 +25,16 @@ class ManejadorErroresTest {
     }
 
     @Test
+    void codigosDeAgendaHistorialAtencionYPacientes() {
+        assertEquals(400, estado("RECETA_INVALIDA"));
+        assertEquals(401, estado("CREDENCIALES_INVALIDAS"));
+        assertEquals(403, estado("PACIENTE_FUERA_DE_AGENDA"));
+        assertEquals(404, estado("AFILIADO_NO_ENCONTRADO"));
+        assertEquals(409, estado("YA_REGISTRADO"));
+        assertEquals(409, estado("USUARIO_DUPLICADO"));
+    }
+
+    @Test
     void unCodigoDesconocidoEsReglaDeNegocio422() {
         assertEquals(422, estado("LIMITE_FICHAS_MEDICO"));
     }

@@ -17,3 +17,11 @@ Aquí se almacena el código fuente y los componentes desarrollados para el Sist
 * Los archivos de configuración necesarios para la ejecución del sistema.
 * Los scripts, componentes y módulos desarrollados durante la implementación.
 
+
+
+
+## Cómo levantar cada parte
+
+* **Backend (Spring Boot):** `cd 04_imp/backend && ./mvnw spring-boot:run` (puerto 8080). Migraciones en `src/main/resources/db/migration` (V1 catálogos, V2 identidad/afiliados, V3 historial y recetas).
+* **App Flutter (paciente, enfermería, administrador, TV):** `cd 04_imp/frontend && flutter run`. Sin backend: `--dart-define=AUTH_FAKE=true` (usuario `paciente` / `paciente123`).
+* **Web del médico (Nuxt):** `cd 04_imp/frontend-web && npm install && npm run dev` (http://localhost:3000). URL del backend en `NUXT_PUBLIC_API_URL`; sin backend: `NUXT_PUBLIC_USAR_FAKES=true`. Pruebas: `npm run test`.

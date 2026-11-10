@@ -65,4 +65,9 @@ public class FakeHistorialRepository implements HistorialRepository {
         recetas.add(guardada);
         return guardada;
     }
+
+    @Override
+    public synchronized void eliminarReceta(long recetaId) {
+        recetas.removeIf(r -> r.recetaId() == recetaId);
+    }
 }

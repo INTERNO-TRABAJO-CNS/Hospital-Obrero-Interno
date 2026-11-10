@@ -1,0 +1,128 @@
+:root {
+  --fondo: #f4f6f9;
+  --superficie: #ffffff;
+  --superficie-2: #eef2f7;
+  --borde: #d9e0ea;
+  --texto: #18212f;
+  --texto-suave: #5b6779;
+  --primario: #1f5fa8;
+  --primario-texto: #ffffff;
+  --primario-suave: #e3edf9;
+  --exito: #1e7b4f;
+  --exito-suave: #e2f3ea;
+  --aviso: #8a5a00;
+  --aviso-suave: #fbf0d9;
+  --peligro: #b3261e;
+  --peligro-suave: #fbe5e3;
+  --neutro-suave: #eceff3;
+  --radio: 10px;
+  --sombra: 0 1px 2px rgba(16, 24, 40, .06), 0 1px 3px rgba(16, 24, 40, .08);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #0f141b;
+    --superficie: #171e28;
+    --superficie-2: #1e2734;
+    --borde: #2c3747;
+    --texto: #e6ebf2;
+    --texto-suave: #9aa6b8;
+    --primario: #6aa3e8;
+    --primario-texto: #0b1726;
+    --primario-suave: #1b2c42;
+    --exito: #5cc596;
+    --exito-suave: #15302a;
+    --aviso: #e2b356;
+    --aviso-suave: #352a14;
+    --peligro: #f08a82;
+    --peligro-suave: #3a1c1a;
+    --neutro-suave: #222b38;
+    --sombra: none;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+h1, h2, h3 { line-height: 1.25; margin: 0; }
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.15rem; }
+a { color: var(--primario); }
+
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 20px;
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid var(--borde);
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.boton:hover:not(:disabled) { background: var(--superficie-2); }
+.boton:disabled { opacity: .5; cursor: not-allowed; }
+.boton.primario { background: var(--primario); border-color: var(--primario); color: var(--primario-texto); }
+.boton.primario:hover:not(:disabled) { filter: brightness(1.08); background: var(--primario); }
+.boton.chico { min-height: 32px; padding: 0 12px; font-size: .9rem; }
+
+.campo { display: flex; flex-direction: column; gap: 6px; }
+.campo label { font-weight: 600; font-size: .9rem; }
+.campo input, .campo textarea {
+  font: inherit;
+  color: var(--texto);
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 9px 12px;
+}
+.campo input:focus, .campo textarea:focus, .boton:focus-visible {
+  outline: 2px solid var(--primario);
+  outline-offset: 1px;
+}
+
+.etiqueta {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: .8rem;
+  font-weight: 600;
+  background: var(--neutro-suave);
+  color: var(--texto-suave);
+}
+.etiqueta.PROGRAMADA { background: var(--primario-suave); color: var(--primario); }
+.etiqueta.ASISTENCIA_CONFIRMADA { background: var(--aviso-suave); color: var(--aviso); }
+.etiqueta.ATENDIDA { background: var(--exito-suave); color: var(--exito); }
+.etiqueta.CANCELADA { background: var(--peligro-suave); color: var(--peligro); }
+
+.alerta { border-radius: 8px; padding: 12px 14px; }
+.alerta.error { background: var(--peligro-suave); color: var(--peligro); }
+.alerta.ok { background: var(--exito-suave); color: var(--exito); }
+.alerta.info { background: var(--primario-suave); color: var(--primario); }
+
+.suave { color: var(--texto-suave); }
+.vacio { text-align: center; padding: 32px 16px; color: var(--texto-suave); }

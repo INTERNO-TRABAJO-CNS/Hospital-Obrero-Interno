@@ -16,10 +16,12 @@ import com.Hospital.CNS.cns_backend.model.compartido.DominioException;
  * Traduce los errores a JSON {@code {codigo, mensaje}} con el estado HTTP segun el codigo.
  *
  * <pre>
- * 400  DATOS_INVALIDOS, ENCABEZADO_FALTANTE, ENCABEZADO_INVALIDO, ROL_INVALIDO
- * 403  ACCESO_DENEGADO, NO_ES_DEL_PACIENTE, NO_ES_DE_SU_AGENDA
- * 404  NO_ENCONTRADA
- * 409  ESTADO_NO_PERMITE, CITA_DUPLICADA_EN_DIA, HORARIO_OCUPADO, CAMBIO_AFECTA_CITAS, HORARIO_SOLAPADO
+ * 400  DATOS_INVALIDOS, ENCABEZADO_FALTANTE, ENCABEZADO_INVALIDO, ROL_INVALIDO, RECETA_INVALIDA
+ * 401  CREDENCIALES_INVALIDAS
+ * 403  ACCESO_DENEGADO, NO_ES_DEL_PACIENTE, NO_ES_DE_SU_AGENDA, PACIENTE_FUERA_DE_AGENDA
+ * 404  NO_ENCONTRADA, AFILIADO_NO_ENCONTRADO
+ * 409  ESTADO_NO_PERMITE, CITA_DUPLICADA_EN_DIA, HORARIO_OCUPADO, CAMBIO_AFECTA_CITAS, HORARIO_SOLAPADO,
+ *      YA_REGISTRADO, USUARIO_DUPLICADO
  * 422  cualquier otro codigo (regla de negocio incumplida)
  * </pre>
  *
@@ -31,12 +33,14 @@ public class ManejadorErrores {
     private static final Logger LOG = LoggerFactory.getLogger(ManejadorErrores.class);
 
     private static final Set<String> CODIGOS_400 =
-            Set.of("DATOS_INVALIDOS", "ENCABEZADO_FALTANTE", "ENCABEZADO_INVALIDO", "ROL_INVALIDO");
+            Set.of("DATOS_INVALIDOS", "ENCABEZADO_FALTANTE", "ENCABEZADO_INVALIDO", "ROL_INVALIDO", "RECETA_INVALIDA");
+    private static final Set<String> CODIGOS_401 = Set.of("CREDENCIALES_INVALIDAS");
     private static final Set<String> CODIGOS_403 =
-            Set.of("ACCESO_DENEGADO", "NO_ES_DEL_PACIENTE", "NO_ES_DE_SU_AGENDA");
-    private static final Set<String> CODIGOS_404 = Set.of("NO_ENCONTRADA");
+            Set.of("ACCESO_DENEGADO", "NO_ES_DEL_PACIENTE", "NO_ES_DE_SU_AGENDA", "PACIENTE_FUERA_DE_AGENDA");
+    private static final Set<String> CODIGOS_404 = Set.of("NO_ENCONTRADA", "AFILIADO_NO_ENCONTRADO");
     private static final Set<String> CODIGOS_409 =
-            Set.of("ESTADO_NO_PERMITE", "CITA_DUPLICADA_EN_DIA", "HORARIO_OCUPADO", "CAMBIO_AFECTA_CITAS", "HORARIO_SOLAPADO");
+            Set.of("ESTADO_NO_PERMITE", "CITA_DUPLICADA_EN_DIA", "HORARIO_OCUPADO", "CAMBIO_AFECTA_CITAS", "HORARIO_SOLAPADO",
+                    "YA_REGISTRADO", "USUARIO_DUPLICADO");
 
     /** Cuerpo de todas las respuestas de error. */
     public record ErrorRespuesta(String codigo, String mensaje) {
@@ -60,6 +64,9 @@ public class ManejadorErrores {
     static int estadoDe(String codigo) {
         if (CODIGOS_400.contains(codigo)) {
             return 400;
+        }
+        if (CODIGOS_401.contains(codigo)) {
+            return 401;
         }
         if (CODIGOS_403.contains(codigo)) {
             return 403;
