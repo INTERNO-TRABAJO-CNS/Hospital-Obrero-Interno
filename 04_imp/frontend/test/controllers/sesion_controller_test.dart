@@ -57,6 +57,20 @@ void main() {
     expect(controller.sesion!.personaId, 1);
   });
 
+  test('modo sin backend: la cuenta creada en el registro sirve para entrar', () async {
+    final authFake = FakeAuthService();
+    final c = SesionController(
+        auth: authFake, pacientes: FakePacienteService(alRegistrarTitular: authFake.agregarCuentaPaciente));
+
+    final error = await c.registrarTitular(
+        const RegistroTitular(numeroAfiliado: 'AF-10001', ci: '4512301', usuario: 'Benjamin', clave: 'secreta123'));
+
+    expect(error, isNull);
+    expect(c.sesion!.nombre, 'Juan Carlos Choque Mamani');
+    c.salir();
+    expect(await c.entrar('benjamin', 'secreta123'), isNull);
+  });
+
   test('contrasena corta se rechaza sin llamar al backend', () async {
     final error = await controller.registrarTitular(
         const RegistroTitular(numeroAfiliado: 'AF-10001', ci: '4512301', usuario: 'juanc', clave: '123'));

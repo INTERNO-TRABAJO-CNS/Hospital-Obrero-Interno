@@ -28,7 +28,7 @@ Un asegurado **titular** crea su cuenta validando su número de afiliado contra 
 - Comportamiento (cada `[Na]` = un test): `03_des/01-diagramaCompor/CU-01_IniciarSesion (1).puml`, `03_des/01-diagramaCompor/CU-03_RegistrarConsultarPacientes.puml`
 - Estados: `03_des/diagramasEstado/ED-01_SolicitudCita.puml`, `ED-02_CitaMedica.puml`
 - Clases: `03_des/02-arquitecturaGeneral/diagramas/ARQ-03_ModeloDominio.puml`
-- Pantallas: Figma `KgJK1swBix6WpC5wfDw2B6` (páginas PHONE, COMPUTER, TV'S)
+- Pantallas: Figma `n2XbqM0jcK8ow40Nsx8uoe` (páginas PHONE, COMPUTER, TV'S)
 
 ## Dónde va cada archivo (rutas desde la raíz del repositorio)
 | Ruta | Qué debe contener |

@@ -26,6 +26,11 @@ class ApiPacienteService implements PacienteService {
 
 /// En memoria, con las mismas respuestas de error que el backend.
 class FakePacienteService implements PacienteService {
+  FakePacienteService({this.alRegistrarTitular});
+
+  /// Avisa la cuenta creada (usuario, clave, pacienteId, nombre), para que el login falso la conozca.
+  final void Function(String usuario, String clave, int pacienteId, String nombre)? alRegistrarTitular;
+
   /// Tabla interna de afiliados: numero -> (CI, nombres, apellidos, nacimiento).
   final Map<String, (String, String, String, DateTime)> afiliados = {
     'AF-10001': ('4512301', 'Juan Carlos', 'Choque Mamani', DateTime(1985, 3, 14)),
@@ -57,6 +62,7 @@ class FakePacienteService implements PacienteService {
       titular: true,
     );
     pacientes.add(p);
+    alRegistrarTitular?.call(d.usuario, d.clave, p.pacienteId, p.nombreCompleto);
     return p;
   }
 

@@ -122,7 +122,10 @@ final SesionController sesionApp = _crearSesion();
 SesionController _crearSesion() {
   const usarFake = bool.fromEnvironment('AUTH_FAKE');
   if (usarFake) {
-    return SesionController(auth: FakeAuthService(), pacientes: FakePacienteService(), api: apiApp);
+    final auth = FakeAuthService();
+    // Como en el backend: la cuenta creada en el registro sirve para iniciar sesion.
+    final pacientes = FakePacienteService(alRegistrarTitular: auth.agregarCuentaPaciente);
+    return SesionController(auth: auth, pacientes: pacientes, api: apiApp);
   }
   return SesionController(auth: ApiAuthService(apiApp), pacientes: ApiPacienteService(apiApp), api: apiApp);
 }

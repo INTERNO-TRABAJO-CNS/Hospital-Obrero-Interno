@@ -28,6 +28,16 @@ class FakeAuthService implements AuthService {
         const Sesion(usuarioId: 2, rol: Rol.enfermeria, personaId: 2, nombre: 'Marta Limachi')),
   };
 
+  int _ultimoUsuarioId = 2;
+
+  /// Cuenta de un titular recien registrado (la usa FakePacienteService).
+  void agregarCuentaPaciente(String usuario, String clave, int pacienteId, String nombre) {
+    cuentas[usuario.trim().toLowerCase()] = (
+      clave,
+      Sesion(usuarioId: ++_ultimoUsuarioId, rol: Rol.paciente, personaId: pacienteId, nombre: nombre),
+    );
+  }
+
   @override
   Future<Sesion> login(String usuario, String clave) async {
     final cuenta = cuentas[usuario.trim().toLowerCase()];

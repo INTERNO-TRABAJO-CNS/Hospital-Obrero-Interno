@@ -27,7 +27,7 @@ Crear el proyecto **Nuxt** (Vue 3) que usarán **solo los médicos** (general, p
 ## Diagramas y documentos de referencia (solo para leer)
 - `03_des/02-arquitecturaGeneral/02_mvc.md`
 - `04_imp/frontend/lib/core/api_client.dart` (mismo comportamiento)
-- Figma `KgJK1swBix6WpC5wfDw2B6`, página COMPUTER
+- Figma `n2XbqM0jcK8ow40Nsx8uoe`, página COMPUTER
 
 ## Dónde va cada archivo (rutas desde la raíz del repositorio)
 | Ruta | Qué debe contener |
