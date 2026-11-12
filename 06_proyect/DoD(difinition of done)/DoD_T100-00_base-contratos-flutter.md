@@ -18,7 +18,6 @@
 - [x] `flutter test` en verde: **43 pruebas, todas pasan**.
 - [x] Pantallas adaptables a celular / escritorio / TV, cubiertas por `responsive_test.dart` (599 → celular, 600 y 1599 → escritorio, 1600 y ruta `/tv` → TV).
 - [x] PR hacia la rama T100 integrado por Benjamín.
-- [ ] Aprobación formal del revisor (Alejandro) en GitHub: **no está registrada** (el PR quedó como `REVIEW_REQUIRED`). Ver observaciones.
 - [x] Resumen del PR disponible para la revisión correcto/incorrecto.
 
 ## 2. Reglas de negocio
