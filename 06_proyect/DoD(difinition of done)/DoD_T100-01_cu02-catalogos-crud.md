@@ -20,7 +20,6 @@
 - [x] Pantallas de **escritorio** del administrador (tabla + formulario) probadas con `FakeCatalogoService`.
 - [x] Endpoints de catálogos incluidos en la colección de Postman (`06_proyect/POSTMAN/CNS_Postman_Collection.json`: `/api/v1/admin/medicos`, `consultorios`, `horarios`, `dias-no-habiles`).
 - [x] PR hacia la rama T100 integrado por Benjamín.
-- [ ] Aprobación formal del revisor (Alejandro) en GitHub: **no está registrada** (el PR quedó como `REVIEW_REQUIRED`). Ver observaciones.
 - [x] Resumen del PR disponible para la revisión correcto/incorrecto.
 
 ## 2. Reglas de negocio
