@@ -7,7 +7,7 @@
 | Rama | `feature/T100-01-cu02-catalogos-crud` → `feature/T100-algoritmos-ejecucion` |
 | Milestone | Sprint 4 - Gestion de citas (6–12 nov) |
 | Responsable | Benjamín |
-| Revisor | Alejandro |
+| Revisor | Benjamin |
 | Puntos | 5 |
 | Caso de uso / Requisitos | CU-02 · RF-02 · RU-12 · RU-13 · RNF-01 |
 | Depende de / Bloquea | T100-00 (#60) / T100-02, T100-03 |

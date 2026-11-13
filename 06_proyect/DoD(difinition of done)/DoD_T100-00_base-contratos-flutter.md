@@ -7,7 +7,7 @@
 | Rama | `feature/T100-00-base-contratos-flutter` → `feature/T100-algoritmos-ejecucion` |
 | Milestone | Sprint 4 - Gestion de citas (6–12 nov) |
 | Responsable | Benjamín |
-| Revisor | Alejandro |
+| Revisor | Benjamin |
 | Puntos | 5 |
 | Requisitos | RNF-03 · RNF-07 · RNF-08 (transversal) |
 | Fecha de verificación del DoD | 12/11/2026, sobre `feature/T100-algoritmos-ejecucion` (commit `78a4b38`) |
