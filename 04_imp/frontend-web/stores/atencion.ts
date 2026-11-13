@@ -52,6 +52,7 @@ export const useAtencionStore = defineStore('atencion', () => {
     try {
       await srv().registrar(datos.value.citaId, medicacion.value.trim())
       finalizada.value = true
+      datos.value = { ...datos.value, estado: 'ATENDIDA' }
       return true
     } catch (e) {
       error.value = mensajeDeError(e)

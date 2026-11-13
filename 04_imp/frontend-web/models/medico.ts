@@ -9,17 +9,21 @@ export interface MedicoActual {
   operaEnQuirofano: boolean
 }
 
-/** Usuario de la sesion. Mientras no exista Spring Security viaja en los headers X-Usuario-Id, X-Rol, X-Persona-Id. */
+/**
+ * POST /api/v1/auth/login. El token viaja en cada peticion como «Authorization: Bearer <token>»
+ * (decision PV-11 del 13/11/2026) hasta {@code venceEn}.
+ */
 export interface Sesion {
   usuarioId: number
   rol: string
   personaId: number
   nombre?: string
+  token: string
+  venceEn?: string
+  numeroAfiliado?: string | null
 }
 
 export interface OpcionMenu {
   texto: string
   ruta: string
-  /** true = la pantalla todavia no existe (otra tarjeta); se muestra deshabilitada. */
-  pendiente?: boolean
 }

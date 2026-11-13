@@ -1,36 +1,49 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { esBasica } from '~/models/especialidad'
+import { esBasica, nombreEspecialidad, soloUrgencia, tipoDeMedico } from '~/models/especialidad'
 import type { MedicoActual, OpcionMenu, Sesion } from '~/models/medico'
 import type { MedicoService } from '~/services/medicoService'
-import { mensajeDeError } from '~/services/apiClient'
+import { ApiError, mensajeDeError } from '~/services/apiClient'
 
 const CLAVE_GUARDADA = 'cns.web.sesion'
 
 /**
- * Menu segun el tipo de medico (T100-18). Agenda, atencion e historial se abren desde la agenda.
- * Las opciones de otras tarjetas aparecen deshabilitadas hasta que existan sus pantallas.
+ * Menu lateral segun el tipo de medico, igual que el Figma:
+ * Medico General y Pediatria: Agenda, Atencion, Historial, Ticket interno y Cola de prioridad.
+ * Odontologia: sin ticket interno ni cola (no deriva). Especialistas: agenda de fichas internas y, si su
+ * especialidad opera, Cirugias.
  */
 export function menuPara(medico: MedicoActual | null): OpcionMenu[] {
   if (!medico) return []
   if (!esBasica(medico.especialidad)) {
-    const especialista: OpcionMenu[] = [
-      { texto: 'Agenda de fichas internas', ruta: '/medico/fichas-internas', pendiente: true }, // T100-22
-    ]
-    if (medico.operaEnQuirofano) {
-      especialista.push({ texto: 'Cirugías', ruta: '/medico/cirugias', pendiente: true }) // T100-23
+    const especialista: OpcionMenu[] = [{ texto: 'Agenda de fichas internas', ruta: '/medico/fichas-internas' }]
+    if (medico.operaEnQuirofano && !soloUrgencia(medico.especialidad)) {
+      especialista.push({ texto: 'Cirugías', ruta: '/medico/cirugias' })
     }
     return especialista
   }
-  const menu: OpcionMenu[] = [{ texto: 'Agenda', ruta: '/medico/agenda' }]
+  const menu: OpcionMenu[] = [
+    { texto: 'Agenda', ruta: '/medico/agenda' },
+    { texto: 'Atención', ruta: '/medico/atencion' },
+    { texto: 'Historial', ruta: '/medico/historial' },
+  ]
   if (medico.puedeDerivar) {
-    menu.push({ texto: 'Ticket interno', ruta: '/medico/ticket-interno', pendiente: true }) // T100-21
-    menu.push({ texto: 'Cola de prioridad', ruta: '/medico/cola', pendiente: true }) // T100-21
+    menu.push({ texto: 'Ticket interno', ruta: '/medico/ticket-interno' })
+    menu.push({ texto: 'Cola de prioridad', ruta: '/medico/cola' })
   }
   return menu
 }
 
-/** Sesion del medico: quien es (headers temporales) y sus datos de /medico/yo. */
+/** Texto de la pildora de la barra superior: «Médico General · Carlos Ramos». */
+export function etiquetaDe(medico: MedicoActual | null): string {
+  if (!medico) return ''
+  const tipo = tipoDeMedico(medico.especialidad)
+  return esBasica(medico.especialidad)
+    ? `${tipo} · ${medico.nombre}`
+    : `${tipo} · ${medico.nombre} · ${nombreEspecialidad(medico.especialidad)}`
+}
+
+/** Sesion del medico: su token (Authorization: Bearer) y sus datos de /medico/yo. */
 export const useSesionStore = defineStore('sesion', () => {
   let servicio: MedicoService | null = null
 
@@ -39,9 +52,11 @@ export const useSesionStore = defineStore('sesion', () => {
   const cargando = ref(false)
   const error = ref<string | null>(null)
 
-  const autenticado = computed(() => usuario.value !== null)
+  const autenticado = computed(() => !!usuario.value?.token)
   const esMedico = computed(() => usuario.value?.rol === 'MEDICO')
   const menu = computed(() => menuPara(medico.value))
+  const etiqueta = computed(() => etiquetaDe(medico.value))
+  const inicio = computed(() => menu.value[0]?.ruta ?? '/medico/agenda')
 
   /** Las pruebas inyectan un Fake; en la app lo pone el plugin de servicios. */
   function usar(s: MedicoService) {
@@ -53,10 +68,13 @@ export const useSesionStore = defineStore('sesion', () => {
     return servicio
   }
 
+  /** Recupera la sesion guardada; si ya vencio, no la usa. */
   function restaurar() {
     try {
       const texto = localStorage.getItem(CLAVE_GUARDADA)
-      usuario.value = texto ? (JSON.parse(texto) as Sesion) : null
+      const guardada = texto ? (JSON.parse(texto) as Sesion) : null
+      const vencida = guardada?.venceEn ? new Date(guardada.venceEn).getTime() <= Date.now() : false
+      usuario.value = guardada?.token && !vencida ? guardada : null
     } catch {
       usuario.value = null
     }
@@ -71,59 +89,66 @@ export const useSesionStore = defineStore('sesion', () => {
     }
   }
 
-  async function cargarMedico(): Promise<boolean> {
-    if (!esMedico.value) return false
+  /**
+   * Carga los datos del medico. Si el backend no responde, NO se borra la sesion (se puede reintentar);
+   * solo un 401/403 la invalida.
+   */
+  async function cargarMedico(): Promise<'ok' | 'sin-conexion' | 'rechazada'> {
+    if (!esMedico.value) return 'rechazada'
     try {
       medico.value = await srv().yo()
-      return true
+      return 'ok'
     } catch (e) {
       error.value = mensajeDeError(e)
-      return false
+      return e instanceof ApiError && (e.status === 401 || e.status === 403) ? 'rechazada' : 'sin-conexion'
     }
   }
 
-  /** Login real (POST /api/v1/auth/login de T100-05). */
+  /** Login real: POST /api/v1/auth/login devuelve el token. */
   async function entrar(nombreUsuario: string, clave: string): Promise<boolean> {
     cargando.value = true
     error.value = null
     try {
       usuario.value = await srv().login(nombreUsuario.trim(), clave)
       guardar()
-      return esMedico.value ? await cargarMedico() : true
+      if (!esMedico.value) return true
+      const resultado = await cargarMedico()
+      if (resultado === 'rechazada') limpiar()
+      return resultado === 'ok'
     } catch (e) {
       error.value = mensajeDeError(e)
-      usuario.value = null
+      limpiar()
       return false
     } finally {
       cargando.value = false
     }
   }
 
-  /**
-   * TEMPORAL (hasta S3-08): entrar indicando el id del medico, igual que los headers de Postman.
-   * El backend valida que el medico exista con GET /medico/yo.
-   */
-  async function entrarTemporal(medicoId: number): Promise<boolean> {
-    cargando.value = true
-    error.value = null
-    try {
-      usuario.value = { usuarioId: medicoId, rol: 'MEDICO', personaId: medicoId }
-      const ok = await cargarMedico()
-      if (!ok) usuario.value = null
-      guardar()
-      return ok
-    } finally {
-      cargando.value = false
+  /** Cierra la sesion en el backend (el token deja de servir) y en el navegador. */
+  async function salir() {
+    if (usuario.value?.token) {
+      try {
+        await srv().logout()
+      } catch {
+        // si el backend no responde, igual se cierra aqui; el token vence solo
+      }
     }
+    limpiar()
+    error.value = null
   }
 
-  function salir() {
+  /** El backend respondio 401: la sesion vencio o se cerro en otro lado. */
+  function sesionPerdida(mensaje: string) {
+    limpiar()
+    error.value = mensaje
+  }
+
+  function limpiar() {
     usuario.value = null
     medico.value = null
-    error.value = null
     guardar()
   }
 
-  return { usuario, medico, cargando, error, autenticado, esMedico, menu, usar, restaurar, cargarMedico, entrar,
-    entrarTemporal, salir }
+  return { usuario, medico, cargando, error, autenticado, esMedico, menu, etiqueta, inicio, usar, restaurar,
+    cargarMedico, entrar, salir, sesionPerdida }
 })

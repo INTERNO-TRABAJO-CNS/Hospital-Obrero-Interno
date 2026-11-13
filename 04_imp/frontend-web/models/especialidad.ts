@@ -16,8 +16,9 @@ export type Especialidad =
 
 export type CategoriaEspecialidad = 'BASICA' | 'INTERNA'
 
+/** Nombre de la especialidad tal como aparece en el Figma (catalogo, consultas, historial). */
 export const NOMBRE_ESPECIALIDAD: Record<Especialidad, string> = {
-  CONSULTORIO_FAMILIAR: 'Médico General',
+  CONSULTORIO_FAMILIAR: 'Consultorio Familiar',
   ODONTOLOGIA: 'Odontología',
   PEDIATRIA: 'Pediatría',
   CARDIOLOGIA: 'Cardiología',
@@ -32,7 +33,29 @@ export const NOMBRE_ESPECIALIDAD: Record<Especialidad, string> = {
   TERAPIA_INTENSIVA: 'Terapia Intensiva',
 }
 
+/** Duracion de ficha (minutos) de cada especialidad interna; igual que TipoEspecialidad. */
+export const DURACION_INTERNA: Partial<Record<Especialidad, [number, number]>> = {
+  CARDIOLOGIA: [20, 40],
+  NEFROLOGIA: [20, 40],
+  NEUMOLOGIA: [20, 30],
+  ENDOCRINOLOGIA: [20, 40],
+  GASTROENTEROLOGIA: [20, 30],
+  HEMATOLOGIA: [20, 40],
+  INFECTOLOGIA: [30, 45],
+  DERMATOLOGIA: [15, 30],
+  MEDICINA_TRABAJO: [20, 40],
+  TERAPIA_INTENSIVA: [30, 60],
+}
+
+/** Rango de duracion de cirugia (minutos) de las especialidades que operan. */
+export const DURACION_CIRUGIA: Partial<Record<Especialidad, [number, number]>> = {
+  GASTROENTEROLOGIA: [30, 120],
+  HEMATOLOGIA: [30, 120],
+  DERMATOLOGIA: [15, 120],
+}
+
 export const BASICAS: readonly Especialidad[] = ['CONSULTORIO_FAMILIAR', 'ODONTOLOGIA', 'PEDIATRIA']
+export const INTERNAS = Object.keys(DURACION_INTERNA) as Especialidad[]
 
 export function nombreEspecialidad(codigo: string | null | undefined): string {
   if (!codigo) return ''
@@ -41,4 +64,15 @@ export function nombreEspecialidad(codigo: string | null | undefined): string {
 
 export function esBasica(e: Especialidad): boolean {
   return BASICAS.includes(e)
+}
+
+/** Terapia Intensiva: solo urgencias (reanimacion), sin agenda propia. */
+export function soloUrgencia(e: Especialidad): boolean {
+  return e === 'TERAPIA_INTENSIVA'
+}
+
+/** Como se presenta el medico en la barra superior: «Médico General», «Pediatría» u «Odontología». */
+export function tipoDeMedico(e: Especialidad): string {
+  if (e === 'CONSULTORIO_FAMILIAR') return 'Médico General'
+  return esBasica(e) ? nombreEspecialidad(e) : 'Especialista'
 }

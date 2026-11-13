@@ -34,4 +34,16 @@ export interface HistorialPaciente {
   nombrePaciente: string
   citasPasadas: CitaPasada[]
   atenciones: Atencion[]
+  numeroAfiliado?: string | null
+  titular?: boolean | null
+  edad?: number | null
+}
+
+/** GET /api/v1/medico/pacientes?afiliado= (buscador: solo pacientes de la agenda del medico). */
+export interface PacienteDeAgenda {
+  pacienteId: number
+  nombre: string
+  numeroAfiliado: string
+  titular: boolean
+  edad: number
 }

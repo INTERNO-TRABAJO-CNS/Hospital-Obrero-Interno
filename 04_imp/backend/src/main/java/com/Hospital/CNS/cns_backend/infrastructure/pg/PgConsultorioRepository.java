@@ -42,7 +42,8 @@ public class PgConsultorioRepository implements ConsultorioRepository {
             stmt.setBoolean(3, c.activo());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw error("guardar el consultorio " + c.consultorioId(), e);
+            throw ErroresPg.traducir(LOG, "guardar el consultorio " + c.consultorioId(), e,
+                    "CONSULTORIO_DUPLICADO", "Ya existe un consultorio con ese nombre");
         }
     }
 

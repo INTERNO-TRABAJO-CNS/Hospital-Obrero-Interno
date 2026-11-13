@@ -56,7 +56,7 @@ public class PgHorarioRepository implements HorarioRepository {
             stmt.setBoolean(7, h.activo());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw error("guardar el horario " + h.horarioId(), e);
+            throw ErroresPg.traducir(LOG, "guardar el horario " + h.horarioId(), e);
         }
     }
 

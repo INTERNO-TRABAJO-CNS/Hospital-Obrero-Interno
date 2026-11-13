@@ -485,6 +485,52 @@ class CatalogoServiceTest {
 
     // ----------------------------------------------------------------- ayudas
 
+    // -------------------------------- bajas en cascada y textos largos (revision del 13/11/2026)
+
+    @Test
+    void darDeBajaMedico_tambienDaDeBajaSusHorarios() {
+        long medico = service.crearMedico(medico(TipoEspecialidad.PEDIATRIA, 30, 6)).medicoId();
+        int consultorio = service.crearConsultorio(new ConsultorioDTO(0, "C1", true)).consultorioId();
+        service.definirHorario(horario(medico, consultorio, DayOfWeek.MONDAY, 8, 12));
+        service.definirHorario(horario(medico, consultorio, DayOfWeek.TUESDAY, 8, 12));
+
+        service.darDeBajaMedico(medico);
+
+        assertTrue(horarios.horarios.stream().noneMatch(HorarioDTO::activo));
+    }
+
+    @Test
+    void darDeBajaConsultorio_tambienDaDeBajaSusHorarios() {
+        long medico = service.crearMedico(medico(TipoEspecialidad.PEDIATRIA, 30, 6)).medicoId();
+        int c1 = service.crearConsultorio(new ConsultorioDTO(0, "C1", true)).consultorioId();
+        int c2 = service.crearConsultorio(new ConsultorioDTO(0, "C2", true)).consultorioId();
+        service.definirHorario(horario(medico, c1, DayOfWeek.MONDAY, 8, 12));
+        HorarioDTO otro = service.definirHorario(horario(medico, c2, DayOfWeek.TUESDAY, 8, 12));
+
+        service.darDeBajaConsultorio(c1);
+
+        assertEquals(List.of(otro), horarios.horarios.stream().filter(HorarioDTO::activo).toList());
+    }
+
+    @Test
+    void crearMedico_especialidadInterna_ok() {
+        MedicoDTO creado = service.crearMedico(medico(TipoEspecialidad.GASTROENTEROLOGIA, 25, 6));
+
+        assertTrue(creado.activo());
+        assertEquals(TipoEspecialidad.GASTROENTEROLOGIA, creado.especialidad());
+    }
+
+    @Test
+    void textosMasLargosQueLaBase_datosInvalidos() {
+        assertEquals("DATOS_INVALIDOS", assertThrows(DominioException.class, () -> service.crearMedico(
+                new MedicoDTO(0, "J".repeat(101), "Perez", TipoEspecialidad.PEDIATRIA, 30, 6, true))).getCodigo());
+        assertEquals("DATOS_INVALIDOS", assertThrows(DominioException.class,
+                () -> service.crearConsultorio(new ConsultorioDTO(0, "C".repeat(81), true))).getCodigo());
+        assertEquals("DATOS_INVALIDOS", assertThrows(DominioException.class, () -> service.registrarDiaNoHabil(
+                new DiaNoHabilDTO(0, HOY.plusDays(5), "D".repeat(201), true))).getCodigo());
+        assertTrue(medicos.medicos.isEmpty());
+    }
+
     private static MedicoDTO medico(TipoEspecialidad especialidad, int duracion, int cupo) {
         return new MedicoDTO(0, "Juan", "Perez", especialidad, duracion, cupo, true);
     }

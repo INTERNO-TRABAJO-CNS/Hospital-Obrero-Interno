@@ -1,5 +1,7 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { FakeCirugiasService } from '~/services/fake/fakeCirugiasService'
+import { FakeFichasInternasService } from '~/services/fake/fakeFichasInternasService'
 import { FakeHistorialService } from '~/services/fake/fakeHistorialService'
 import { useHistorialStore } from '~/stores/historial'
 
@@ -13,10 +15,25 @@ describe('historial del paciente', () => {
     await historial.cargar(100)
 
     const linea = historial.lineaDeTiempo
-    expect(linea.map(e => e.fecha)).toEqual(['2026-10-28', '2026-09-15'])
-    expect(linea[0].recetas).toEqual(['Paracetamol 500 mg cada 8 h por 3 días'])
+    expect(linea.map(e => e.fecha)).toEqual(['2026-10-14', '2026-08-02'])
+    expect(linea[0].tipo).toBe('ATENCION')
+    expect(linea[0].recetas).toEqual(['Losartán 50 mg cada 24 h por 30 días.'])
     expect(linea[1].estado).toBe('CANCELADA')
     expect(historial.totalRecetas).toBe(1)
+  })
+
+  it('suma fichas internas y cirugias y se puede filtrar', async () => {
+    const fichas = new FakeFichasInternasService()
+    const historial = useHistorialStore()
+    const fake = new FakeHistorialService()
+    fake.porPaciente[113] = { pacienteId: 113, nombrePaciente: 'Marco Ríos', citasPasadas: [], atenciones: [] }
+    historial.usar(fake, fichas, new FakeCirugiasService(fichas))
+
+    await historial.cargar(113)
+
+    expect(historial.lineaDeTiempo.map(e => e.tipo).sort()).toEqual(['CIRUGIA', 'FICHA_INTERNA'])
+    historial.filtro = 'CIRUGIAS'
+    expect(historial.eventosFiltrados.map(e => e.tipo)).toEqual(['CIRUGIA'])
   })
 
   it('paciente fuera de su agenda: sin permiso y con el mensaje del backend', async () => {

@@ -100,7 +100,7 @@ public class PgHistorialRepository implements HistorialRepository {
                         r.numeroFicha());
             }
         } catch (SQLException e) {
-            throw error("guardar la receta de la cita " + r.citaId(), e);
+            throw ErroresPg.traducir(LOG, "guardar la receta de la cita " + r.citaId(), e);
         }
     }
 

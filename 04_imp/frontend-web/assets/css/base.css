@@ -1,128 +1,202 @@
+/* Sistema visual del Figma «HOSPITAL-OBRERO-CNS» (pagina COMPUTER): fondo verde, menu lateral verde oscuro,
+   acento amarillo-verde, tarjetas blancas y tipografia Inter. Los nombres de los colores siguen el Figma. */
 :root {
-  --fondo: #f4f6f9;
-  --superficie: #ffffff;
-  --superficie-2: #eef2f7;
-  --borde: #d9e0ea;
-  --texto: #18212f;
-  --texto-suave: #5b6779;
-  --primario: #1f5fa8;
-  --primario-texto: #ffffff;
-  --primario-suave: #e3edf9;
-  --exito: #1e7b4f;
-  --exito-suave: #e2f3ea;
-  --aviso: #8a5a00;
-  --aviso-suave: #fbf0d9;
-  --peligro: #b3261e;
-  --peligro-suave: #fbe5e3;
-  --neutro-suave: #eceff3;
-  --radio: 10px;
-  --sombra: 0 1px 2px rgba(16, 24, 40, .06), 0 1px 3px rgba(16, 24, 40, .08);
+  --verde-fondo: #74c070;
+  --verde-menu: #227e28;
+  --amarillo: #e1eb60;
+  --blanco: #ffffff;
+  --gris-entrada: #d9d9d9;
+  --gris-chip: #e6e6e6;
+  --texto: #000000;
+  --texto-suave: #6d6161;
+  --texto-nota: #2f4f2f;
+  --texto-deshabilitado: #8a8a8a;
+  --peligro: #c83c32;
+  --fila-par: #ecf6eb;
+  --fila-destacada: #fbf8d0;
+  --fila-cirugia: #fdf3dc;
+  --estado-atendida: #c8d2e1;
+  --estado-confirmada: #96d796;
+  --estado-programada: #e1eb60;
+  --estado-cancelada: #f0a8a0;
+  --estado-interna: #bfe3f5;
+  --sombra-menu: 0 6px 16px rgba(0, 0, 0, .18);
   color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --fondo: #0f141b;
-    --superficie: #171e28;
-    --superficie-2: #1e2734;
-    --borde: #2c3747;
-    --texto: #e6ebf2;
-    --texto-suave: #9aa6b8;
-    --primario: #6aa3e8;
-    --primario-texto: #0b1726;
-    --primario-suave: #1b2c42;
-    --exito: #5cc596;
-    --exito-suave: #15302a;
-    --aviso: #e2b356;
-    --aviso-suave: #352a14;
-    --peligro: #f08a82;
-    --peligro-suave: #3a1c1a;
-    --neutro-suave: #222b38;
-    --sombra: none;
-    color-scheme: dark;
-  }
 }
 
 * { box-sizing: border-box; }
 
 html, body {
   margin: 0;
-  background: var(--fondo);
+  min-height: 100%;
+  background: var(--verde-fondo);
   color: var(--texto);
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  font-size: 15px;
-  line-height: 1.5;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  line-height: normal;
 }
 
-h1, h2, h3 { line-height: 1.25; margin: 0; }
-h1 { font-size: 1.5rem; }
-h2 { font-size: 1.15rem; }
-a { color: var(--primario); }
+h1, h2, h3, p { margin: 0; }
+a { color: inherit; }
+button { font: inherit; }
 
+/* ---------------------------------------------------------------- pagina */
+.pagina { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.barra-superior { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.titulo-pagina { font-size: 28px; font-weight: 800; }
+.pildora {
+  background: var(--blanco);
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.fila-fecha { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.fila-fecha .resumen { flex: 1; font-size: 15px; font-weight: 700; min-width: 220px; }
+.selector-fecha {
+  background: var(--blanco);
+  border: 0;
+  border-radius: 10px;
+  padding: 7px 12px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--texto);
+}
+.columnas { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+.columnas > .principal { flex: 1 1 560px; max-width: 700px; }
+.columnas > .lateral { flex: 1 1 280px; }
+
+/* ---------------------------------------------------------------- tarjetas */
 .tarjeta {
-  background: var(--superficie);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
-  box-shadow: var(--sombra);
-  padding: 20px;
+  background: var(--blanco);
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
+.tarjeta-titulo { font-size: 16px; font-weight: 800; }
+.tarjeta-titulo.grande { font-size: 18px; }
+.dato { display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 13px; }
+.dato > :first-child { color: var(--texto-suave); white-space: nowrap; }
+.dato > :last-child { font-weight: 800; text-align: right; }
+.nota { font-size: 12px; color: var(--texto-nota); }
+.ayuda { font-size: 11px; color: var(--texto-suave); }
+.suave { color: var(--texto-suave); }
+.vacio { padding: 18px 16px; color: var(--texto-suave); }
+.item-lista {
+  background: var(--fila-par);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+.item-lista strong { font-weight: 800; }
+.item-lista.cirugia { background: var(--fila-cirugia); }
+.lista-puntos { display: flex; flex-direction: column; gap: 6px; font-size: 12px; margin: 0; padding-left: 16px; }
 
+/* ---------------------------------------------------------------- tablas */
+.tabla-contenedor { background: var(--blanco); border-radius: 12px; overflow-x: auto; }
+.tabla { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tabla th {
+  background: var(--verde-menu);
+  color: var(--blanco);
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 16px;
+  white-space: nowrap;
+}
+.tabla td { padding: 11px 16px; vertical-align: middle; }
+.tabla tbody tr:nth-child(even) { background: var(--fila-par); }
+.tabla tbody tr.destacada { background: var(--fila-destacada); }
+.tabla tbody tr.seleccionable { cursor: pointer; }
+.tabla tr.tachada td.tachable { text-decoration: line-through; color: var(--texto-suave); }
+.tabla .acciones { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.tabla .detalle { font-size: 12px; color: var(--texto-suave); }
+
+/* ---------------------------------------------------------------- chips de estado */
+.chip {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: var(--gris-chip);
+}
+.chip.ATENDIDA, .chip.BAJA, .chip.REALIZADA { background: var(--estado-atendida); }
+.chip.ASISTENCIA_CONFIRMADA, .chip.GENERAL, .chip.LIBRE { background: var(--estado-confirmada); }
+.chip.PROGRAMADA, .chip.ASIGNADA, .chip.ACTIVO, .chip.EN_CURSO { background: var(--estado-programada); }
+.chip.CANCELADA, .chip.URGENCIA, .chip.ALTA, .chip.RECHAZADA { background: var(--estado-cancelada); }
+.chip.INTERNA, .chip.PEDIATRIA { background: var(--estado-interna); }
+.chip.MEDIA, .chip.EN_ESPERA { background: #f5c26b; }
+.chip.BASICA { background: var(--gris-chip); }
+
+/* ---------------------------------------------------------------- botones */
 .boton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 38px;
-  padding: 0 16px;
-  border-radius: 8px;
-  border: 1px solid var(--borde);
-  background: var(--superficie);
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--amarillo);
   color: var(--texto);
-  font: inherit;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 800;
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
 }
-.boton:hover:not(:disabled) { background: var(--superficie-2); }
-.boton:disabled { opacity: .5; cursor: not-allowed; }
-.boton.primario { background: var(--primario); border-color: var(--primario); color: var(--primario-texto); }
-.boton.primario:hover:not(:disabled) { filter: brightness(1.08); background: var(--primario); }
-.boton.chico { min-height: 32px; padding: 0 12px; font-size: .9rem; }
+.boton:hover:not(:disabled) { filter: brightness(.96); }
+.boton:disabled { cursor: not-allowed; opacity: .55; }
+.boton.secundario { background: var(--blanco); border-color: var(--verde-menu); }
+.boton.gris { background: var(--gris-entrada); color: var(--texto-deshabilitado); }
+.boton.peligro { background: var(--gris-entrada); color: var(--peligro); }
+.boton.chico { padding: 6px 12px; font-size: 12px; }
+.boton.mediano { padding: 8px 16px; font-size: 13px; }
+.boton.ancho { width: 100%; }
+.botones { display: flex; gap: 12px; flex-wrap: wrap; }
+.botones > .boton { flex: 1; }
+.boton:focus-visible, .entrada:focus-visible { outline: 2px solid var(--verde-menu); outline-offset: 2px; }
 
+/* ---------------------------------------------------------------- formularios */
 .campo { display: flex; flex-direction: column; gap: 6px; }
-.campo label { font-weight: 600; font-size: .9rem; }
-.campo input, .campo textarea {
-  font: inherit;
-  color: var(--texto);
-  background: var(--superficie);
-  border: 1px solid var(--borde);
+.campo > label, .campo > .rotulo { font-size: 13px; font-weight: 800; }
+.entrada {
+  width: 100%;
+  background: var(--gris-entrada);
+  border: 0;
   border-radius: 8px;
-  padding: 9px 12px;
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--texto);
 }
-.campo input:focus, .campo textarea:focus, .boton:focus-visible {
-  outline: 2px solid var(--primario);
-  outline-offset: 1px;
+textarea.entrada { resize: vertical; min-height: 64px; line-height: 1.4; }
+.entrada::placeholder { color: var(--texto-suave); }
+.opciones { display: flex; gap: 8px; flex-wrap: wrap; }
+.opcion {
+  border: 0;
+  background: var(--gris-entrada);
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
 }
+.opcion.activa { background: var(--amarillo); font-weight: 800; }
 
-.etiqueta {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 999px;
-  font-size: .8rem;
-  font-weight: 600;
-  background: var(--neutro-suave);
-  color: var(--texto-suave);
+/* ---------------------------------------------------------------- avisos */
+.alerta { border-radius: 10px; padding: 10px 12px; font-size: 13px; }
+.alerta.error { background: #fbe1de; color: #7a1d16; }
+.alerta.info { background: var(--fila-destacada); color: var(--texto-nota); }
+.alerta.ok { background: var(--fila-par); color: var(--texto-nota); }
+
+@media print {
+  html, body { background: var(--blanco); }
 }
-.etiqueta.PROGRAMADA { background: var(--primario-suave); color: var(--primario); }
-.etiqueta.ASISTENCIA_CONFIRMADA { background: var(--aviso-suave); color: var(--aviso); }
-.etiqueta.ATENDIDA { background: var(--exito-suave); color: var(--exito); }
-.etiqueta.CANCELADA { background: var(--peligro-suave); color: var(--peligro); }
-
-.alerta { border-radius: 8px; padding: 12px 14px; }
-.alerta.error { background: var(--peligro-suave); color: var(--peligro); }
-.alerta.ok { background: var(--exito-suave); color: var(--exito); }
-.alerta.info { background: var(--primario-suave); color: var(--primario); }
-
-.suave { color: var(--texto-suave); }
-.vacio { text-align: center; padding: 32px 16px; color: var(--texto-suave); }

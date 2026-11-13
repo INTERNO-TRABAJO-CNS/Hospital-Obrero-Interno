@@ -225,9 +225,14 @@ class FakeCatalogoService implements CatalogoService {
     Medico m(String n, String a, Especialidad e, int d, int c) =>
         Medico(id: _id(), nombres: n, apellidos: a, especialidad: e, duracionCitaMin: d, cupoMaximoDia: c);
     medicos.addAll([
-      m('Jorge', 'Ramos', Especialidad.consultorioFamiliar, 40, 7),
-      m('Ana', 'Quispe', Especialidad.pediatria, 35, 6),
-      m('Luis', 'Mamani', Especialidad.odontologia, 50, 5),
+      m('Carlos', 'Ramos', Especialidad.consultorioFamiliar, 40, 7),
+      m('Lucía', 'Quispe', Especialidad.pediatria, 35, 6),
+      m('Jorge', 'Mamani', Especialidad.odontologia, 50, 5),
+      m('Raúl', 'Vargas', Especialidad.gastroenterologia, 25, 6),
+      m('Patricia', 'Arce', Especialidad.gastroenterologia, 25, 7),
+      m('Daniela', 'Salinas', Especialidad.dermatologia, 20, 7),
+      m('Miguel', 'Paredes', Especialidad.cardiologia, 30, 5),
+      m('Hugo', 'Lima', Especialidad.terapiaIntensiva, 45, 5),
       m('Rosa', 'Salas', Especialidad.consultorioFamiliar, 45, 7).copiar(activo: false),
     ]);
     consultorios.addAll([

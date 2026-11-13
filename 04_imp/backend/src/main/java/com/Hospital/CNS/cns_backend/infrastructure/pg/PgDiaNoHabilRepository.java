@@ -47,7 +47,8 @@ public class PgDiaNoHabilRepository implements DiaNoHabilRepository {
             stmt.setBoolean(4, d.activo());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw error("guardar el dia no habil " + d.diaNoHabilId(), e);
+            throw ErroresPg.traducir(LOG, "guardar el dia no habil " + d.diaNoHabilId(), e,
+                    "DIA_NO_HABIL_DUPLICADO", "Esa fecha ya esta registrada como dia no habil");
         }
     }
 

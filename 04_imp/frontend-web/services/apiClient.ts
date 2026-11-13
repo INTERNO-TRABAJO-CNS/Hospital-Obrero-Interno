@@ -17,24 +17,22 @@ export interface Api {
 
 export interface OpcionesApi {
   urlBase: string
-  /** Usuario actual; sus datos van en los headers temporales X-Usuario-Id, X-Rol, X-Persona-Id. */
+  /** Usuario actual: su token va en «Authorization: Bearer <token>». */
   sesion: () => Sesion | null
+  /** Se llama cuando el backend responde 401 (sesion vencida o cerrada). */
+  alNoAutenticado?: (error: ApiError) => void
   fetchFn?: typeof fetch
 }
 
 /** Cliente REST unico de la web (mismo comportamiento que api_client.dart de Flutter). */
-export function crearApi({ urlBase, sesion, fetchFn = fetch }: OpcionesApi): Api {
+export function crearApi({ urlBase, sesion, alNoAutenticado, fetchFn = fetch }: OpcionesApi): Api {
   const base = urlBase.replace(/\/+$/, '')
 
   async function enviar<T>(metodo: string, ruta: string, cuerpo?: unknown): Promise<T> {
     const s = sesion()
     const cabeceras: Record<string, string> = { Accept: 'application/json' }
     if (cuerpo !== undefined) cabeceras['Content-Type'] = 'application/json'
-    if (s) {
-      cabeceras['X-Usuario-Id'] = String(s.usuarioId)
-      cabeceras['X-Rol'] = s.rol
-      cabeceras['X-Persona-Id'] = String(s.personaId)
-    }
+    if (s?.token) cabeceras.Authorization = `Bearer ${s.token}`
     let respuesta: Response
     try {
       respuesta = await fetchFn(base + (ruta.startsWith('/') ? ruta : `/${ruta}`), {
@@ -45,14 +43,15 @@ export function crearApi({ urlBase, sesion, fetchFn = fetch }: OpcionesApi): Api
     } catch {
       throw new ApiError('SIN_CONEXION', 'No se pudo conectar con el servidor', 0)
     }
-    const texto = await respuesta.text()
-    const datos = texto ? JSON.parse(texto) : null
+    const datos = leerJson(await respuesta.text())
     if (!respuesta.ok) {
-      throw new ApiError(
+      const error = new ApiError(
         datos?.codigo ?? 'ERROR_HTTP',
         datos?.mensaje ?? `El servidor respondió ${respuesta.status}`,
         respuesta.status,
       )
+      if (respuesta.status === 401 && s) alNoAutenticado?.(error)
+      throw error
     }
     return datos as T
   }
@@ -64,11 +63,28 @@ export function crearApi({ urlBase, sesion, fetchFn = fetch }: OpcionesApi): Api
   }
 }
 
+/** Una respuesta que no es JSON (un proxy, un error HTML) no rompe la app. */
+function leerJson(texto: string): any {
+  if (!texto) return null
+  try {
+    return JSON.parse(texto)
+  } catch {
+    return null
+  }
+}
+
 /** Cliente configurado con NUXT_PUBLIC_API_URL y la sesion actual. */
 export function useApi(): Api {
   const config = useRuntimeConfig()
   const sesion = useSesionStore()
-  return crearApi({ urlBase: String(config.public.apiUrl), sesion: () => sesion.usuario })
+  return crearApi({
+    urlBase: String(config.public.apiUrl),
+    sesion: () => sesion.usuario,
+    alNoAutenticado: (e) => {
+      sesion.sesionPerdida(e.message)
+      navigateTo('/login')
+    },
+  })
 }
 
 /** Mensaje para mostrar al usuario a partir de cualquier error. */

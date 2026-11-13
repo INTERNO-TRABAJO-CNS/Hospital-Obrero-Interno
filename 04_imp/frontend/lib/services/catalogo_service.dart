@@ -32,7 +32,7 @@ abstract class CatalogoService {
   Future<void> darDeBajaDiaNoHabil(int id);
 }
 
-/// Implementacion real: REST bajo `/api/v1/admin`.
+/// Implementacion real: REST bajo `/api/v1/admin` con el token de la sesion (rol ADMINISTRADOR).
 class ApiCatalogoService implements CatalogoService {
   ApiCatalogoService(this._api);
 
@@ -43,67 +43,71 @@ class ApiCatalogoService implements CatalogoService {
   @override
   Future<List<Medico>> listarMedicos({Especialidad? filtro}) async {
     final r = await _api.get('$_base/medicos', consulta: filtro == null ? null : {'especialidad': filtro.codigo});
-    return _lista(r, Medico.desdeJson);
+    return listaDe(r, Medico.desdeJson);
   }
 
   @override
   Future<Medico> crearMedico(Medico medico) async =>
-      Medico.desdeJson(await _api.post('$_base/medicos', medico.aJson()));
+      unoDe(await _api.post('$_base/medicos', medico.aJson()), Medico.desdeJson);
 
   @override
   Future<Medico> modificarMedico(int id, Medico medico) async =>
-      Medico.desdeJson(await _api.put('$_base/medicos/$id', medico.aJson()));
+      unoDe(await _api.put('$_base/medicos/$id', medico.aJson()), Medico.desdeJson);
 
   @override
   Future<void> darDeBajaMedico(int id) => _api.delete('$_base/medicos/$id');
 
   @override
   Future<List<Consultorio>> listarConsultorios() async =>
-      _lista(await _api.get('$_base/consultorios'), Consultorio.desdeJson);
+      listaDe(await _api.get('$_base/consultorios'), Consultorio.desdeJson);
 
   @override
   Future<Consultorio> crearConsultorio(Consultorio consultorio) async =>
-      Consultorio.desdeJson(await _api.post('$_base/consultorios', consultorio.aJson()));
+      unoDe(await _api.post('$_base/consultorios', consultorio.aJson()), Consultorio.desdeJson);
 
   @override
   Future<Consultorio> modificarConsultorio(int id, Consultorio consultorio) async =>
-      Consultorio.desdeJson(await _api.put('$_base/consultorios/$id', consultorio.aJson()));
+      unoDe(await _api.put('$_base/consultorios/$id', consultorio.aJson()), Consultorio.desdeJson);
 
   @override
   Future<void> darDeBajaConsultorio(int id) => _api.delete('$_base/consultorios/$id');
 
   @override
-  Future<List<Horario>> listarHorarios() async => _lista(await _api.get('$_base/horarios'), Horario.desdeJson);
+  Future<List<Horario>> listarHorarios() async => listaDe(await _api.get('$_base/horarios'), Horario.desdeJson);
 
   @override
   Future<Horario> definirHorario(Horario horario) async =>
-      Horario.desdeJson(await _api.post('$_base/horarios', horario.aJson()));
+      unoDe(await _api.post('$_base/horarios', horario.aJson()), Horario.desdeJson);
 
   @override
   Future<Horario> modificarHorario(int id, Horario horario) async =>
-      Horario.desdeJson(await _api.put('$_base/horarios/$id', horario.aJson()));
+      unoDe(await _api.put('$_base/horarios/$id', horario.aJson()), Horario.desdeJson);
 
   @override
   Future<void> darDeBajaHorario(int id) => _api.delete('$_base/horarios/$id');
 
   @override
   Future<List<DiaNoHabil>> listarDiasNoHabiles() async =>
-      _lista(await _api.get('$_base/dias-no-habiles'), DiaNoHabil.desdeJson);
+      listaDe(await _api.get('$_base/dias-no-habiles'), DiaNoHabil.desdeJson);
 
   @override
   Future<DiaNoHabil> registrarDiaNoHabil(DiaNoHabil dia) async =>
-      DiaNoHabil.desdeJson(await _api.post('$_base/dias-no-habiles', dia.aJson()));
+      unoDe(await _api.post('$_base/dias-no-habiles', dia.aJson()), DiaNoHabil.desdeJson);
 
   @override
   Future<DiaNoHabil> modificarDiaNoHabil(int id, DiaNoHabil dia) async =>
-      DiaNoHabil.desdeJson(await _api.put('$_base/dias-no-habiles/$id', dia.aJson()));
+      unoDe(await _api.put('$_base/dias-no-habiles/$id', dia.aJson()), DiaNoHabil.desdeJson);
 
   @override
   Future<void> darDeBajaDiaNoHabil(int id) => _api.delete('$_base/dias-no-habiles/$id');
-
-  /// ApiClient entrega las listas JSON dentro de {'datos': [...]}.
-  static List<T> _lista<T>(Map<String, dynamic> respuesta, T Function(Map<String, dynamic>) convertir) {
-    final datos = respuesta['datos'] as List? ?? const [];
-    return [for (final e in datos) convertir(Map<String, dynamic>.from(e as Map))];
-  }
 }
+
+/// ApiClient entrega las listas JSON dentro de {'datos': [...]}. Un dato que esta version no
+/// reconoce (p. ej. una especialidad nueva) llega como RESPUESTA_INVALIDA.
+List<T> listaDe<T>(Map<String, dynamic> respuesta, T Function(Map<String, dynamic>) convertir) {
+  final datos = respuesta['datos'] as List? ?? const [];
+  return leerRespuesta(() => [for (final e in datos) convertir(Map<String, dynamic>.from(e as Map))]);
+}
+
+T unoDe<T>(Map<String, dynamic> respuesta, T Function(Map<String, dynamic>) convertir) =>
+    leerRespuesta(() => convertir(respuesta));

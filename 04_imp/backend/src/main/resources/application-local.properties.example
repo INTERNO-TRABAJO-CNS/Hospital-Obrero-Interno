@@ -1,0 +1,8 @@
+# Copia este archivo como application-local.properties (en esta misma carpeta) y pon los datos de TU base.
+# application-local.properties esta en .gitignore: NUNCA lo subas a GitHub.
+spring.datasource.url=jdbc:postgresql://localhost:5432/cns_db
+spring.datasource.username=postgres
+spring.datasource.password=CAMBIAR
+
+# Opcional: clave del administrador inicial (tambien puede ir en la variable de entorno CNS_ADMIN_CLAVE).
+# cns.admin.clave=CAMBIAR

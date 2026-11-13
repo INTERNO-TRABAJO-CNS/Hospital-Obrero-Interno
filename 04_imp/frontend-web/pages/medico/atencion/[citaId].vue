@@ -1,94 +1,103 @@
 <script setup lang="ts">
 import { MAX_RECETA } from '~/models/atencion'
 import { nombreEspecialidad } from '~/models/especialidad'
-import { fechaCorta, horaCorta } from '~/models/fechas'
+import { fechaDiaMes, fechaMes, horaCorta } from '~/models/fechas'
 import { useAtencionStore } from '~/stores/atencion'
+import { useHistorialStore } from '~/stores/historial'
 
 const route = useRoute()
 const atencion = useAtencionStore()
+const historial = useHistorialStore()
 const citaId = computed(() => Number(route.params.citaId))
 
-onMounted(() => atencion.cargar(citaId.value))
+onMounted(async () => {
+  await atencion.cargar(citaId.value)
+  if (atencion.datos) await historial.cargar(atencion.datos.pacienteId)
+})
+
+const d = computed(() => atencion.datos)
+const afiliado = computed(() => {
+  if (!d.value) return ''
+  const tipo = d.value.titular === true ? ' · Titular' : d.value.titular === false ? ' · Beneficiario' : ''
+  return `${d.value.numeroAfiliado}${tipo}`
+})
+const paciente = computed(() => {
+  if (!d.value) return ''
+  return d.value.edad != null ? `${d.value.nombrePaciente} · ${d.value.edad} años` : d.value.nombrePaciente
+})
+/** Las 3 atenciones o cirugias mas recientes, sin contar la de hoy. */
+const recientes = computed(() => historial.lineaDeTiempo
+  .filter(e => (e.tipo === 'ATENCION' && e.recetas.length) || e.tipo === 'CIRUGIA')
+  .slice(0, 3))
 </script>
 
 <template>
-  <section class="atencion">
-    <NuxtLink to="/medico/agenda" class="boton chico volver">← Agenda</NuxtLink>
+  <section class="pagina">
+    <BarraSuperior titulo="Atención" />
 
-    <p v-if="atencion.cargando" class="vacio">Cargando la cita…</p>
-    <p v-else-if="!atencion.datos && atencion.error" class="alerta error" role="alert">{{ atencion.error }}</p>
+    <p v-if="atencion.cargando" class="tarjeta vacio">Cargando la cita…</p>
+    <div v-else-if="!d && atencion.error" class="tarjeta">
+      <p class="alerta error" role="alert">{{ atencion.error }}</p>
+      <NuxtLink to="/medico/agenda" class="boton secundario">Volver a la agenda</NuxtLink>
+    </div>
 
-    <template v-else-if="atencion.datos">
-      <header>
-        <p class="suave">Atención · Ficha {{ atencion.datos.numeroFicha }}</p>
-        <h1>{{ atencion.datos.nombrePaciente }}</h1>
-      </header>
-
-      <dl class="tarjeta datos">
-        <div><dt>Afiliado</dt><dd>{{ atencion.datos.numeroAfiliado }}</dd></div>
-        <div><dt>Ficha</dt><dd>{{ atencion.datos.numeroFicha }}</dd></div>
-        <div><dt>Fecha</dt><dd>{{ fechaCorta(atencion.datos.fecha) }}</dd></div>
-        <div><dt>Hora</dt><dd>{{ horaCorta(atencion.datos.hora) }}</dd></div>
-        <div>
-          <dt>Consulta</dt>
-          <dd>
-            {{ nombreEspecialidad(atencion.datos.consulta) }}
-            <span class="etiqueta">{{ atencion.datos.categoriaConsulta === 'INTERNA' ? 'Interna' : 'General' }}</span>
-          </dd>
+    <div v-else-if="d" class="columnas">
+      <form class="tarjeta principal" @submit.prevent="atencion.finalizar()">
+        <h2 class="tarjeta-titulo grande">Ficha N° {{ d.numeroFicha }} · {{ fechaDiaMes(d.fecha) }} · {{ horaCorta(d.hora) }}</h2>
+        <div class="dato"><span>Afiliado</span><span>{{ afiliado }}</span></div>
+        <div class="dato"><span>Paciente</span><span>{{ paciente }}</span></div>
+        <div class="dato">
+          <span>Consulta</span><span>{{ nombreEspecialidad(d.consulta) }} · {{ d.nombreConsultorio ?? `Consultorio ${d.consultorio}` }}</span>
         </div>
-        <div><dt>Consultorio</dt><dd>{{ atencion.datos.consultorio }}</dd></div>
-      </dl>
+        <div class="dato"><span>Estado</span><ChipEstado :valor="d.estado ?? 'ASISTENCIA_CONFIRMADA'" /></div>
 
-      <div class="enlaces">
-        <NuxtLink :to="`/medico/pacientes/${atencion.datos.pacienteId}/historial`" class="boton chico">
-          Ver historial
-        </NuxtLink>
-        <NuxtLink v-if="atencion.datos.puedeDerivar" :to="`/medico/ticket-interno?citaId=${atencion.datos.citaId}`"
-                  class="boton chico">
-          Generar ticket interno
-        </NuxtLink>
-      </div>
-
-      <div v-if="atencion.finalizada" class="alerta ok" role="status">
-        Atención finalizada: la receta quedó en el historial y la cita pasó a «Atendida».
-      </div>
-
-      <form v-else class="tarjeta receta" @submit.prevent="atencion.finalizar()">
-        <div class="campo">
-          <label for="medicacion">Medicación</label>
-          <textarea id="medicacion" v-model="atencion.medicacion" rows="7" :maxlength="MAX_RECETA + 200"
-                    placeholder="Medicamento, dosis, frecuencia y duración"></textarea>
-          <span class="contador" :class="{ excedido: atencion.caracteres > MAX_RECETA }">
-            {{ atencion.caracteres }} / {{ MAX_RECETA }}
+        <div v-if="!atencion.finalizada" class="campo">
+          <label for="medicacion">Medicación / receta</label>
+          <textarea id="medicacion" v-model="atencion.medicacion" class="entrada receta" rows="6"
+                    :maxlength="MAX_RECETA + 200" placeholder="Medicamento, dosis, frecuencia y duración" />
+          <span class="ayuda" :class="{ excedido: atencion.caracteres > MAX_RECETA }">
+            Entre 1 y {{ MAX_RECETA }} caracteres. {{ atencion.caracteres ? `(${atencion.caracteres})` : '' }}
           </span>
         </div>
+        <p v-else class="alerta ok" role="status">
+          Atención finalizada: la receta quedó en el historial y la cita pasó a ATENDIDA.
+        </p>
+
         <p v-if="atencion.error" class="alerta error" role="alert">{{ atencion.error }}</p>
-        <div class="pie">
-          <button class="boton primario" type="submit" :disabled="!atencion.puedeFinalizar">
+
+        <div class="botones">
+          <button v-if="!atencion.finalizada" class="boton" type="submit" :disabled="!atencion.puedeFinalizar">
             {{ atencion.enviando ? 'Guardando…' : 'Finalizar atención' }}
           </button>
+          <NuxtLink v-else to="/medico/agenda" class="boton">Volver a la agenda</NuxtLink>
+          <NuxtLink v-if="d.puedeDerivar" :to="`/medico/ticket-interno?citaId=${d.citaId}`" class="boton secundario">
+            Generar ticket interno
+          </NuxtLink>
         </div>
+        <p class="ayuda nota-final">Al finalizar, la receta se agrega al historial y la cita pasa a ATENDIDA. El ticket
+          interno se puede generar antes o después de finalizar, siempre el mismo día.</p>
       </form>
-    </template>
+
+      <aside class="tarjeta lateral">
+        <h2 class="tarjeta-titulo">Historial reciente</h2>
+        <p v-if="historial.cargando" class="suave">Cargando…</p>
+        <p v-else-if="!recientes.length" class="suave">Sin atenciones anteriores.</p>
+        <div v-for="e in recientes" :key="e.clave" class="item-lista" :class="{ cirugia: e.tipo === 'CIRUGIA' }">
+          <strong v-if="e.tipo === 'CIRUGIA'">{{ fechaMes(e.fecha, false) }} · Cirugía · {{ nombreEspecialidad(e.especialidad) }}</strong>
+          <strong v-else>{{ fechaMes(e.fecha, false) }} · {{ e.titulo }}</strong>
+          <span v-if="e.tipo === 'CIRUGIA'">{{ e.lineas[0]?.split(' · ')[0] }} · {{ e.estado }}</span>
+          <span v-for="(r, i) in e.recetas" v-else :key="i">Receta: {{ r }}</span>
+        </div>
+        <NuxtLink :to="`/medico/pacientes/${d.pacienteId}/historial`" class="boton secundario mediano ancho">
+          Ver historial completo
+        </NuxtLink>
+      </aside>
+    </div>
   </section>
 </template>
 
 <style scoped>
-.atencion { display: flex; flex-direction: column; gap: 18px; max-width: 860px; }
-.volver { align-self: flex-start; }
-header p { margin: 0 0 2px; }
-.datos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 24px; margin: 0; }
-.datos dt { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--texto-suave); }
-.datos dd { margin: 2px 0 0; font-weight: 600; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.enlaces { display: flex; gap: 8px; flex-wrap: wrap; }
-.receta { display: flex; flex-direction: column; gap: 14px; }
-.receta textarea { resize: vertical; min-height: 140px; }
-.contador { align-self: flex-end; font-size: .8rem; color: var(--texto-suave); font-variant-numeric: tabular-nums; }
-.contador.excedido { color: var(--peligro); font-weight: 600; }
-.receta .alerta { margin: 0; }
-.pie { display: flex; justify-content: flex-end; }
-
-@media (max-width: 640px) {
-  .datos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
+.receta { min-height: 120px; }
+.excedido { color: var(--peligro); font-weight: 700; }
+.nota-final { font-size: 12px; }
 </style>

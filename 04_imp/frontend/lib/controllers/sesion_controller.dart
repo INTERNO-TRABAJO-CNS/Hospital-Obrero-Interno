@@ -6,7 +6,7 @@ import '../models/auth/sesion.dart';
 import '../services/auth_service.dart';
 import '../services/paciente_service.dart';
 
-/// Controlador de la sesion (MVC): login, registro del titular y del beneficiario.
+/// Controlador de la sesion (MVC): login, logout, registro del titular y del beneficiario.
 ///
 /// Solo valida formato y llama a los services; las reglas las aplica el backend.
 /// Cada accion devuelve `null` si salio bien o el mensaje para mostrar.
@@ -19,27 +19,29 @@ class SesionController extends ChangeNotifier {
   final AuthService _auth;
   final PacienteService _pacientes;
 
-  /// Cliente compartido: al entrar se le ponen los headers temporales del usuario.
+  /// Cliente compartido: al entrar se le pone el token de la sesion.
   final ApiClient? _api;
 
   Sesion? sesion;
   bool cargando = false;
 
-  /// Afiliacion del titular que inicio sesion (para registrar beneficiarios).
-  String? numeroAfiliado;
+  /// Afiliacion que quedo del registro del titular (por si el login no la trae).
+  String? _afiliadoRegistrado;
 
   bool get autenticado => sesion != null;
+
+  /// Afiliacion del titular que inicio sesion (para registrar beneficiarios): la manda el login
+  /// para el rol PACIENTE o queda del registro.
+  String? get numeroAfiliado => sesion?.numeroAfiliado ?? _afiliadoRegistrado;
 
   Future<String?> entrar(String usuario, String clave) async {
     if (usuario.trim().isEmpty || clave.isEmpty) {
       return 'Ingrese usuario y contraseña.';
     }
     return _ejecutar(() async {
-      sesion = await _auth.login(usuario, clave);
-      _api
-        ?..usuarioId = sesion!.usuarioId
-        ..rol = sesion!.rol.codigo
-        ..personaId = sesion!.personaId;
+      final nueva = await _auth.login(usuario, clave);
+      sesion = nueva;
+      _api?.token = nueva.token.isEmpty ? null : nueva.token;
     });
   }
 
@@ -53,7 +55,7 @@ class SesionController extends ChangeNotifier {
     }
     final error = await _ejecutar(() async {
       final titular = await _pacientes.registrarTitular(datos);
-      numeroAfiliado = titular.numeroAfiliado;
+      _afiliadoRegistrado = titular.numeroAfiliado;
     });
     if (error != null) {
       return error;
@@ -71,13 +73,24 @@ class SesionController extends ChangeNotifier {
     return _ejecutar(() => _pacientes.registrarBeneficiario(datos));
   }
 
-  void salir() {
+  /// Cierra la sesion en el backend y la olvida en la app. Si no hay conexion igual se olvida:
+  /// el token vence solo.
+  Future<void> salir() async {
+    if (sesion != null) {
+      try {
+        await _auth.logout();
+      } on ApiException {
+        // Sin conexion o sesion ya vencida: no hay nada mas que hacer en el backend.
+      }
+    }
+    olvidar();
+  }
+
+  /// Borra la sesion sin llamar al backend (cuando el backend ya respondio 401).
+  void olvidar() {
     sesion = null;
-    numeroAfiliado = null;
-    _api
-      ?..usuarioId = null
-      ..rol = null
-      ..personaId = null;
+    _afiliadoRegistrado = null;
+    _api?.token = null;
     notifyListeners();
   }
 

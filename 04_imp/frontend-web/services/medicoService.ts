@@ -4,8 +4,10 @@ import type { MedicoActual, Sesion } from '~/models/medico'
 export interface MedicoService {
   /** GET /api/v1/medico/yo */
   yo(): Promise<MedicoActual>
-  /** POST /api/v1/auth/login (T100-05) */
+  /** POST /api/v1/auth/login: devuelve el token de la sesion. */
   login(usuario: string, clave: string): Promise<Sesion>
+  /** POST /api/v1/auth/logout: el token deja de servir. */
+  logout(): Promise<void>
 }
 
 export class MedicoServiceApi implements MedicoService {
@@ -17,5 +19,9 @@ export class MedicoServiceApi implements MedicoService {
 
   login(usuario: string, clave: string): Promise<Sesion> {
     return this.api.post<Sesion>('/api/v1/auth/login', { usuario, clave })
+  }
+
+  async logout(): Promise<void> {
+    await this.api.post('/api/v1/auth/logout')
   }
 }

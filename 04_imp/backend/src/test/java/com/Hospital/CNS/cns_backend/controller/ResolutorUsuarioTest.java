@@ -1,6 +1,7 @@
 package com.Hospital.CNS.cns_backend.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Map;
@@ -10,40 +11,48 @@ import org.junit.jupiter.api.Test;
 import com.Hospital.CNS.cns_backend.model.compartido.DominioException;
 import com.Hospital.CNS.cns_backend.model.compartido.RolUsuario;
 
+/** El usuario sale del token (Authorization: Bearer); las cabeceras X-* ya no se aceptan. */
 class ResolutorUsuarioTest {
 
-    private final ResolutorUsuario resolutor = new ResolutorUsuario();
+    private final SesionesDePrueba sesiones = new SesionesDePrueba();
+    private final ResolutorUsuario resolutor = sesiones.resolutor();
 
     @Test
-    void leeElUsuarioDeLosHeaders() {
-        Map<String, String> headers = Map.of("X-Usuario-Id", "7", "X-Rol", "medico", "X-Persona-Id", "42");
+    void tokenValido_devuelveSuUsuario() {
+        String bearer = sesiones.bearer(50, "MEDICO", 7);
 
-        UsuarioAutenticado usuario = resolutor.resolver(headers::get);
+        UsuarioAutenticado u = resolutor.resolver(Map.of("Authorization", bearer)::get);
 
-        assertEquals(new UsuarioAutenticado(7, RolUsuario.MEDICO, 42), usuario);
+        assertEquals(RolUsuario.MEDICO, u.rol());
+        assertEquals(7, u.personaId());
     }
 
     @Test
-    void faltaUnHeader_error400() {
-        DominioException e = assertThrows(DominioException.class,
-                () -> resolutor.resolver("7", null, "42"));
-
-        assertEquals("ENCABEZADO_FALTANTE", e.getCodigo());
+    void sinToken_noAutenticado() {
+        DominioException e = assertThrows(DominioException.class, () -> resolutor.resolver(Map.<String, String>of()::get));
+        assertEquals("NO_AUTENTICADO", e.getCodigo());
     }
 
     @Test
-    void idQueNoEsNumero_error400() {
-        DominioException e = assertThrows(DominioException.class,
-                () -> resolutor.resolver("abc", "PACIENTE", "42"));
-
-        assertEquals("ENCABEZADO_INVALIDO", e.getCodigo());
+    void cabecerasTemporales_yaNoSirven() {
+        Map<String, String> viejas = Map.of("X-Usuario-Id", "1", "X-Rol", "ADMINISTRADOR", "X-Persona-Id", "1");
+        DominioException e = assertThrows(DominioException.class, () -> resolutor.resolver(viejas::get));
+        assertEquals("NO_AUTENTICADO", e.getCodigo());
     }
 
     @Test
-    void rolDesconocido_error400() {
+    void tokenInventado_noAutenticado() {
         DominioException e = assertThrows(DominioException.class,
-                () -> resolutor.resolver("7", "DIRECTOR", "42"));
+                () -> resolutor.resolver(Map.of("Authorization", "Bearer inventado")::get));
+        assertEquals("NO_AUTENTICADO", e.getCodigo());
+    }
 
-        assertEquals("ROL_INVALIDO", e.getCodigo());
+    @Test
+    void token_soloConPrefijoBearer() {
+        assertEquals("abc", ResolutorUsuario.token("Bearer abc"));
+        assertEquals("abc", ResolutorUsuario.token("bearer  abc "));
+        assertNull(ResolutorUsuario.token("abc"));
+        assertNull(ResolutorUsuario.token("Bearer "));
+        assertNull(ResolutorUsuario.token(null));
     }
 }

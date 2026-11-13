@@ -6,70 +6,44 @@ definePageMeta({ layout: 'vacio' })
 const sesion = useSesionStore()
 const usuario = ref('')
 const clave = ref('')
-const medicoId = ref<number | null>(null)
-const modoTemporal = ref(false)
-
-async function despues(ok: boolean) {
-  if (!ok) return
-  await navigateTo(sesion.esMedico ? '/medico/agenda' : '/sin-acceso')
-}
 
 async function entrar() {
-  await despues(await sesion.entrar(usuario.value, clave.value))
-}
-
-async function entrarTemporal() {
-  if (!medicoId.value) return
-  await despues(await sesion.entrarTemporal(medicoId.value))
+  if (!(await sesion.entrar(usuario.value, clave.value))) return
+  await navigateTo(sesion.esMedico ? sesion.inicio : '/sin-acceso')
 }
 </script>
 
 <template>
-  <div class="tarjeta login">
-    <div class="encabezado">
-      <strong class="marca">CNS</strong>
-      <h1>Web del médico</h1>
-      <p class="suave">Agenda, atención e historial de sus pacientes.</p>
-    </div>
-
-    <form v-if="!modoTemporal" class="formulario" @submit.prevent="entrar">
+  <div class="login">
+    <img class="logo" src="/logo-cns.jpg" alt="Logo de la CNS">
+    <form class="tarjeta inicio" @submit.prevent="entrar">
+      <h1>Iniciar sesión</h1>
       <div class="campo">
-        <label for="usuario">Usuario</label>
-        <input id="usuario" v-model="usuario" autocomplete="username" required>
+        <label for="usuario" class="etiqueta-campo">Usuario</label>
+        <input id="usuario" v-model="usuario" class="entrada" autocomplete="username" placeholder="Ingresar usuario"
+               required>
       </div>
       <div class="campo">
-        <label for="clave">Contraseña</label>
-        <input id="clave" v-model="clave" type="password" autocomplete="current-password" required>
+        <label for="clave" class="etiqueta-campo">Contraseña</label>
+        <input id="clave" v-model="clave" class="entrada" type="password" autocomplete="current-password"
+               placeholder="Ingresar contraseña" required>
       </div>
-      <button class="boton primario" type="submit" :disabled="sesion.cargando">
-        {{ sesion.cargando ? 'Ingresando…' : 'Ingresar' }}
+      <p v-if="sesion.error" class="alerta error" role="alert">{{ sesion.error }}</p>
+      <button class="boton ancho" type="submit" :disabled="sesion.cargando">
+        {{ sesion.cargando ? 'Ingresando…' : 'Iniciar Sesión' }}
       </button>
+      <p class="ayuda-registro">¿Aún no tienes cuenta? Si eres asegurado titular activo, regístrate desde la
+        aplicación.</p>
     </form>
-
-    <form v-else class="formulario" @submit.prevent="entrarTemporal">
-      <p class="alerta info">Acceso temporal de pruebas: hasta que exista la seguridad real (S3-08) se entra con el id
-        del médico.</p>
-      <div class="campo">
-        <label for="medico">Id del médico</label>
-        <input id="medico" v-model.number="medicoId" type="number" min="1" required>
-      </div>
-      <button class="boton primario" type="submit" :disabled="sesion.cargando">Entrar</button>
-    </form>
-
-    <p v-if="sesion.error" class="alerta error" role="alert">{{ sesion.error }}</p>
-
-    <button class="enlace" type="button" @click="modoTemporal = !modoTemporal">
-      {{ modoTemporal ? 'Volver al ingreso con usuario y contraseña' : 'Acceso temporal con id de médico' }}
-    </button>
   </div>
 </template>
 
 <style scoped>
-.login { width: min(400px, 100%); display: flex; flex-direction: column; gap: 18px; padding: 28px; }
-.encabezado { display: flex; flex-direction: column; gap: 4px; }
-.encabezado p { margin: 0; }
-.marca { color: var(--primario); letter-spacing: .06em; }
-.formulario { display: flex; flex-direction: column; gap: 14px; }
-.formulario .alerta { margin: 0; font-size: .9rem; }
-.enlace { background: none; border: 0; color: var(--primario); cursor: pointer; font: inherit; font-size: .9rem; }
+.login { display: flex; flex-direction: column; align-items: center; gap: 24px; width: min(420px, 100%); }
+.logo { width: 120px; height: 120px; border-radius: 20px; object-fit: cover; background: var(--blanco); }
+.inicio { width: 100%; gap: 14px; }
+h1 { font-size: 24px; font-weight: 800; }
+.campo { gap: 6px; }
+.etiqueta-campo { font-size: 12px !important; font-weight: 500 !important; }
+.ayuda-registro { font-size: 12px; color: var(--texto-suave); }
 </style>

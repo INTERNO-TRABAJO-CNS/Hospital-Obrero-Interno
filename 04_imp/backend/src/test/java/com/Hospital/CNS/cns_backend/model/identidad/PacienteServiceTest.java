@@ -5,8 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import com.Hospital.CNS.cns_backend.model.compartido.DominioException;
 import com.Hospital.CNS.cns_backend.model.compartido.FakeHistorialRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.RelojFijo;
 import com.Hospital.CNS.cns_backend.model.compartido.RolUsuario;
+import com.Hospital.CNS.cns_backend.model.compartido.Transaccion;
 
 /** CU-03 con Fakes (sin BD). */
 class PacienteServiceTest {
@@ -189,5 +192,76 @@ class PacienteServiceTest {
         DominioException e = assertThrows(DominioException.class,
                 () -> service.exigirMismaAfiliacion(juan.pacienteId(), "AF-10002"));
         assertEquals("NO_ES_DEL_PACIENTE", e.getCodigo());
+    }
+
+    // ------------------------------------------------ revision del 13/11/2026: nada a medias
+
+    @Test
+    void registrarTitular_claveDeMasDe72Bytes_noGuardaNada() {
+        DominioException e = assertThrows(DominioException.class, () -> service.registrarTitular(
+                new RegistroTitularDTO("AF-10001", "4512301", "juanc", "ñ".repeat(37))));
+
+        assertEquals("DATOS_INVALIDOS", e.getCodigo());
+        assertTrue(pacientes.pacientes.isEmpty());
+        assertTrue(usuarios.usuarios.isEmpty());
+        assertTrue(service.registrarTitular(registroJuan()).titular(), "despues puede registrarse normalmente");
+    }
+
+    @Test
+    void registrarTitular_usuarioDeMasDe60_noGuardaNada() {
+        DominioException e = assertThrows(DominioException.class, () -> service.registrarTitular(
+                new RegistroTitularDTO("AF-10001", "4512301", "u".repeat(61), "secreta1")));
+
+        assertEquals("DATOS_INVALIDOS", e.getCodigo());
+        assertTrue(pacientes.pacientes.isEmpty());
+    }
+
+    @Test
+    void registrarTitular_pacienteCuentaEHistorialEnUnaSolaTransaccion() {
+        int[] transacciones = {0};
+        Transaccion contadora = new Transaccion() {
+            @Override
+            public <T> T ejecutar(Supplier<T> trabajo) {
+                transacciones[0]++;
+                return trabajo.get();
+            }
+        };
+        PacienteService conTransaccion = new PacienteService(pacientes, new FakeAfiliadoRepository().con(JUAN),
+                historiales, usuarios, new FakeCifradorClave(), new RelojFijo(HOY.atTime(9, 0)), contadora,
+                LimitadorIntentos.sinLimite());
+
+        conTransaccion.registrarTitular(registroJuan());
+
+        assertEquals(1, transacciones[0]);
+    }
+
+    @Test
+    void registrarTitular_variosCiEquivocados_bloqueaElNumeroDeAfiliado() {
+        RelojFijo reloj = new RelojFijo(HOY.atTime(9, 0));
+        PacienteService limitado = new PacienteService(pacientes, new FakeAfiliadoRepository().con(JUAN), historiales,
+                usuarios, new FakeCifradorClave(), reloj, Transaccion.DIRECTA,
+                new LimitadorIntentos(3, Duration.ofMinutes(15), Duration.ofMinutes(15), reloj));
+        for (int i = 0; i < 3; i++) {
+            assertThrows(DominioException.class, () -> limitado.registrarTitular(
+                    new RegistroTitularDTO("AF-10001", "0000000", "juanc", "secreta1")));
+        }
+
+        DominioException e = assertThrows(DominioException.class, () -> limitado.registrarTitular(registroJuan()));
+
+        assertEquals("INTENTOS_EXCEDIDOS", e.getCodigo());
+        assertTrue(pacientes.pacientes.isEmpty());
+    }
+
+    @Test
+    void registrarBeneficiario_textosLargos_datosInvalidos() {
+        service.registrarTitular(registroJuan());
+        PacienteDTO largo = new PacienteDTO(0, "AF-10001", "9000001", "N".repeat(101), "Choque",
+                LocalDate.of(2018, 10, 5), false);
+
+        assertEquals("DATOS_INVALIDOS", assertThrows(DominioException.class,
+                () -> service.registrarBeneficiario("AF-10001", "9000001", largo)).getCodigo());
+        assertEquals("DATOS_INVALIDOS", assertThrows(DominioException.class,
+                () -> service.registrarBeneficiario("AF-10001", "9".repeat(21), hijo(LocalDate.of(2018, 10, 5))))
+                .getCodigo());
     }
 }

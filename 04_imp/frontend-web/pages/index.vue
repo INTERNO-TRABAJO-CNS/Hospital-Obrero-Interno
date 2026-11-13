@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useSesionStore } from '~/stores/sesion'
 
+// La primera opcion del menu de cada tipo de medico (Agenda o Agenda de fichas internas).
 const sesion = useSesionStore()
-const primera = sesion.menu.find(o => !o.pendiente)
-await navigateTo(primera?.ruta ?? '/medico/agenda', { replace: true })
+await navigateTo(sesion.inicio, { replace: true })
 </script>
 
 <template>

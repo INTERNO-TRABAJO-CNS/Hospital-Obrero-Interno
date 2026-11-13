@@ -12,7 +12,7 @@ http.Response _json(Object cuerpo, int estado) => http.Response(
     );
 
 void main() {
-  test('envia los headers temporales de usuario y arma la URL', () async {
+  test('envia el token como Authorization: Bearer y arma la URL', () async {
     late http.BaseRequest enviada;
     final api = ApiClient(
       urlBase: 'http://servidor:8080/',
@@ -20,18 +20,63 @@ void main() {
         enviada = peticion;
         return _json({'ok': true}, 200);
       }),
-    )
-      ..usuarioId = 7
-      ..rol = 'PACIENTE'
-      ..personaId = 42;
+    )..token = 'abc123';
 
     final respuesta = await api.get('/api/citas', consulta: {'fecha': '2026-11-09'});
 
     expect(respuesta['ok'], true);
     expect(enviada.url.toString(), 'http://servidor:8080/api/citas?fecha=2026-11-09');
-    expect(enviada.headers['X-Usuario-Id'], '7');
-    expect(enviada.headers['X-Rol'], 'PACIENTE');
-    expect(enviada.headers['X-Persona-Id'], '42');
+    expect(enviada.headers['Authorization'], 'Bearer abc123');
+    expect(enviada.headers.keys.where((k) => k.toLowerCase().startsWith('x-')), isEmpty,
+        reason: 'los headers X-Usuario-Id/X-Rol/X-Persona-Id ya no existen');
+  });
+
+  test('sin sesion no manda Authorization', () async {
+    late http.BaseRequest enviada;
+    final api = ApiClient(
+      urlBase: 'http://servidor:8080',
+      cliente: MockClient((peticion) async {
+        enviada = peticion;
+        return _json({'ok': true}, 200);
+      }),
+    );
+
+    await api.post('/api/v1/auth/login', {'usuario': 'x'});
+
+    expect(enviada.headers.containsKey('Authorization'), isFalse);
+  });
+
+  test('un 401 con token avisa que la sesion se perdio', () async {
+    ApiException? perdida;
+    final api = ApiClient(
+      urlBase: 'http://servidor:8080',
+      cliente: MockClient((_) async => _json({'codigo': 'SESION_VENCIDA', 'mensaje': 'La sesion vencio'}, 401)),
+    )
+      ..token = 'viejo'
+      ..alPerderSesion = (e) => perdida = e;
+
+    await expectLater(api.get('/api/v1/medico/yo'), throwsA(isA<ApiException>()));
+
+    expect(perdida?.codigo, 'SESION_VENCIDA');
+  });
+
+  test('un 401 sin token (login fallido) no cuenta como sesion perdida', () async {
+    var avisos = 0;
+    final api = ApiClient(
+      urlBase: 'http://servidor:8080',
+      cliente: MockClient((_) async => _json({'codigo': 'CREDENCIALES_INVALIDAS', 'mensaje': 'x'}, 401)),
+    )..alPerderSesion = (_) => avisos++;
+
+    await expectLater(api.post('/api/v1/auth/login'), throwsA(isA<ApiException>()));
+
+    expect(avisos, 0);
+  });
+
+  test('leerRespuesta convierte un dato desconocido en RESPUESTA_INVALIDA', () {
+    expect(
+      () => leerRespuesta(() => throw const FormatException('rol desconocido "X"')),
+      throwsA(isA<ApiException>().having((e) => e.codigo, 'codigo', 'RESPUESTA_INVALIDA')),
+    );
   });
 
   test('una lista JSON se devuelve dentro de la clave datos', () async {

@@ -8,9 +8,15 @@ export default defineNuxtConfig({
   css: ['~/assets/css/base.css'],
   app: {
     head: {
-      title: 'CNS · Médico',
+      title: 'CNS · Web del médico',
       htmlAttrs: { lang: 'es' },
       meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
+      link: [
+        { rel: 'icon', type: 'image/jpeg', href: '/logo-cns.jpg' },
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap' },
+      ],
     },
   },
   runtimeConfig: {

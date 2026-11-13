@@ -22,7 +22,7 @@ public class ConfiguracionCors {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(origen.split("\\s*,\\s*")));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Content-Type", "Accept", "X-Usuario-Id", "X-Rol", "X-Persona-Id"));
+        config.setAllowedHeaders(List.of("Content-Type", "Accept", "Authorization"));
         config.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource fuente = new UrlBasedCorsConfigurationSource();
         fuente.registerCorsConfiguration("/api/**", config);

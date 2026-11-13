@@ -1,3 +1,4 @@
+import type { EstadoCita } from './agenda'
 import type { CategoriaEspecialidad, Especialidad } from './especialidad'
 
 /** GET /api/v1/citas/{id}/atencion: datos autocompletados. */
@@ -15,6 +16,12 @@ export interface DatosAtencion {
   consultorio: number
   medico: string
   puedeDerivar: boolean
+  estado?: EstadoCita
+  /** null si el backend no conoce al paciente. */
+  edad?: number | null
+  titular?: boolean | null
+  /** «Consultorio 1»; null si el backend no lo conoce (se muestra el numero). */
+  nombreConsultorio?: string | null
 }
 
 export type ResultadoAtencion =

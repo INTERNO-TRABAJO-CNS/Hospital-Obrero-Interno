@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../controllers/sesion_controller.dart';
+import '../../core/app_theme.dart';
 import '../../models/auth/sesion.dart';
+import '../comun/cns_widgets.dart';
 
-/// CU-01: iniciar sesion (celular y escritorio). Al entrar llama [alEntrar] con la sesion;
-/// [alRegistrarse] abre la creacion de cuenta del titular.
+/// CU-01: iniciar sesion (Figma "LOGIN ESCRITORIO"; en celular es la misma tarjeta).
+/// Al entrar llama [alEntrar] con la sesion; [alRegistrarse] abre la creacion de cuenta del titular.
 class LoginView extends StatefulWidget {
   const LoginView({super.key, required this.controller, required this.alEntrar, required this.alRegistrarse});
 
@@ -43,71 +45,99 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    final tema = Theme.of(context);
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: ListenableBuilder(
-                listenable: widget.controller,
-                builder: (context, _) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Icon(Icons.local_hospital_rounded, size: 56, color: tema.colorScheme.primary),
-                    const SizedBox(height: 12),
-                    Text('CNS Hospital Obrero',
-                        textAlign: TextAlign.center, style: tema.textTheme.headlineSmall),
-                    const SizedBox(height: 4),
-                    Text('Inicie sesión para gestionar sus citas',
-                        textAlign: TextAlign.center, style: tema.textTheme.bodyMedium),
-                    const SizedBox(height: 28),
-                    TextField(
-                      key: const Key('login_usuario'),
-                      controller: _usuario,
-                      textInputAction: TextInputAction.next,
-                      autofillHints: const [AutofillHints.username],
-                      decoration: const InputDecoration(labelText: 'Usuario', border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 14),
-                    TextField(
-                      key: const Key('login_clave'),
-                      controller: _clave,
-                      obscureText: !_verClave,
-                      autofillHints: const [AutofillHints.password],
-                      onSubmitted: (_) => _entrar(),
-                      decoration: InputDecoration(
-                        labelText: 'Contraseña',
-                        border: const OutlineInputBorder(),
-                        suffixIcon: IconButton(
-                          tooltip: _verClave ? 'Ocultar' : 'Mostrar',
-                          icon: Icon(_verClave ? Icons.visibility_off : Icons.visibility),
-                          onPressed: () => setState(() => _verClave = !_verClave),
+    const nota = TextStyle(fontSize: 12, color: ColoresCns.textoSuave);
+    return Theme(
+      data: AppTheme.claro(),
+      child: Scaffold(
+        backgroundColor: ColoresCns.fondo,
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: ListenableBuilder(
+                  listenable: widget.controller,
+                  builder: (context, _) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Center(child: LogoCns(tamano: 120)),
+                      const SizedBox(height: 24),
+                      TarjetaBlanca(
+                        padding: const EdgeInsets.all(20),
+                        child: AutofillGroup(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const Text('Iniciar sesión', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+                              const SizedBox(height: 16),
+                              CampoCns(
+                                etiqueta: 'Usuario',
+                                child: TextField(
+                                  key: const Key('login_usuario'),
+                                  controller: _usuario,
+                                  textInputAction: TextInputAction.next,
+                                  autofillHints: const [AutofillHints.username],
+                                  decoration: const InputDecoration(hintText: 'Ingresar usuario'),
+                                ),
+                              ),
+                              CampoCns(
+                                etiqueta: 'Contraseña',
+                                child: TextField(
+                                  key: const Key('login_clave'),
+                                  controller: _clave,
+                                  obscureText: !_verClave,
+                                  autofillHints: const [AutofillHints.password],
+                                  onSubmitted: (_) => _entrar(),
+                                  decoration: InputDecoration(
+                                    hintText: 'Ingresar contraseña',
+                                    suffixIcon: IconButton(
+                                      tooltip: _verClave ? 'Ocultar contraseña' : 'Mostrar contraseña',
+                                      icon: Icon(_verClave ? Icons.visibility_off : Icons.visibility, size: 20),
+                                      onPressed: () => setState(() => _verClave = !_verClave),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              if (_error != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: Text(
+                                    _error!,
+                                    key: const Key('login_error'),
+                                    style: const TextStyle(color: ColoresCns.peligro, fontSize: 13),
+                                  ),
+                                ),
+                              FilledButton(
+                                key: const Key('login_entrar'),
+                                onPressed: widget.controller.cargando ? null : _entrar,
+                                child: Text(widget.controller.cargando ? 'Ingresando…' : 'Iniciar Sesión'),
+                              ),
+                              const SizedBox(height: 14),
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  const Text('¿Aún no tienes cuenta? Si eres asegurado titular activo, ', style: nota),
+                                  InkWell(
+                                    key: const Key('login_registrarse'),
+                                    onTap: widget.alRegistrarse,
+                                    child: Text(
+                                      'regístrate aquí.',
+                                      style: nota.copyWith(
+                                        color: ColoresCns.menu,
+                                        fontWeight: FontWeight.w700,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    if (_error != null) ...[
-                      const SizedBox(height: 12),
-                      Text(_error!, key: const Key('login_error'), style: TextStyle(color: tema.colorScheme.error)),
                     ],
-                    const SizedBox(height: 20),
-                    FilledButton(
-                      key: const Key('login_entrar'),
-                      onPressed: widget.controller.cargando ? null : _entrar,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Text(widget.controller.cargando ? 'Ingresando…' : 'Ingresar'),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextButton(
-                      key: const Key('login_registrarse'),
-                      onPressed: widget.alRegistrarse,
-                      child: const Text('¿Es titular asegurado? Cree su cuenta'),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),

@@ -11,25 +11,22 @@ import com.Hospital.CNS.cns_backend.model.compartido.CitaRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.FinalizacionCita;
 import com.Hospital.CNS.cns_backend.model.compartido.HistorialRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.Reloj;
-import com.Hospital.CNS.cns_backend.model.compartido.RelojSistema;
 import com.Hospital.CNS.cns_backend.model.compartido.ResultadoFinalizacion;
+import com.Hospital.CNS.cns_backend.model.compartido.Transaccion;
 import com.Hospital.CNS.cns_backend.model.historial.HistorialService;
+import com.Hospital.CNS.cns_backend.model.identidad.PacienteRepository;
 import com.Hospital.CNS.cns_backend.model.operaciones.AgendaMedicaService;
+import com.Hospital.CNS.cns_backend.model.recursos.ConsultorioRepository;
 import com.Hospital.CNS.cns_backend.model.recursos.MedicoActualService;
 import com.Hospital.CNS.cns_backend.model.recursos.MedicoRepository;
 
 /**
  * Une el model del medico (agenda CU-13, historial CU-14, atencion CU-15) con su base de datos.
- * El model no conoce Spring: los Service se crean aqui.
+ * El model no conoce Spring: los Service se crean aqui. El Reloj (hora del hospital) sale de
+ * ConfiguracionBaseDatos.
  */
 @Configuration
 public class ConfiguracionMedico {
-
-    @Bean
-    @ConditionalOnMissingBean(Reloj.class)
-    Reloj reloj() {
-        return new RelojSistema();
-    }
 
     @Bean
     HistorialRepository historialRepository() {
@@ -47,14 +44,16 @@ public class ConfiguracionMedico {
     }
 
     @Bean
-    HistorialService historialService(HistorialRepository historiales, CitaRepository citas, Reloj reloj) {
-        return new HistorialService(historiales, citas, reloj);
+    HistorialService historialService(HistorialRepository historiales, CitaRepository citas, Reloj reloj,
+                                      PacienteRepository pacientes) {
+        return new HistorialService(historiales, citas, reloj, pacientes);
     }
 
     @Bean
     AtencionService atencionService(CitaRepository citas, HistorialRepository historiales,
-                                    FinalizacionCita finalizacion, Reloj reloj) {
-        return new AtencionService(citas, historiales, finalizacion, reloj);
+                                    FinalizacionCita finalizacion, Reloj reloj, Transaccion transaccion,
+                                    PacienteRepository pacientes, ConsultorioRepository consultorios) {
+        return new AtencionService(citas, historiales, finalizacion, reloj, transaccion, pacientes, consultorios);
     }
 
     /**

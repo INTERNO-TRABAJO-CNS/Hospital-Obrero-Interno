@@ -25,6 +25,8 @@ import com.Hospital.CNS.cns_backend.model.compartido.RelojFijo;
 
 class AtencionControllerTest {
 
+    private final SesionesDePrueba sesiones = new SesionesDePrueba();
+
     private static final LocalDate HOY = LocalDate.of(2026, 11, 10);
 
     private MockMvc mvc;
@@ -36,7 +38,7 @@ class AtencionControllerTest {
         citas.store(cita(2, 101, 7, HOY, LocalTime.of(9, 0), 3, EstadoCita.PROGRAMADA));
         AtencionService service = new AtencionService(citas, new FakeHistorialRepository(), new FakeFinalizacionCita(),
                 new RelojFijo(HOY.atTime(8, 30)));
-        mvc = MockMvcBuilders.standaloneSetup(new AtencionController(service, new ResolutorUsuario()))
+        mvc = MockMvcBuilders.standaloneSetup(new AtencionController(service, sesiones.resolutor()))
                 .setControllerAdvice(new ManejadorErrores())
                 .build();
     }
@@ -83,11 +85,11 @@ class AtencionControllerTest {
     @Test
     void rolPaciente_403() throws Exception {
         mvc.perform(get("/api/v1/citas/1/atencion")
-                        .header("X-Usuario-Id", "1").header("X-Rol", "PACIENTE").header("X-Persona-Id", "100"))
+                        .header("Authorization", sesiones.bearer(1, "PACIENTE", 100)))
                 .andExpect(status().isForbidden());
     }
 
-    private static MockHttpServletRequestBuilder medico(MockHttpServletRequestBuilder b) {
-        return b.header("X-Usuario-Id", "50").header("X-Rol", "MEDICO").header("X-Persona-Id", "7");
+    private MockHttpServletRequestBuilder medico(MockHttpServletRequestBuilder b) {
+        return b.header("Authorization", sesiones.bearer(50, "MEDICO", 7));
     }
 }

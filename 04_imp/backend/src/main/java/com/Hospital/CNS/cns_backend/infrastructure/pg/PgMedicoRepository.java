@@ -52,7 +52,7 @@ public class PgMedicoRepository implements MedicoRepository {
             stmt.setBoolean(7, m.activo());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw error("guardar el medico " + m.medicoId(), e);
+            throw ErroresPg.traducir(LOG, "guardar el medico " + m.medicoId(), e);
         }
     }
 

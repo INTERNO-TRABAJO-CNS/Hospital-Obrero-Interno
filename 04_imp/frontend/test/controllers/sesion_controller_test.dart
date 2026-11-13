@@ -11,6 +11,20 @@ class _AuthQueAprende extends FakeAuthService {
   void agregar(String usuario, String clave, Sesion sesion) => cuentas[usuario] = (clave, sesion);
 }
 
+/// Cuenta las llamadas a logout (y puede simular que no hay red).
+class _AuthQueCuenta extends FakeAuthService {
+  int cierres = 0;
+  bool fallar = false;
+
+  @override
+  Future<void> logout() async {
+    cierres++;
+    if (fallar) {
+      throw const ApiException('SIN_CONEXION', 'No se pudo conectar con el servidor');
+    }
+  }
+}
+
 void main() {
   late ApiClient api;
   late _AuthQueAprende auth;
@@ -24,12 +38,18 @@ void main() {
     controller = SesionController(auth: auth, pacientes: pacientes, api: api);
   });
 
-  test('login correcto pone los headers temporales del usuario', () async {
+  test('login correcto guarda el token de la sesion en el cliente', () async {
     expect(await controller.entrar('paciente', 'paciente123'), isNull);
 
     expect(controller.sesion!.rol, Rol.paciente);
-    expect(api.rol, 'PACIENTE');
-    expect(api.personaId, 1);
+    expect(api.token, controller.sesion!.token);
+    expect(api.token, isNotEmpty);
+  });
+
+  test('el titular que entra trae su afiliacion para registrar beneficiarios', () async {
+    await controller.entrar('paciente', 'paciente123');
+
+    expect(controller.numeroAfiliado, 'AF-10001');
   });
 
   test('[2a] credenciales invalidas devuelven el mensaje del backend', () async {
@@ -38,16 +58,16 @@ void main() {
   });
 
   test('registrar titular con afiliado inexistente no crea nada', () async {
-    final error = await controller.registrarTitular(
-        const RegistroTitular(numeroAfiliado: 'AF-00000', ci: '1', usuario: 'x', clave: 'secreta1'));
+    final error = await controller
+        .registrarTitular(const RegistroTitular(numeroAfiliado: 'AF-00000', ci: '1', usuario: 'x', clave: 'secreta1'));
 
     expect(error, 'El número de afiliado no está registrado en la CNS');
     expect(pacientes.pacientes, isEmpty);
   });
 
   test('registrar titular y entrar con su cuenta', () async {
-    auth.agregar('juanc', 'secreta1',
-        const Sesion(usuarioId: 9, rol: Rol.paciente, personaId: 1, nombre: 'Juan Carlos Choque'));
+    auth.agregar(
+        'juanc', 'secreta1', const Sesion(usuarioId: 9, rol: Rol.paciente, personaId: 1, nombre: 'Juan Carlos Choque'));
 
     final error = await controller.registrarTitular(
         const RegistroTitular(numeroAfiliado: 'AF-10001', ci: '4512301', usuario: 'juanc', clave: 'secreta1'));
@@ -67,7 +87,7 @@ void main() {
 
     expect(error, isNull);
     expect(c.sesion!.nombre, 'Juan Carlos Choque Mamani');
-    c.salir();
+    await c.salir();
     expect(await c.entrar('benjamin', 'secreta123'), isNull);
   });
 
@@ -91,12 +111,26 @@ void main() {
     expect(error, 'La fecha de nacimiento no puede ser futura.');
   });
 
-  test('salir borra la sesion y los headers', () async {
-    await controller.entrar('paciente', 'paciente123');
+  test('salir cierra la sesion en el backend y borra el token', () async {
+    final auth = _AuthQueCuenta();
+    final c = SesionController(auth: auth, pacientes: pacientes, api: api);
+    await c.entrar('paciente', 'paciente123');
 
-    controller.salir();
+    await c.salir();
 
-    expect(controller.autenticado, isFalse);
-    expect(api.rol, isNull);
+    expect(auth.cierres, 1);
+    expect(c.autenticado, isFalse);
+    expect(api.token, isNull);
+  });
+
+  test('si el logout falla por red igual se olvida la sesion', () async {
+    final auth = _AuthQueCuenta()..fallar = true;
+    final c = SesionController(auth: auth, pacientes: pacientes, api: api);
+    await c.entrar('paciente', 'paciente123');
+
+    await c.salir();
+
+    expect(c.autenticado, isFalse);
+    expect(api.token, isNull);
   });
 }

@@ -54,7 +54,7 @@ public class PgPacienteRepository implements PacienteRepository {
             if (VIOLACION_UNIQUE.equals(e.getSQLState())) {
                 return false;
             }
-            throw error("guardar el paciente " + p.pacienteId(), e);
+            throw ErroresPg.traducir(LOG, "guardar el paciente " + p.pacienteId(), e);
         }
     }
 

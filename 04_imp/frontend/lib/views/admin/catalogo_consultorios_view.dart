@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../controllers/catalogo_controller.dart';
 import '../../models/catalogo/consultorio.dart';
+import '../comun/cns_widgets.dart';
 import 'catalogo_widgets.dart';
 
 /// CU-02 · Catalogo de consultorios. El Figma no tiene esta pantalla: sigue el
@@ -112,25 +113,23 @@ class _CatalogoConsultoriosViewState extends State<CatalogoConsultoriosView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextFormField(
-              key: const Key('consultorio_nombre'),
-              controller: _nombre,
-              decoration: const InputDecoration(labelText: 'Nombre', hintText: 'Consultorio 1'),
-              validator: validarTexto,
+            CampoCns(
+              etiqueta: 'Nombre',
+              child: TextFormField(
+                key: const Key('consultorio_nombre'),
+                controller: _nombre,
+                decoration: const InputDecoration(hintText: 'Ej. Consultorio 7'),
+                validator: validarTexto,
+              ),
             ),
             MensajeError(_error),
-            const SizedBox(height: 16),
             FilledButton(
               key: const Key('consultorio_guardar'),
               onPressed: _guardando ? null : _guardar,
               child: Text(_guardando ? 'Guardando…' : 'Guardar'),
             ),
-            const SizedBox(height: 8),
-            OutlinedButton(
-              onPressed: editando && _seleccionado!.activo ? _darDeBaja : null,
-              style: OutlinedButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
-              child: const Text('Dar de baja'),
-            ),
+            const SizedBox(height: 10),
+            BotonPeligro(texto: 'Dar de baja', alTocar: editando && _seleccionado!.activo ? _darDeBaja : null),
             if (editando)
               TextButton(onPressed: () => _seleccionar(null), child: const Text('Nuevo consultorio')),
             const SizedBox(height: 8),
