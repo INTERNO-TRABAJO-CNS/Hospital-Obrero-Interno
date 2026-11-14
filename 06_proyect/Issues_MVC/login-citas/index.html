@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Obrero (CNS) - Sistema de Citas</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Iconos para la campanita -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-hospital"></i> Hospital Obrero - CNS
+        </div>
+        <!-- Campanita (Oculta hasta que inicie sesión) -->
+        <div id="zonaNotificaciones" class="notificacion-container oculto">
+            <button id="btnCampanita" class="btn-campana" title="Ver notificaciones">
+                <i class="fa-solid fa-bell"></i>
+                <span id="badgeNotificacion" class="badge oculto">1</span>
+            </button>
+            <div id="dropdownNotificacion" class="dropdown-notificacion oculto">
+                <h4>Notificaciones del Sistema</h4>
+                <p id="textoNotificacion">No tienes notificaciones nuevas.</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- VISTA 1: INICIO / OPCIÓN REGISTRAR PACIENTE -->
+        <section id="vistaInicio" class="card">
+            <h2>Bienvenido al Portal de Citas</h2>
+            <p>Seleccione una opción para continuar:</p>
+            <button id="btnIrRegistro" class="btn-primary">Registrar Paciente</button>
+            <button id="btnIrLoginDirecto" class="btn-secondary">Ya tengo cuenta (Iniciar Sesión)</button>
+        </section>
+
+        <!-- VISTA 2: REGISTRO DE CREDENCIALES (Nro Afiliado y Password) -->
+        <section id="vistaRegistro" class="card oculto">
+            <h2>Registro de Nuevo Paciente</h2>
+            <p>Cree su usuario único para ingresar al sistema.</p>
+            <form id="formRegistro">
+                <div class="form-group">
+                    <label for="regAfiliado">Nro. de Afiliado:</label>
+                    <input type="text" id="regAfiliado" placeholder="Ej: 854120-MGS" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Contraseña (Password):</label>
+                    <input type="password" id="regPassword" placeholder="Cree una contraseña" required>
+                </div>
+                <button type="submit" class="btn-primary">Crear Cuenta y Continuar</button>
+                <button type="button" id="btnVolverInicio1" class="btn-link">Cancelar</button>
+            </form>
+        </section>
+
+        <!-- VISTA 3: LOGIN (Nro de Afiliado y Password) -->
+        <section id="vistaLogin" class="card oculto">
+            <h2>Iniciar Sesión</h2>
+            <p>Ingrese sus credenciales de asegurado.</p>
+            <form id="formLogin">
+                <div class="form-group">
+                    <label for="loginAfiliado">Nro. de Afiliado:</label>
+                    <input type="text" id="loginAfiliado" placeholder="Ingrese su Nro. de Afiliado" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" placeholder="Ingrese su contraseña" required>
+                </div>
+                <button type="submit" class="btn-primary">Ingresar</button>
+                <button type="button" id="btnIrRegistroDesdeLogin" class="btn-link">¿No tienes cuenta? Registrar paciente</button>
+            </form>
+        </section>
+
+        <!-- VISTA 4: DATOS DEL PACIENTE (IDAFI, EI persona, nombre, fecha) -->
+        <section id="vistaDatosPaciente" class="card oculto">
+            <h2>Completar Ficha del Paciente</h2>
+            <p>Complete sus datos personales para validar su habilitación en el sistema (JSON).</p>
+            <form id="formDatosPaciente">
+                <div class="form-group">
+                    <label for="inputIdAfi">IDAFI (Número largo):</label>
+                    <input type="number" id="inputIdAfi" placeholder="Ej: 1002548963" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputEiPersona">EI Persona (Número entero):</label>
+                    <input type="number" id="inputEiPersona" placeholder="Ej: 12" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputNombre">Nombre Completo:</label>
+                    <input type="text" id="inputNombre" placeholder="Ej: Juan Pérez" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputFecha">Fecha:</label>
+                    <input type="date" id="inputFecha" required>
+                </div>
+                <button type="submit" class="btn-primary">Validar y Enviar Datos</button>
+            </form>
+        </section>
+
+        <!-- VISTA 5: PANEL PRINCIPAL / RESULTADO DE VALIDACIÓN JSON -->
+        <section id="vistaPanel" class="card oculto">
+            <h2>Panel del Asegurado</h2>
+            <div id="infoPacienteResumen" class="resumen-box"></div>
+            
+            <div class="json-box">
+                <h4><i class="fa-solid fa-code"></i> Respuesta JSON del Controlador:</h4>
+                <pre id="visorJson"></pre>
+            </div>
+
+            <button id="btnCerrarSesion" class="btn-secondary" style="margin-top: 15px;">Cerrar Sesión</button>
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
