@@ -1,0 +1,203 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f0f4f8;
+    color: #333;
+}
+
+/* Barra superior estilo institucional CNS */
+.navbar {
+    background-color: #005a32; /* Verde institucional Hospital Obrero / CNS */
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.logo {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+/* Campanita de Notificaciones */
+.notificacion-container {
+    position: relative;
+}
+
+.btn-campana {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.4rem;
+    cursor: pointer;
+    position: relative;
+    padding: 5px;
+}
+
+.badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #e63946;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 2px 6px;
+}
+
+.dropdown-notificacion {
+    position: absolute;
+    right: 0;
+    top: 40px;
+    background: white;
+    color: #333;
+    width: 300px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 15px;
+    z-index: 100;
+    border-top: 4px solid #005a32;
+}
+
+.dropdown-notificacion h4 {
+    margin-bottom: 8px;
+    color: #005a32;
+    font-size: 0.95rem;
+}
+
+.dropdown-notificacion p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Contenedor principal y tarjetas */
+.container {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 0 15px;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+    color: #005a32;
+    margin-bottom: 10px;
+}
+
+.card p {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #005a32;
+}
+
+/* Botones */
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background-color: #005a32;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #004224;
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 12px;
+    background-color: #e2e8f0;
+    color: #333;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background-color: #cbd5e1;
+}
+
+.btn-link {
+    width: 100%;
+    background: none;
+    border: none;
+    color: #005a32;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 8px;
+    font-size: 0.9rem;
+}
+
+/* Caja de resumen y JSON */
+.resumen-box {
+    background-color: #e8f5e9;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #005a32;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.json-box {
+    background-color: #1e293b;
+    color: #38bdf8;
+    padding: 15px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    overflow-x: auto;
+}
+
+.json-box h4 {
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+.oculto {
+    display: none !important;
+}
