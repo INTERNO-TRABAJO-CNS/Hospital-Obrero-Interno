@@ -2,7 +2,7 @@ package com.Hospital.CNS.cns_backend.model.recursos;
 
 import com.Hospital.CNS.cns_backend.model.compartido.DominioException;
 
-/** Datos del medico autenticado para la web Nuxt. Un medico dado de baja no entra (ACCESO_DENEGADO). */
+/** Datos del medico autenticado para sus pantallas de la app. Un medico dado de baja no entra (ACCESO_DENEGADO). */
 public class MedicoActualService {
 
     private final MedicoRepository medicos;
