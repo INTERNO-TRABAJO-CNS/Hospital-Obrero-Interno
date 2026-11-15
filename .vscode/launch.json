@@ -1,0 +1,72 @@
+{
+    // Arranque del proyecto desde VS Code (Ejecutar y depurar / F5).
+    // Elige un "compuesto" para levantar el backend y la app al mismo tiempo; al detener uno se detienen los dos.
+    // Requiere: Extension Pack for Java (vscjava) y Flutter (Dart-Code), y el archivo
+    // 04_imp/backend/src/main/resources/application-local.properties con los datos de tu base.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Backend (Spring Boot :8080)",
+            "type": "java",
+            "request": "launch",
+            "mainClass": "com.Hospital.CNS.cns_backend.CnsBackendApplication",
+            "projectName": "cns_backend",
+            "cwd": "${workspaceFolder}/04_imp/backend",
+            "console": "integratedTerminal"
+        },
+        {
+            // En el navegador: el backend ya acepta este origen (cns.web.origen = http://localhost:5050).
+            "name": "App web (Chrome :5050)",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/04_imp/frontend",
+            "program": "lib/main.dart",
+            "deviceId": "chrome",
+            "args": ["--web-port", "5050"]
+        },
+        {
+            // Emulador de Android: 10.0.2.2 es el localhost de la PC. Elige el emulador abajo a la derecha en VS Code.
+            "name": "App Android (emulador)",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/04_imp/frontend",
+            "program": "lib/main.dart",
+            "args": ["--dart-define=API_URL=http://10.0.2.2:8080"]
+        },
+        {
+            "name": "App Windows",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/04_imp/frontend",
+            "program": "lib/main.dart",
+            "deviceId": "windows"
+        },
+        {
+            // Sin backend: usuarios y datos de prueba en memoria (paciente/paciente123, admin/admin123, medico/medico123...).
+            "name": "App web sin backend (datos de prueba)",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/04_imp/frontend",
+            "program": "lib/main.dart",
+            "deviceId": "chrome",
+            "args": ["--web-port", "5050", "--dart-define=AUTH_FAKE=true", "--dart-define=CATALOGO_FAKE=true"]
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Backend + App web (Chrome)",
+            "configurations": ["Backend (Spring Boot :8080)", "App web (Chrome :5050)"],
+            "stopAll": true
+        },
+        {
+            "name": "Backend + App Android (emulador)",
+            "configurations": ["Backend (Spring Boot :8080)", "App Android (emulador)"],
+            "stopAll": true
+        },
+        {
+            "name": "Backend + App Windows",
+            "configurations": ["Backend (Spring Boot :8080)", "App Windows"],
+            "stopAll": true
+        }
+    ]
+}

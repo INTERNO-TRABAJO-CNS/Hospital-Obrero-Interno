@@ -28,3 +28,6 @@ replay_pid*
 
 # Configuracion local de Claude Code (no es parte del proyecto)
 .claude/
+
+# Cuentas y claves de prueba de cada maquina (nunca se suben: el repositorio es publico)
+*.local.txt
