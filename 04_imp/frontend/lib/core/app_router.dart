@@ -398,7 +398,9 @@ final CuentasService cuentasApp = _catalogoFake ? FakeCuentasService() : ApiCuen
 // en memoria. Comparten estado: confirmar una llegada aparece en el historial y en la supervision.
 final FakeHistorialCambiosService historialApp = FakeHistorialCambiosService();
 final FakeEnfermeriaService enfermeriaApp = FakeEnfermeriaService(historial: historialApp);
-final FakeQuirofanoService quirofanosApp = FakeQuirofanoService();
+
+/// Quirofanos (T100-19): en PostgreSQL por el backend, o en memoria con CATALOGO_FAKE.
+final QuirofanoService quirofanosApp = _catalogoFake ? FakeQuirofanoService() : ApiQuirofanoService(apiApp);
 final SupervisionService supervisionApp = FakeSupervisionService(enfermeria: enfermeriaApp, quirofanos: quirofanosApp);
 final ReportesService reportesApp = FakeReportesService();
 
@@ -417,8 +419,8 @@ final HistorialPacienteService historialPacienteApp =
 final FichasInternasService fichasInternasApp =
     _medicoFake ? FakeFichasInternasService() : ApiFichasInternasService(apiApp);
 
-// Cirugias (CU-24): todavia en memoria hasta su backend (T100-23).
-final CirugiasService cirugiasApp = FakeCirugiasService(fichasInternasApp);
+// Cirugias (CU-24): en PostgreSQL por el backend (T100-23), o en memoria con AUTH_FAKE / MEDICO_FAKE.
+final CirugiasService cirugiasApp = _medicoFake ? FakeCirugiasService(fichasInternasApp) : ApiCirugiasService(apiApp);
 
 /// Datos del medico de la sesion y su agenda (la fecha elegida se recuerda entre pantallas).
 final MedicoController medicoApp = MedicoController(medicoServicioApp);

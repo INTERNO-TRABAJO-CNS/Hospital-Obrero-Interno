@@ -64,6 +64,27 @@ class Cirugia {
   final Gravedad gravedad;
   final EstadoCirugia estado;
 
+  factory Cirugia.fromJson(Map<String, dynamic> json) => Cirugia(
+        numero: (json['numero'] as num).toInt(),
+        fichaTicket: (json['fichaTicket'] as num?)?.toInt() ?? 0,
+        pacienteId: (json['pacienteId'] as num).toInt(),
+        nombrePaciente: json['nombrePaciente'] as String? ?? '',
+        numeroAfiliado: json['numeroAfiliado'] as String? ?? '',
+        edad: (json['edad'] as num?)?.toInt() ?? 0,
+        especialidad: Especialidad.desdeCodigo(json['especialidad'] as String? ?? ''),
+        quirofano: json['quirofano'] as String? ?? '',
+        cirujano: json['cirujano'] as String? ?? '',
+        fecha: json['fecha'] as String? ?? '',
+        inicio: json['inicio'] as String? ?? '',
+        fin: json['fin'] as String? ?? '',
+        limpiezaHasta: json['limpiezaHasta'] as String? ?? '',
+        duracionMin: (json['duracionMin'] as num?)?.toInt() ?? 0,
+        urgente: json['urgente'] as bool? ?? false,
+        gravedad: Gravedad.desdeCodigo(json['gravedad'] as String?) ?? Gravedad.media,
+        estado: EstadoCirugia.values.firstWhere((e) => e.codigo == json['estado'],
+            orElse: () => throw FormatException('estado de cirugía desconocido "${json['estado']}"')),
+      );
+
   Cirugia copia({EstadoCirugia? estado, String? fecha, String? inicio, String? fin, String? limpiezaHasta}) => Cirugia(
         numero: numero,
         fichaTicket: fichaTicket,
@@ -99,6 +120,12 @@ class DatosCirugia {
 class Desplazamiento {
   const Desplazamiento({required this.cirugia, required this.nuevaFecha, required this.nuevoInicio});
 
+  factory Desplazamiento.fromJson(Map<String, dynamic> json) => Desplazamiento(
+        cirugia: Cirugia.fromJson(Map<String, dynamic>.from(json['cirugia'] as Map)),
+        nuevaFecha: json['nuevaFecha'] as String? ?? '',
+        nuevoInicio: json['nuevoInicio'] as String? ?? '',
+      );
+
   final Cirugia cirugia;
   final String nuevaFecha;
   final String nuevoInicio;
@@ -115,8 +142,25 @@ class PropuestaCirugia {
     required this.limpiezaHasta,
     required this.limpiezaMin,
     this.desplaza,
+    this.quirofanoId,
   });
 
+  factory PropuestaCirugia.fromJson(Map<String, dynamic> json) => PropuestaCirugia(
+        quirofanoId: (json['quirofanoId'] as num?)?.toInt(),
+        quirofano: json['quirofano'] as String? ?? '',
+        especialidad: Especialidad.desdeCodigo(json['especialidad'] as String? ?? ''),
+        fecha: json['fecha'] as String? ?? '',
+        inicio: json['inicio'] as String? ?? '',
+        fin: json['fin'] as String? ?? '',
+        limpiezaHasta: json['limpiezaHasta'] as String? ?? '',
+        limpiezaMin: (json['limpiezaMin'] as num?)?.toInt() ?? 0,
+        desplaza: json['desplaza'] == null
+            ? null
+            : Desplazamiento.fromJson(Map<String, dynamic>.from(json['desplaza'] as Map)),
+      );
+
+  /// Id del quirofano en el backend (null en los datos de prueba).
+  final int? quirofanoId;
   final String quirofano;
   final Especialidad especialidad;
   final String fecha;

@@ -8,6 +8,8 @@ import com.Hospital.CNS.cns_backend.infrastructure.pg.PgCambioFichaRepository;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgFichaInternaRepository;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgNotificacionPublicador;
 import com.Hospital.CNS.cns_backend.infrastructure.planificador.ProcesadorFichasEnEspera;
+import com.Hospital.CNS.cns_backend.model.cirugias.CirugiaRepository;
+import com.Hospital.CNS.cns_backend.model.cirugias.OcupacionCirugias;
 import com.Hospital.CNS.cns_backend.model.compartido.CitaRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.NotificacionPublicador;
 import com.Hospital.CNS.cns_backend.model.compartido.Reloj;
@@ -53,11 +55,10 @@ public class ConfiguracionFichasInternas {
         return new AsignadorFichaInterna(fichas, medicos, horarios, consultorios, citas, dias, extra, reloj);
     }
 
-    /** Las cirugias (T100-23) la reemplazan con su propia ocupacion. */
+    /** Un paciente o un especialista que esta en cirugia (T100-23) no esta libre para una ficha. */
     @Bean
-    @org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean(AsignadorFichaInterna.OcupacionExtra.class)
-    AsignadorFichaInterna.OcupacionExtra ocupacionExtra() {
-        return AsignadorFichaInterna.OcupacionExtra.NINGUNA;
+    AsignadorFichaInterna.OcupacionExtra ocupacionExtra(CirugiaRepository cirugias) {
+        return new OcupacionCirugias(cirugias);
     }
 
     @Bean

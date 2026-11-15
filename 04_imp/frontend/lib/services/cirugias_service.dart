@@ -24,7 +24,7 @@ abstract class CirugiasService {
   Future<Cirugia> marcar(int numero, EstadoCirugia estado);
 
   /// Quirófanos de la especialidad (para la línea de tiempo).
-  List<String> quirofanosDe(Especialidad especialidad);
+  Future<List<String>> quirofanosDe(Especialidad especialidad);
 }
 
 /// Quirófanos de prueba: no se comparten entre especialidades.
@@ -54,7 +54,7 @@ class FakeCirugiasService implements CirugiasService {
   int _siguiente = 58;
 
   @override
-  List<String> quirofanosDe(Especialidad especialidad) => [
+  Future<List<String>> quirofanosDe(Especialidad especialidad) async => [
         for (final q in _quirofanos)
           if (q.especialidad == especialidad) q.codigo
       ];
@@ -150,7 +150,7 @@ class FakeCirugiasService implements CirugiasService {
 
   @override
   Future<List<Cirugia>> delDia(MedicoActual medico, String fecha) async {
-    final codigos = quirofanosDe(medico.especialidad);
+    final codigos = await quirofanosDe(medico.especialidad);
     return [
       for (final c in cirugias)
         if (codigos.contains(c.quirofano) && c.fecha == fecha) c
@@ -372,4 +372,89 @@ List<Cirugia> _semilla(String hoy) {
         cirujano: 'Daniela Salinas',
         estado: EstadoCirugia.realizada),
   ];
+}
+
+/// Cirugias contra el backend (T100-23): todo queda en PostgreSQL y la base impide los choques.
+class ApiCirugiasService implements CirugiasService {
+  ApiCirugiasService(this._api);
+
+  final ApiClient _api;
+
+  static List<Cirugia> _lista(Map<String, dynamic> json) =>
+      [for (final c in (json['datos'] as List? ?? const [])) Cirugia.fromJson(Map<String, dynamic>.from(c as Map))];
+
+  @override
+  Future<PropuestaCirugia> proponer(DatosCirugia d, MedicoActual medico) async {
+    final json = await _api.post('/api/v1/especialista/cirugias/propuesta', {
+      'fichaTicket': d.fichaTicket,
+      'duracionMin': d.duracionMin,
+      'gravedad': d.gravedad.codigo,
+      'urgente': d.urgente,
+    });
+    return leerRespuesta(() => PropuestaCirugia.fromJson(json));
+  }
+
+  @override
+  Future<Cirugia> confirmar(DatosCirugia d, PropuestaCirugia p, MedicoActual medico) async {
+    final desplaza = p.desplaza;
+    final json = await _api.post('/api/v1/especialista/cirugias', {
+      'fichaTicket': d.fichaTicket,
+      'duracionMin': d.duracionMin,
+      'gravedad': d.gravedad.codigo,
+      'urgente': d.urgente,
+      'quirofanoId': p.quirofanoId,
+      'fecha': p.fecha,
+      'inicio': p.inicio,
+      'desplazaNumero': desplaza?.cirugia.numero,
+      'desplazaFecha': desplaza?.nuevaFecha,
+      'desplazaInicio': desplaza?.nuevoInicio,
+    });
+    return leerRespuesta(() => Cirugia.fromJson(json));
+  }
+
+  @override
+  Future<List<Cirugia>> delDia(MedicoActual medico, String fecha) async {
+    final json = await _api.get('/api/v1/especialista/cirugias', consulta: {'fecha': fecha});
+    return leerRespuesta(() => _lista(json));
+  }
+
+  @override
+  Future<List<Cirugia>> delPaciente(int pacienteId) async {
+    try {
+      final json = await _api.get('/api/v1/medico/pacientes/$pacienteId/cirugias');
+      return leerRespuesta<List<Cirugia>>(() => _lista(json));
+    } on ApiException catch (e) {
+      // Sin permiso para ver sus cirugias: el historial se muestra igual, sin ellas.
+      if (e.estado == 403) {
+        return const [];
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Cirugia?> porNumero(int numero) async {
+    try {
+      final json = await _api.get('/api/v1/cirugias/$numero');
+      return leerRespuesta<Cirugia>(() => Cirugia.fromJson(json));
+    } on ApiException catch (e) {
+      if (e.estado == 404) {
+        return null;
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Cirugia> marcar(int numero, EstadoCirugia estado) async {
+    final accion = estado == EstadoCirugia.realizada ? 'realizada' : 'no-se-presento';
+    final json = await _api.post('/api/v1/especialista/cirugias/$numero/$accion');
+    return leerRespuesta(() => Cirugia.fromJson(json));
+  }
+
+  @override
+  Future<List<String>> quirofanosDe(Especialidad especialidad) async {
+    final json = await _api.get('/api/v1/especialista/quirofanos');
+    return leerRespuesta(() => [for (final q in (json['datos'] as List? ?? const [])) q as String]);
+  }
 }

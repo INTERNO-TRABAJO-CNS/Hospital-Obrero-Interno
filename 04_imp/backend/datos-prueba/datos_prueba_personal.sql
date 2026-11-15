@@ -7,7 +7,8 @@
 -- afiliados y la agenda de HOY del Dr. Ramos (Medico General) con los 4 estados de cita. No crea cuentas:
 -- el administrador las crea desde la app (Catalogos > Cuentas) o con POST /api/v1/admin/usuarios.
 -- Tambien da horario y consultorio a los especialistas (fichas internas, V7) y crea una paciente pediatrica.
--- Requiere las migraciones V1..V7 (el backend las aplica al arrancar).
+-- Crea los quirofanos del Figma (G-1, G-2, H-1, D-1).
+-- Requiere las migraciones V1..V8 (el backend las aplica al arrancar).
 
 DO $$
 DECLARE
@@ -140,3 +141,14 @@ BEGIN
     INSERT INTO clinico.historial (paciente_id)
     SELECT id FROM identidad.paciente WHERE ci = 'PR-0007' ON CONFLICT (paciente_id) DO NOTHING;
 END $$;
+
+-- Quirofanos del Figma (no se comparten entre especialidades) ----------------------------------------------
+INSERT INTO quirofano.quirofano (nombre, especialidad, apertura, cierre, limpieza_min)
+SELECT q.nombre, q.especialidad, q.apertura, q.cierre, q.limpieza
+FROM (VALUES
+    ('G-1', 'GASTROENTEROLOGIA', time '07:00', time '19:00', 40),
+    ('G-2', 'GASTROENTEROLOGIA', time '07:00', time '19:00', 30),
+    ('H-1', 'HEMATOLOGIA', time '07:00', time '19:00', 45),
+    ('D-1', 'DERMATOLOGIA', time '08:00', time '16:00', 30)
+) AS q (nombre, especialidad, apertura, cierre, limpieza)
+WHERE NOT EXISTS (SELECT 1 FROM quirofano.quirofano x WHERE lower(x.nombre) = lower(q.nombre) AND x.activo);

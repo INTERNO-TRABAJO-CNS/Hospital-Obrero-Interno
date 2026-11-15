@@ -22,6 +22,7 @@ class CirugiasController extends ChangeNotifier with AvisoSeguro {
 
   String fecha;
   List<Cirugia> cirugias = const [];
+  List<String> _quirofanos = const [];
   String? error;
 
   String get hoy => hoyIso(_reloj());
@@ -32,6 +33,7 @@ class CirugiasController extends ChangeNotifier with AvisoSeguro {
     error = null;
     try {
       cirugias = await _servicio.delDia(medico, fecha);
+      _quirofanos = await _servicio.quirofanosDe(medico.especialidad);
     } on ApiException catch (e) {
       error = e.mensaje;
     }
@@ -43,8 +45,7 @@ class CirugiasController extends ChangeNotifier with AvisoSeguro {
     return cargar();
   }
 
-  List<String> get quirofanos =>
-      {..._servicio.quirofanosDe(medico.especialidad), for (final c in cirugias) c.quirofano}.toList()..sort();
+  List<String> get quirofanos => {..._quirofanos, for (final c in cirugias) c.quirofano}.toList()..sort();
 
   List<Cirugia> get mias => [
         for (final c in cirugias)
