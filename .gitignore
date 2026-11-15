@@ -25,3 +25,6 @@ replay_pid*
 
 # Configuracion personal del editor (rutas de cada maquina)
 .vscode/settings.json
+
+# Configuracion local de Claude Code (no es parte del proyecto)
+.claude/
