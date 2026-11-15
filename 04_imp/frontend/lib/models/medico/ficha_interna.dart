@@ -13,6 +13,15 @@ enum Gravedad {
 
   const Gravedad(this.codigo, this.peso);
 
+  static Gravedad? desdeCodigo(String? codigo) {
+    for (final g in values) {
+      if (g.codigo == codigo) {
+        return g;
+      }
+    }
+    return null;
+  }
+
   final String codigo;
 
   /// Menor peso = más grave.
@@ -26,6 +35,9 @@ enum EstadoFicha {
   cancelada('CANCELADA');
 
   const EstadoFicha(this.codigo);
+
+  static EstadoFicha desdeCodigo(String codigo) => values.firstWhere((e) => e.codigo == codigo,
+      orElse: () => throw FormatException('estado de ficha desconocido "$codigo"'));
 
   final String codigo;
 }
@@ -66,8 +78,9 @@ class FichaInterna {
   final TablaFicha tabla;
   final bool urgencia;
 
-  /// Solo la ve el médico que derivó (general o pediatra): nunca sale en el ticket.
-  final Gravedad gravedad;
+  /// Solo la ve el medico que derivo (general o pediatra): para el especialista llega null. Nunca sale en el
+  /// ticket.
+  final Gravedad? gravedad;
   final String motivo;
   final EstadoFicha estado;
 
@@ -76,6 +89,8 @@ class FichaInterna {
   final String? hora;
   final int duracionMin;
   final String? medico;
+
+  /// Nombre del consultorio ("Consultorio 12", "UTI").
   final String? consultorio;
   final String derivadoPor;
   final Especialidad especialidadOrigen;
@@ -83,6 +98,30 @@ class FichaInterna {
   /// Momento de la derivación: desempata la cola por orden de llegada.
   final DateTime llegada;
   final String? observaciones;
+
+  factory FichaInterna.fromJson(Map<String, dynamic> json) => FichaInterna(
+        ticket: (json['ticket'] as num).toInt(),
+        citaOrigenId: (json['citaOrigenId'] as num?)?.toInt(),
+        pacienteId: (json['pacienteId'] as num).toInt(),
+        nombrePaciente: json['nombrePaciente'] as String? ?? '',
+        numeroAfiliado: json['numeroAfiliado'] as String? ?? '',
+        edad: (json['edad'] as num?)?.toInt() ?? 0,
+        especialidad: Especialidad.desdeCodigo(json['especialidad'] as String? ?? ''),
+        tabla: json['tabla'] == 'PEDIATRIA' ? TablaFicha.pediatria : TablaFicha.general,
+        urgencia: json['urgencia'] as bool? ?? false,
+        gravedad: Gravedad.desdeCodigo(json['gravedad'] as String?),
+        motivo: json['motivo'] as String? ?? '',
+        estado: EstadoFicha.desdeCodigo(json['estado'] as String? ?? ''),
+        fecha: json['fecha'] as String?,
+        hora: json['hora'] as String?,
+        duracionMin: (json['duracionMin'] as num?)?.toInt() ?? 0,
+        medico: json['medico'] as String?,
+        consultorio: json['consultorio'] as String?,
+        derivadoPor: json['derivadoPor'] as String? ?? '',
+        especialidadOrigen: Especialidad.desdeCodigo(json['especialidadOrigen'] as String? ?? ''),
+        llegada: DateTime.parse(json['llegada'] as String),
+        observaciones: json['observaciones'] as String?,
+      );
 
   /// Todavía ocupa al paciente (una sola ficha activa a la vez).
   bool get activa => estado == EstadoFicha.asignada || estado == EstadoFicha.enEspera;
@@ -168,6 +207,13 @@ class PacienteBuscado {
   final String nombre;
   final String numeroAfiliado;
   final int edad;
+
+  factory PacienteBuscado.fromJson(Map<String, dynamic> json) => PacienteBuscado(
+        pacienteId: (json['pacienteId'] as num).toInt(),
+        nombre: json['nombre'] as String? ?? '',
+        numeroAfiliado: json['numeroAfiliado'] as String? ?? '',
+        edad: (json['edad'] as num?)?.toInt() ?? 0,
+      );
 }
 
 /// ASIGNADA o EN_ESPERA con su [ficha], o RECHAZADA con [codigo] y [mensaje].
@@ -202,7 +248,7 @@ int compararPrioridad(FichaInterna a, FichaInterna b) {
     return a.urgencia ? -1 : 1;
   }
   if (a.gravedad != b.gravedad) {
-    return a.gravedad.peso - b.gravedad.peso;
+    return (a.gravedad?.peso ?? 3) - (b.gravedad?.peso ?? 3);
   }
   final mayorA = a.edad >= edadAdultoMayor;
   final mayorB = b.edad >= edadAdultoMayor;

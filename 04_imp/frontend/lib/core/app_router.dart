@@ -52,6 +52,7 @@ class AppRutas {
   static const String registro = '/registro';
   static const String paciente = '/paciente';
   static const String beneficiario = '/paciente/beneficiario';
+
   /// Médico: lleva a la primera opción de su menú (ver [RutasMedico]).
   static const String medico = RutasMedico.prefijo;
 
@@ -411,9 +412,12 @@ final AtencionService atencionApp = _medicoFake ? FakeAtencionService() : ApiAte
 final HistorialPacienteService historialPacienteApp =
     _medicoFake ? FakeHistorialPacienteService() : ApiHistorialPacienteService(apiApp);
 
-// Fichas internas y cirugias (CU-21..CU-25): el backend todavia no tiene sus endpoints ni sus
-// tablas (T100-20..23), asi que por ahora viven en memoria y se pierden al cerrar la app.
-final FichasInternasService fichasInternasApp = FakeFichasInternasService();
+// Fichas internas (CU-21..CU-23, CU-25): en PostgreSQL por el backend (T100-20..22), o en memoria con
+// AUTH_FAKE / MEDICO_FAKE.
+final FichasInternasService fichasInternasApp =
+    _medicoFake ? FakeFichasInternasService() : ApiFichasInternasService(apiApp);
+
+// Cirugias (CU-24): todavia en memoria hasta su backend (T100-23).
 final CirugiasService cirugiasApp = FakeCirugiasService(fichasInternasApp);
 
 /// Datos del medico de la sesion y su agenda (la fecha elegida se recuerda entre pantallas).

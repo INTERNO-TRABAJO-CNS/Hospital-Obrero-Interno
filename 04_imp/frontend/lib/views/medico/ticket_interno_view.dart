@@ -150,6 +150,19 @@ class _TicketInternoViewState extends State<TicketInternoView> {
                 ),
               ],
             ),
+            if (_c.encontrados.length > 1)
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final p in _c.encontrados)
+                    ChoiceChip(
+                      label: Text('${p.nombre} · ${p.edad} años'),
+                      selected: _c.paciente?.pacienteId == p.pacienteId,
+                      onSelected: bloqueado ? null : (_) => _c.elegirPaciente(p),
+                    ),
+                ],
+              ),
             if (_c.paciente != null)
               Text(
                 '${_c.paciente!.nombre} · ${_c.paciente!.edad} años'

@@ -28,7 +28,7 @@ class TicketMedico {
         ('N° afiliado', f.numeroAfiliado.isEmpty ? '—' : f.numeroAfiliado),
         ('Especialidad', f.especialidad.nombre),
         ('Profesional', f.medico ?? 'Por asignar'),
-        ('Lugar', f.consultorio != null ? 'Consultorio ${f.consultorio}' : 'Por asignar'),
+        ('Lugar', f.consultorio ?? 'Por asignar'),
         ('Fecha', f.fecha != null ? fechaTicketIso(f.fecha!) : 'Sin fecha todavía'),
         ('Hora', f.hora ?? '—'),
       ],

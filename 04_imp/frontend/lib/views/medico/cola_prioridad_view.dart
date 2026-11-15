@@ -110,7 +110,7 @@ class _ColaPrioridadViewState extends State<ColaPrioridadView> {
                     Text('${i + 1}', style: const TextStyle(fontWeight: FontWeight.w800)),
                     Text(_c.fichas[i].nombrePaciente),
                     _c.fichas[i].urgencia ? const ChipEstado('URGENCIA') : const Text('—'),
-                    ChipEstado(_c.fichas[i].gravedad.codigo),
+                    ChipEstado(_c.fichas[i].gravedad?.codigo ?? '—'),
                     Text(_c.fichas[i].edad >= edadAdultoMayor ? 'Sí' : 'No'),
                     _c.fichas[i].estado == EstadoFicha.enEspera
                         ? const Wrap(spacing: 6, children: [

@@ -112,9 +112,9 @@ List<EventoHistorial> lineaDeTiempo(HistorialPaciente h, List<FichaInterna> fich
       f.estado == EstadoFicha.enEspera
           ? 'En espera: sin fecha todavía'
           : 'Asignada: ${f.fecha != null ? fechaMesIso(f.fecha!, conAnio: false) : ''} · ${f.hora ?? ''} · '
-              '${f.medico ?? ''} · Consultorio ${f.consultorio ?? ''}',
+              '${f.medico ?? ''} · ${f.consultorio ?? ''}',
       'Motivo: ${f.motivo}',
-      'Gravedad: ${f.gravedad.codigo} (solo la ven el médico general y el pediatra)',
+      if (f.gravedad != null) 'Gravedad: ${f.gravedad!.codigo} (solo la ven el médico general y el pediatra)',
       if (f.observaciones != null) 'Observaciones: ${f.observaciones}',
     ];
     eventos['ficha-${f.ticket}'] = EventoHistorial(

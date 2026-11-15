@@ -20,8 +20,8 @@ abstract class FichasInternasService {
   /// Cola de prioridad de una especialidad (solo lectura), ya ordenada.
   Future<List<FichaInterna>> cola(Especialidad especialidad, TablaFicha tabla);
 
-  /// Urgencia sin cita: buscar al paciente por N° de afiliado.
-  Future<PacienteBuscado?> buscarPaciente(String numeroAfiliado);
+  /// Urgencia sin cita: titular y beneficiarios de ese N° de afiliado.
+  Future<List<PacienteBuscado>> buscarPacientes(String numeroAfiliado);
 
   /// Agenda del especialista: sus fichas de ese día, ordenadas por hora.
   Future<List<FichaInterna>> agendaEspecialista(MedicoActual medico, String fecha);
@@ -40,15 +40,15 @@ class _Especialista {
 
 /// Especialistas de prueba (nombres del Figma). Endocrinología no tiene: sus fichas quedan EN_ESPERA.
 const List<_Especialista> _especialistas = [
-  _Especialista('Raúl Vargas', Especialidad.gastroenterologia, '12', 25),
-  _Especialista('Patricia Arce', Especialidad.gastroenterologia, '14', 25),
-  _Especialista('Miguel Paredes', Especialidad.cardiologia, '15', 30),
-  _Especialista('Daniela Salinas', Especialidad.dermatologia, '16', 20),
-  _Especialista('Sonia Pinto', Especialidad.hematologia, '17', 30),
-  _Especialista('Óscar Rocha', Especialidad.neumologia, '18', 25),
-  _Especialista('Gloria Mendoza', Especialidad.nefrologia, '19', 30),
-  _Especialista('Iván Cuéllar', Especialidad.infectologia, '20', 40),
-  _Especialista('Rocío Aliaga', Especialidad.medicinaTrabajo, '21', 30),
+  _Especialista('Raúl Vargas', Especialidad.gastroenterologia, 'Consultorio 12', 25),
+  _Especialista('Patricia Arce', Especialidad.gastroenterologia, 'Consultorio 14', 25),
+  _Especialista('Miguel Paredes', Especialidad.cardiologia, 'Consultorio 15', 30),
+  _Especialista('Daniela Salinas', Especialidad.dermatologia, 'Consultorio 16', 20),
+  _Especialista('Sonia Pinto', Especialidad.hematologia, 'Consultorio 17', 30),
+  _Especialista('Óscar Rocha', Especialidad.neumologia, 'Consultorio 18', 25),
+  _Especialista('Gloria Mendoza', Especialidad.nefrologia, 'Consultorio 19', 30),
+  _Especialista('Iván Cuéllar', Especialidad.infectologia, 'Consultorio 20', 40),
+  _Especialista('Rocío Aliaga', Especialidad.medicinaTrabajo, 'Consultorio 21', 30),
   _Especialista('Hugo Lima', Especialidad.terapiaIntensiva, 'UTI', 45),
 ];
 
@@ -170,8 +170,8 @@ class FakeFichasInternasService implements FichasInternasService {
       ]..sort(compararPrioridad);
 
   @override
-  Future<PacienteBuscado?> buscarPaciente(String numeroAfiliado) async =>
-      _directorio.where((p) => p.numeroAfiliado == numeroAfiliado.trim()).firstOrNull;
+  Future<List<PacienteBuscado>> buscarPacientes(String numeroAfiliado) async =>
+      _directorio.where((p) => p.numeroAfiliado == numeroAfiliado.trim()).toList();
 
   @override
   Future<List<FichaInterna>> agendaEspecialista(MedicoActual medico, String fecha) async => [
@@ -283,7 +283,7 @@ List<FichaInterna> _semilla(String hoy) {
     String? hora = '08:00',
     int duracionMin = 25,
     String? medico = 'Raúl Vargas',
-    String? consultorio = '12',
+    String? consultorio = 'Consultorio 12',
     String derivadoPor = 'Carlos Ramos',
     Especialidad especialidadOrigen = Especialidad.consultorioFamiliar,
     DateTime? llegada,
@@ -326,7 +326,7 @@ List<FichaInterna> _semilla(String hoy) {
         hora: '09:00',
         duracionMin: 30,
         medico: 'Miguel Paredes',
-        consultorio: '15',
+        consultorio: 'Consultorio 15',
         llegada: DateTime.parse('${hoy}T08:55:00')),
     // Agenda de fichas internas del Dr. Vargas (hoy).
     base(
@@ -422,7 +422,7 @@ List<FichaInterna> _semilla(String hoy) {
         fecha: manana,
         hora: '08:30',
         medico: 'Patricia Arce',
-        consultorio: '14',
+        consultorio: 'Consultorio 14',
         llegada: DateTime.parse('2026-11-10T15:40:00')),
     base(
         ticket: 1029,
@@ -434,7 +434,7 @@ List<FichaInterna> _semilla(String hoy) {
         fecha: manana,
         hora: '09:00',
         medico: 'Patricia Arce',
-        consultorio: '14',
+        consultorio: 'Consultorio 14',
         llegada: DateTime.parse('2026-11-12T08:20:00')),
     base(
         ticket: 1030,
@@ -447,7 +447,7 @@ List<FichaInterna> _semilla(String hoy) {
         fecha: sumarDias(hoy, 5, habiles: true),
         hora: '11:00',
         medico: 'Patricia Arce',
-        consultorio: '14',
+        consultorio: 'Consultorio 14',
         llegada: DateTime.parse('2026-11-09T10:30:00')),
     base(
         ticket: 1025,
@@ -463,4 +463,112 @@ List<FichaInterna> _semilla(String hoy) {
         consultorio: null,
         llegada: DateTime.parse('2026-11-09T11:00:00')),
   ];
+}
+
+/// Fichas internas contra el backend (T100-20/21/22): todo queda en PostgreSQL.
+class ApiFichasInternasService implements FichasInternasService {
+  ApiFichasInternasService(this._api);
+
+  final ApiClient _api;
+
+  /// Codigos que el formulario muestra como "Ticket rechazado" (no como error de conexion).
+  static final Set<String> _rechazos = {
+    for (final (codigo, _) in rechazosFicha) codigo,
+    'ESPECIALIDAD_NO_INTERNA',
+    'NO_ENCONTRADA',
+  };
+
+  static List<FichaInterna> _lista(Map<String, dynamic> json) => [
+        for (final f in (json['datos'] as List? ?? const [])) FichaInterna.fromJson(Map<String, dynamic>.from(f as Map))
+      ];
+
+  @override
+  Future<ResultadoFicha> generar(SolicitudFicha s, MedicoActual medico, CitaOrigen? cita) async {
+    try {
+      final json = await _api.post('/api/v1/medico/fichas-internas', {
+        'citaOrigenId': cita?.citaId,
+        'pacienteId': cita == null ? s.pacienteId : null,
+        'especialidad': s.especialidad.codigo,
+        'gravedad': s.gravedad.codigo,
+        'urgencia': s.urgencia,
+        'motivo': s.motivo,
+      });
+      return ResultadoFicha.generada(leerRespuesta(() => FichaInterna.fromJson(json)));
+    } on ApiException catch (e) {
+      if (_rechazos.contains(e.codigo)) {
+        return ResultadoFicha.rechazada(e.codigo, e.mensaje);
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<FichaInterna?> deCita(int citaId) => _unaONula('/api/v1/medico/fichas-internas/por-cita/$citaId');
+
+  @override
+  Future<FichaInterna?> porTicket(int ticket) => _unaONula('/api/v1/fichas-internas/$ticket');
+
+  Future<FichaInterna?> _unaONula(String ruta) async {
+    try {
+      final json = await _api.get(ruta);
+      return leerRespuesta<FichaInterna>(() => FichaInterna.fromJson(json));
+    } on ApiException catch (e) {
+      if (e.estado == 404) {
+        return null;
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<FichaInterna>> delPaciente(int pacienteId) async {
+    try {
+      final json = await _api.get('/api/v1/medico/pacientes/$pacienteId/fichas-internas');
+      return leerRespuesta<List<FichaInterna>>(() => _lista(json));
+    } on ApiException catch (e) {
+      // Sin permiso para ver sus fichas: el historial se muestra igual, sin ellas.
+      if (e.estado == 403) {
+        return const [];
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<FichaInterna>> cola(Especialidad especialidad, TablaFicha tabla) async {
+    final json = await _api.get('/api/v1/medico/fichas-internas/cola', consulta: {
+      'especialidad': especialidad.codigo,
+      'pediatrica': '${tabla == TablaFicha.pediatria}',
+    });
+    return leerRespuesta(() => _lista(json));
+  }
+
+  @override
+  Future<List<PacienteBuscado>> buscarPacientes(String numeroAfiliado) async {
+    final json =
+        await _api.get('/api/v1/medico/fichas-internas/pacientes', consulta: {'afiliado': numeroAfiliado.trim()});
+    return leerRespuesta(() => [
+          for (final p in (json['datos'] as List? ?? const []))
+            PacienteBuscado.fromJson(Map<String, dynamic>.from(p as Map))
+        ]);
+  }
+
+  @override
+  Future<List<FichaInterna>> agendaEspecialista(MedicoActual medico, String fecha) async {
+    final json = await _api.get('/api/v1/especialista/fichas-internas', consulta: {'fecha': fecha});
+    return leerRespuesta(() => _lista(json));
+  }
+
+  @override
+  Future<FichaInterna> marcarAtendida(int ticket, String observaciones) async {
+    final json = await _api.post('/api/v1/especialista/fichas-internas/$ticket/atendida',
+        {'observaciones': observaciones.trim().isEmpty ? null : observaciones.trim()});
+    return leerRespuesta(() => FichaInterna.fromJson(json));
+  }
+
+  @override
+  Future<FichaInterna> noSePresento(int ticket) async {
+    final json = await _api.post('/api/v1/especialista/fichas-internas/$ticket/no-se-presento');
+    return leerRespuesta(() => FichaInterna.fromJson(json));
+  }
 }

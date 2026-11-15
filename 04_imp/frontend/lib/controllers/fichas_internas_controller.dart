@@ -31,6 +31,9 @@ class TicketInternoController extends ChangeNotifier with AvisoSeguro {
   bool urgencia = false;
   int? citaId;
   PacienteBuscado? paciente;
+
+  /// Titular y beneficiarios encontrados con el N° de afiliado (urgencia); se elige uno.
+  List<PacienteBuscado> encontrados = const [];
   String? errorBusqueda;
   Especialidad? especialidad;
   Gravedad gravedad = Gravedad.media;
@@ -98,10 +101,25 @@ class TicketInternoController extends ChangeNotifier with AvisoSeguro {
 
   Future<void> buscar(String numeroAfiliado) async {
     errorBusqueda = null;
-    paciente = await _fichas.buscarPaciente(numeroAfiliado);
-    if (paciente == null) {
-      errorBusqueda = 'No se encontró un paciente con ese N° de afiliado.';
+    paciente = null;
+    try {
+      encontrados = await _fichas.buscarPacientes(numeroAfiliado);
+    } on ApiException catch (e) {
+      encontrados = const [];
+      errorBusqueda = e.mensaje;
+      notificar();
+      return;
     }
+    if (encontrados.isEmpty) {
+      errorBusqueda = 'No se encontró un paciente con ese N° de afiliado.';
+    } else if (encontrados.length == 1) {
+      paciente = encontrados.first;
+    }
+    notificar();
+  }
+
+  void elegirPaciente(PacienteBuscado p) {
+    paciente = p;
     notificar();
   }
 
@@ -251,7 +269,7 @@ class FichasEspecialistaController extends ChangeNotifier with AvisoSeguro {
     return [
       fechaTituloIso(fecha),
       '$n ${n == 1 ? 'ficha interna' : 'fichas internas'}',
-      if (consultorio != null) 'Consultorio $consultorio',
+      if (consultorio != null) consultorio!,
     ].join(' · ');
   }
 
