@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 
 import '../controllers/enfermeria_controller.dart';
+import '../controllers/medico_controller.dart';
 import '../controllers/sesion_controller.dart';
 import '../models/auth/sesion.dart';
+import '../models/catalogo/especialidad.dart';
+import '../models/medico/medico_actual.dart';
 import '../services/auth_service.dart';
 import '../services/catalogo_service.dart';
+import '../services/cirugias_service.dart';
 import '../services/cuentas_service.dart';
 import '../services/enfermeria_service.dart';
 import '../services/fake_catalogo_service.dart';
+import '../services/fake_medico_service.dart';
+import '../services/fichas_internas_service.dart';
 import '../services/historial_cambios_service.dart';
+import '../services/medico_service.dart';
 import '../services/paciente_service.dart';
 import '../services/quirofano_service.dart';
 import '../services/reportes_service.dart';
@@ -22,11 +29,19 @@ import '../views/comun/historial_cambios_view.dart';
 import '../views/comun/marco_personal.dart';
 import '../views/enfermeria/confirmar_asistencia_view.dart';
 import '../views/enfermeria/fichas_dia_view.dart';
+import '../views/medico/agenda_medico_view.dart';
+import '../views/medico/atencion_view.dart';
+import '../views/medico/cirugias_view.dart';
+import '../views/medico/cola_prioridad_view.dart';
+import '../views/medico/fichas_internas_view.dart';
+import '../views/medico/historial_paciente_view.dart';
+import '../views/medico/ticket_interno_view.dart';
 import '../views/paciente/home_paciente_view.dart';
 import '../views/paciente/registro_beneficiario_view.dart';
 import '../views/shell/app_shell.dart';
 import 'api_client.dart';
 import 'responsive.dart';
+import 'rutas_medico.dart';
 
 /// Nombres de las rutas de la app.
 class AppRutas {
@@ -37,7 +52,8 @@ class AppRutas {
   static const String registro = '/registro';
   static const String paciente = '/paciente';
   static const String beneficiario = '/paciente/beneficiario';
-  static const String medico = '/medico';
+  /// Médico: lleva a la primera opción de su menú (ver [RutasMedico]).
+  static const String medico = RutasMedico.prefijo;
 
   /// Enfermeria: "Fichas del día" es su inicio.
   static const String enfermeria = '/enfermeria';
@@ -67,6 +83,29 @@ const List<OpcionMenu> menuAdmin = [
   OpcionMenu('Historial de cambios', AppRutas.adminHistorial),
 ];
 
+/// Menu lateral del medico segun su tipo (Figma "WEB MEDICO" y "WEB ESPECIALISTA"):
+/// Medico General y Pediatria: Agenda, Atencion, Historial, Ticket interno y Cola de prioridad.
+/// Odontologia: sin ticket interno ni cola (no deriva). Especialistas: agenda de fichas internas y,
+/// si su especialidad opera, Cirugias.
+List<OpcionMenu> menuMedico(MedicoActual medico) {
+  if (!medico.especialidad.esBasica) {
+    return [
+      const OpcionMenu('Agenda de fichas internas', RutasMedico.fichasInternas),
+      if (medico.operaEnQuirofano && medico.especialidad != Especialidad.terapiaIntensiva)
+        const OpcionMenu('Cirugías', RutasMedico.cirugias),
+    ];
+  }
+  return [
+    const OpcionMenu('Agenda', RutasMedico.agenda),
+    const OpcionMenu('Atención', RutasMedico.atencion),
+    const OpcionMenu('Historial', RutasMedico.historial),
+    if (medico.puedeDerivar) ...[
+      const OpcionMenu('Ticket interno', RutasMedico.ticketInterno),
+      const OpcionMenu('Cola de prioridad', RutasMedico.cola),
+    ],
+  ];
+}
+
 /// Pantalla provisional. Cada dueno de caso de uso la reemplaza por su pantalla real.
 class PantallaMarcador extends StatelessWidget {
   const PantallaMarcador({super.key, required this.titulo});
@@ -92,7 +131,9 @@ final GlobalKey<ScaffoldMessengerState> mensajesApp = GlobalKey<ScaffoldMessenge
 Route<dynamic> generarRuta(RouteSettings ajustes) {
   final nombre = ajustes.name ?? AppRutas.login;
   final pagina = _pagina(nombre);
-  if (nombre.startsWith(AppRutas.enfermeria) || nombre.startsWith(AppRutas.admin)) {
+  if (nombre.startsWith(AppRutas.enfermeria) ||
+      nombre.startsWith(AppRutas.admin) ||
+      nombre.startsWith(RutasMedico.prefijo)) {
     // El menu lateral cambia de pantalla sin animacion, como una pagina web.
     return PageRouteBuilder<void>(
       settings: ajustes,
@@ -108,6 +149,7 @@ Widget _pagina(String nombre) {
   switch (nombre) {
     case AppRutas.salir:
       sesionApp.salir();
+      _olvidarMedico();
       return _login();
     case AppRutas.registro:
       return Builder(
@@ -144,12 +186,6 @@ Widget _pagina(String nombre) {
                   alTerminar: () => Navigator.of(context).maybePop(),
                 ),
               ));
-    case AppRutas.medico:
-      return _conRol(
-          {Rol.medico},
-          (_) => const Scaffold(
-                body: PantallaMarcador(titulo: 'Los médicos usan la web del médico (agenda, atención e historial).'),
-              ));
     case AppRutas.enfermeria:
       return _personal(Rol.enfermeria, nombre, 'Fichas del día', menuEnfermeria,
           (s) => FichasDiaView(servicio: enfermeriaApp, usuario: _usuarioHistorial(s)));
@@ -178,7 +214,111 @@ Widget _pagina(String nombre) {
         child: PantallaMarcador(titulo: 'Fichas del dia'),
       );
     default:
+      if (nombre.startsWith(RutasMedico.prefijo)) {
+        return _paginaMedico(nombre);
+      }
       return _login();
+  }
+}
+
+/// Pantallas del medico (antes la web Nuxt). Cada pagina solo para el tipo de medico que la tiene
+/// en su menu: si entra otro (un medico general escribiendo /medico/cirugias), ve su inicio.
+Widget _paginaMedico(String nombre) {
+  return _conRol({Rol.medico}, (sesion) {
+    final medico = medicoApp.medico;
+    if (medico == null) {
+      // Sin los datos de /medico/yo (p. ej. se recargo la pagina): se vuelve a entrar.
+      return _login();
+    }
+    final menu = menuMedico(medico);
+    final uri = Uri.parse(nombre);
+    final camino = uri.path.startsWith('/medico/pacientes/') ? RutasMedico.historial : uri.path;
+    final coinciden = [
+      for (final op in menu)
+        if (camino == op.ruta || camino.startsWith('${op.ruta}/')) op.ruta
+    ]..sort((a, b) => b.length - a.length);
+    final permitida = coinciden.isNotEmpty;
+    final ruta = permitida ? uri.path : menu.first.ruta;
+    final rutaMenu = permitida ? coinciden.first : menu.first.ruta;
+    final (titulo, contenido) = _vistaMedico(ruta, uri.queryParameters, medico);
+    return Builder(
+      builder: (context) => MarcoPersonal(
+        titulo: titulo,
+        etiqueta: medico.etiqueta,
+        opciones: menu,
+        rutaActual: rutaMenu,
+        alSalir: () => _cerrarSesion(context),
+        child: contenido,
+      ),
+    );
+  });
+}
+
+(String, Widget) _vistaMedico(String ruta, Map<String, String> consulta, MedicoActual medico) {
+  final partes = Uri.parse(ruta).pathSegments;
+  if (partes.length == 3 && partes[1] == 'atencion') {
+    final citaId = int.tryParse(partes[2]);
+    if (citaId != null) {
+      return (
+        'Atención',
+        AtencionView(
+            key: ValueKey(ruta),
+            citaId: citaId,
+            servicio: atencionApp,
+            historial: historialPacienteApp,
+            fichas: fichasInternasApp,
+            cirugias: cirugiasApp),
+      );
+    }
+  }
+  if (partes.length == 4 && partes[1] == 'pacientes') {
+    final pacienteId = int.tryParse(partes[2]);
+    if (pacienteId != null) {
+      return (
+        'Historial del paciente',
+        HistorialPacienteView(
+            key: ValueKey(ruta),
+            pacienteId: pacienteId,
+            servicio: historialPacienteApp,
+            fichas: fichasInternasApp,
+            cirugias: cirugiasApp),
+      );
+    }
+  }
+  switch (ruta) {
+    case RutasMedico.atencion:
+      return ('Atención', AtencionInicioView(agenda: agendaMedicoApp));
+    case RutasMedico.historial:
+      return ('Historial del paciente', HistorialInicioView(agenda: agendaMedicoApp, servicio: historialPacienteApp));
+    case RutasMedico.ticketInterno:
+      return (
+        'Ticket interno',
+        TicketInternoView(
+          medico: medico,
+          agenda: agendaMedicoApp,
+          fichas: fichasInternasApp,
+          historial: historialPacienteApp,
+          citaId: int.tryParse(consulta['citaId'] ?? ''),
+        ),
+      );
+    case RutasMedico.cola:
+      return ('Cola de prioridad', ColaPrioridadView(medico: medico, fichas: fichasInternasApp));
+    case RutasMedico.fichasInternas:
+      return ('Fichas internas de hoy', FichasInternasView(medico: medico, fichas: fichasInternasApp));
+    case RutasMedico.cirugias:
+      return ('Cirugías', CirugiasView(medico: medico, servicio: cirugiasApp));
+    case RutasMedico.programarCirugia:
+      return (
+        'Programar cirugía',
+        ProgramarCirugiaView(
+          medico: medico,
+          cirugias: cirugiasApp,
+          fichas: fichasInternasApp,
+          fichaTicket: int.tryParse(consulta['ficha'] ?? ''),
+        ),
+      );
+    default:
+      return ('Agenda', AgendaMedicoView(agenda: agendaMedicoApp, medico: medico));
   }
 }
 
@@ -212,6 +352,7 @@ String _usuarioHistorial(Sesion s) => usuarioParaHistorial(s.rol.etiqueta, s.nom
 Future<void> _cerrarSesion(BuildContext context) async {
   final navegador = Navigator.of(context);
   await sesionApp.salir();
+  _olvidarMedico();
   navegador.pushNamedAndRemoveUntil(AppRutas.login, (_) => false);
 }
 
@@ -224,6 +365,7 @@ void _alPerderSesion(ApiException error) {
     return;
   }
   sesionApp.olvidar();
+  _olvidarMedico();
   navegadorApp.currentState?.pushNamedAndRemoveUntil(AppRutas.login, (_) => false);
   mensajesApp.currentState?.showSnackBar(
     const SnackBar(content: Text('Tu sesión venció o se cerró. Vuelve a iniciar sesión.')),
@@ -259,6 +401,32 @@ final FakeQuirofanoService quirofanosApp = FakeQuirofanoService();
 final SupervisionService supervisionApp = FakeSupervisionService(enfermeria: enfermeriaApp, quirofanos: quirofanosApp);
 final ReportesService reportesApp = FakeReportesService();
 
+/// Medico (CU-13/14/15) contra el backend, o en memoria con `--dart-define=AUTH_FAKE=true`
+/// (o `MEDICO_FAKE=true`). Sin token, el backend responderia 401: por eso con AUTH_FAKE tambien
+/// son de prueba.
+const bool _medicoFake = bool.fromEnvironment('AUTH_FAKE') || bool.fromEnvironment('MEDICO_FAKE');
+final MedicoService medicoServicioApp =
+    _medicoFake ? FakeMedicoService(sesion: () => sesionApp.sesion) : ApiMedicoService(apiApp);
+final AtencionService atencionApp = _medicoFake ? FakeAtencionService() : ApiAtencionService(apiApp);
+final HistorialPacienteService historialPacienteApp =
+    _medicoFake ? FakeHistorialPacienteService() : ApiHistorialPacienteService(apiApp);
+
+// Fichas internas y cirugias (CU-21..CU-25): el backend todavia no tiene sus endpoints ni sus
+// tablas (T100-20..23), asi que por ahora viven en memoria y se pierden al cerrar la app.
+final FichasInternasService fichasInternasApp = FakeFichasInternasService();
+final CirugiasService cirugiasApp = FakeCirugiasService(fichasInternasApp);
+
+/// Datos del medico de la sesion y su agenda (la fecha elegida se recuerda entre pantallas).
+final MedicoController medicoApp = MedicoController(medicoServicioApp);
+final AgendaMedicoController agendaMedicoApp = AgendaMedicoController(
+    _medicoFake ? FakeAgendaMedicoService() : ApiAgendaMedicoService(apiApp),
+    fichas: fichasInternasApp);
+
+void _olvidarMedico() {
+  medicoApp.olvidar();
+  agendaMedicoApp.olvidar();
+}
+
 Widget _login() {
   return Builder(
     builder: (context) => LoginView(
@@ -269,8 +437,8 @@ Widget _login() {
   );
 }
 
-/// Cada rol a su pantalla. Los medicos usan la web Nuxt (decision del 10/11/2026).
-void _irSegunRol(BuildContext context, Sesion sesion) {
+/// Cada rol a su pantalla. El medico primero carga sus datos (`/medico/yo`) para armar su menu.
+Future<void> _irSegunRol(BuildContext context, Sesion sesion) async {
   switch (sesion.rol) {
     case Rol.paciente:
       Navigator.of(context).pushReplacementNamed(AppRutas.paciente);
@@ -279,10 +447,17 @@ void _irSegunRol(BuildContext context, Sesion sesion) {
     case Rol.administrador:
       Navigator.of(context).pushReplacementNamed(AppRutas.admin);
     case Rol.medico:
-      sesionApp.salir();
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Los médicos usan la web del médico (agenda, atención e historial).'),
-      ));
+      final navegador = Navigator.of(context);
+      final mensajes = ScaffoldMessenger.of(context);
+      final resultado = await medicoApp.cargar();
+      if (resultado == CargaMedico.ok) {
+        navegador.pushReplacementNamed(menuMedico(medicoApp.medico!).first.ruta);
+        return;
+      }
+      final motivo = medicoApp.error ?? 'No se pudieron cargar tus datos de médico.';
+      await sesionApp.salir();
+      _olvidarMedico();
+      mensajes.showSnackBar(SnackBar(content: Text(motivo)));
   }
 }
 

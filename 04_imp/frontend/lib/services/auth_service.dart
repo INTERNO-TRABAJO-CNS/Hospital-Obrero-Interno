@@ -27,7 +27,8 @@ class ApiAuthService implements AuthService {
 }
 
 /// Sin backend: `flutter run --dart-define=AUTH_FAKE=true`. Usuarios de prueba:
-/// paciente/paciente123, enfermera/enfermera123 y admin/admin123.
+/// paciente/paciente123, enfermera/enfermera123, admin/admin123 y, para el médico,
+/// medico, pediatra, odontologo o especialista con la clave medico123.
 class FakeAuthService implements AuthService {
   final Map<String, (String, Sesion)> cuentas = {
     'paciente': (
@@ -48,9 +49,27 @@ class FakeAuthService implements AuthService {
       'admin123',
       const Sesion(usuarioId: 3, rol: Rol.administrador, personaId: 3, nombre: 'Administrador CNS', token: 'prueba-3'),
     ),
+    // Medicos (clave medico123): uno por cada tipo de pantalla del Figma. El personaId es el
+    // medicoId de `medicosDePrueba` (fake_medico_service.dart).
+    'medico': (
+      'medico123',
+      const Sesion(usuarioId: 107, rol: Rol.medico, personaId: 7, nombre: 'Carlos Ramos', token: 'prueba-107'),
+    ),
+    'pediatra': (
+      'medico123',
+      const Sesion(usuarioId: 108, rol: Rol.medico, personaId: 8, nombre: 'Lucía Quispe', token: 'prueba-108'),
+    ),
+    'odontologo': (
+      'medico123',
+      const Sesion(usuarioId: 109, rol: Rol.medico, personaId: 9, nombre: 'Jorge Mamani', token: 'prueba-109'),
+    ),
+    'especialista': (
+      'medico123',
+      const Sesion(usuarioId: 121, rol: Rol.medico, personaId: 21, nombre: 'Raúl Vargas', token: 'prueba-121'),
+    ),
   };
 
-  int _ultimoUsuarioId = 3;
+  int _ultimoUsuarioId = 200;
 
   /// Cuenta de un titular recien registrado (la usa FakePacienteService).
   void agregarCuentaPaciente(String usuario, String clave, int pacienteId, String nombre) {

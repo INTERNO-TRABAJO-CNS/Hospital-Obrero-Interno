@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Colores del Figma "HOSPITAL OBRERO CNS" (los mismos tokens que la web Nuxt).
+/// Colores del Figma "HOSPITAL OBRERO CNS".
 class ColoresCns {
   const ColoresCns._();
 
