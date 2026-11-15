@@ -1,4 +1,6 @@
-# [T100-28][Java+Nuxt][Ajuste CU-14] Historial del paciente en la web Nuxt, con sus fichas internas y cirugías
+# [T100-28][Java+Flutter][Ajuste CU-14] Historial del paciente en la app Flutter, con sus fichas internas y cirugías
+
+> **Actualización 15/11/2026:** el proyecto ya no usa Nuxt. Todas las pantallas del médico (general, pediatría, odontología y especialistas) están en la **app Flutter** (`04_imp/frontend`), igual que paciente, enfermería, administrador y TV. Equivalencias: `pages/` → `lib/views/medico/`, `stores/` → `lib/controllers/`, `services/` → `lib/services/`, `models/` → `lib/models/medico/`; `npm run test` → `flutter test`. CORS del backend: `http://localhost:5050` (`flutter run -d chrome --web-port 5050`). El proyecto Nuxt (`04_imp/frontend-web`) se borró.
 
 | Campo | Valor |
 |---|---|
@@ -33,13 +35,13 @@ El historial del paciente («hist web JS» de la pizarra) se muestra en la web d
 | `04_imp/backend/src/main/java/com/Hospital/CNS/cns_backend/model/historial/DerivacionDTO.java` | record |
 | `04_imp/backend/src/main/java/com/Hospital/CNS/cns_backend/controller/HistorialController.java` | nuevo GET |
 | `04_imp/backend/src/test/java/com/Hospital/CNS/cns_backend/model/historial/HistorialServiceTest.java` | casos nuevos |
-| `04_imp/frontend-web/pages/medico/pacientes/[pacienteId]/historial.vue` | línea de tiempo de atenciones, recetas, fichas internas y cirugías |
-| `04_imp/frontend-web/stores/historial.ts, services/historialService.ts + fake, models/historial.ts, tests/historial.test.ts` |  |
+| `04_imp/frontend/lib/views/medico/historial_paciente_view.dart` | línea de tiempo de atenciones, recetas, fichas internas y cirugías |
+| `04_imp/frontend/lib/controllers/historial_paciente_controller.dart, lib/models/medico/historial_paciente.dart, test/medico/historial_y_menu_test.dart` |  |
 
 ## Paso a paso
 1. Rama `feature/T100-28-ajuste-cu14-historial-nuxt`.
 2. Backend + tests.
-3. Página Nuxt.
+3. Pantalla en Flutter.
 4. PR a T100.
 
 ## Pruebas que deben existir
@@ -47,7 +49,7 @@ El historial del paciente («hist web JS» de la pizarra) se muestra en la web d
 |---|---|
 | `especialistaConFicha_puedeVerHistorial` |  |
 | `derivaciones_especialista_sinGravedad` |  |
-| `historial.test: muestraFichasYCirugias` | Vitest |
+| `historial.test: muestraFichasYCirugias` | `flutter test` |
 
 ## Cómo crear tu rama y entregar
 ```bash
@@ -68,18 +70,18 @@ Abrir el Pull Request con **base = `feature/T100-algoritmos-ejecucion`** (no `de
 - **En el PR solo código y migraciones** (nada de `.md`, capturas ni documentación). Cambios fuera de las carpetas de la tabla: pedirlos antes a Benjamín.
 - Si necesitas cambiar un contrato de `model/compartido`, **no lo cambies**: abre un comentario en este issue y avisa a Benjamín.
 - Nada «demasiado automático»: el sistema calcula y propone; las acciones las dispara una persona (médico, especialista, administrador). El único proceso programado nuevo es el de fichas EN_ESPERA (T100-20).
-- **MVC también en la web:** `pages/` = vista, `stores/` (Pinia) = controlador de interfaz, `services/` = llamadas REST, `models/` = tipos. Una página **nunca** llama `fetch` directo: usa su *store* y el *store* usa el *service*.
+- **MVC en Flutter:** `views/` = vista, `controllers/` = controlador, `services/` = llamadas REST, `models/` = datos. Una vista **nunca** llama a `http` directo: usa su *controller* y el *controller* usa el *service*.
 - Sin reglas de negocio en la web: el backend decide; la web muestra el resultado o el mensaje del `codigo` de error.
 - Cada *service* tiene su `Fake*` en `services/fake/` para trabajar sin backend (igual que `FakeCatalogoService` en Flutter).
-- Pruebas con Vitest (`npm run test`) para *stores* y *services*.
-- La URL del backend sale de `NUXT_PUBLIC_API_URL`; nada de usuarios ni claves escritos en el código.
+- Pruebas con `flutter test` para *controllers*, *services* y vistas.
+- La URL del backend sale de `--dart-define=API_URL=...`; nada de usuarios ni claves escritos en el código.
 
 ## Fuera de alcance
 - Editar el historial.
 
 ## Definition of Done
 - [ ] Cumple las reglas de negocio y todos los flujos alternativos listados
-- [ ] `./mvnw test` en verde (y `flutter test` / `npm run test` si la tarjeta toca Flutter / Nuxt)
+- [ ] `./mvnw test` en verde (y `flutter test` si la tarjeta toca Flutter)
 - [ ] Pantallas probadas en el tamaño que corresponde (celular / escritorio)
 - [ ] PR hacia la rama T100 aprobado por el revisor e integrado por Benjamín
 - [ ] Tarjeta movida a **Hecho** en el tablero Kanban y resumen del PR enviado a Benjamín

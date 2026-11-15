@@ -1,4 +1,6 @@
-# [T100-32][Pruebas][Modelo V] Pruebas de sistema y aceptación de punta a punta (web Nuxt + app Flutter) — todo el equipo
+# [T100-32][Pruebas][Modelo V] Pruebas de sistema y aceptación de punta a punta (app Flutter) — todo el equipo
+
+> **Actualización 15/11/2026:** el proyecto ya no usa Nuxt. Todas las pantallas del médico (general, pediatría, odontología y especialistas) están en la **app Flutter** (`04_imp/frontend`), igual que paciente, enfermería, administrador y TV. Equivalencias: `pages/` → `lib/views/medico/`, `stores/` → `lib/controllers/`, `services/` → `lib/services/`, `models/` → `lib/models/medico/`; `npm run test` → `flutter test`. CORS del backend: `http://localhost:5050` (`flutter run -d chrome --web-port 5050`). El proyecto Nuxt (`04_imp/frontend-web`) se borró.
 
 | Campo | Valor |
 |---|---|
@@ -32,9 +34,9 @@ Probar el sistema completo como lo usaría el hospital, contra cada criterio Dad
 ## Paso a paso
 1. **Benjamín** — derivación normal, urgencia, Terapia Intensiva, desplazamiento, EN_ESPERA → asignada al siguiente día hábil, cirugía sin choques (incluida la limpieza), urgencia que desplaza una cirugía, supervisión del administrador.
 2. **Matías** — paciente de 10 años no puede pedir Pediatría; el paciente no ve las especialidades internas; registro con fecha de nacimiento.
-3. **Alejandro** — agenda del médico en Nuxt; botón Ticket interno solo para General/Pediatría; enfermería sigue confirmando en Flutter.
-4. **Alex** — historial en Nuxt con fichas internas y cirugías; el especialista no ve la gravedad.
-5. **Abigail** — atención en Nuxt; notificación en la app y ticket impreso de cita común, ficha interna y cirugía; el ticket no muestra la gravedad.
+3. **Alejandro** — agenda del médico en Flutter; botón Ticket interno solo para General/Pediatría; enfermería sigue confirmando en Flutter.
+4. **Alex** — historial en Flutter con fichas internas y cirugías; el especialista no ve la gravedad.
+5. **Abigail** — atención en Flutter; notificación en la app y ticket impreso de cita común, ficha interna y cirugía; el ticket no muestra la gravedad.
 6. Benjamín consolida los resultados y abre los bugs.
 
 ## Pruebas que deben existir
