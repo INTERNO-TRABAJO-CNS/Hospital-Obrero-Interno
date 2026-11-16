@@ -1,14 +1,12 @@
 package com.Hospital.CNS.cns_backend.lib;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.Map;
 import java.util.Properties;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 class DBTest {
-
     @Test
     void usaElEntornoPrimero() {
         Properties local = new Properties();
