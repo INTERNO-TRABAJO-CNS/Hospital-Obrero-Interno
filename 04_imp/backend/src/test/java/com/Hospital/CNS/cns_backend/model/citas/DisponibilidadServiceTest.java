@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.Hospital.CNS.cns_backend.model.compartido.CitaDTO;
@@ -34,6 +35,7 @@ class DisponibilidadServiceTest {
     // ---- Camino principal ----
 
     @Test
+    @DisplayName("CP-24: medico, horario y consultorio libres -> DISPONIBLE")
     void validar_disponible() {
         cita(RAMOS, 200, CONSULTORIO_RAMOS, LocalTime.of(8, 0), EstadoCita.PROGRAMADA);
         cita(RAMOS, 201, CONSULTORIO_RAMOS, LocalTime.of(8, 30), EstadoCita.ASISTENCIA_CONFIRMADA);
@@ -61,6 +63,7 @@ class DisponibilidadServiceTest {
     // ---- [3a] Consultorio ocupado ----
 
     @Test
+    @DisplayName("CP-27: un consultorio ocupado en ese horario no puede asignarse a otra cita")
     void validar_consultorioOcupado() {
         agenda.duracion(VARGAS, 30);
         cita(VARGAS, 200, CONSULTORIO_RAMOS, LocalTime.of(9, 15), EstadoCita.PROGRAMADA);
@@ -79,6 +82,7 @@ class DisponibilidadServiceTest {
     // ---- [4a] Medico con 7 fichas o paciente con otra cita ese dia ----
 
     @Test
+    @DisplayName("CP-25: medico con 7 citas ese dia -> MEDICO_COMPLETO")
     void validar_medicoCompleto7() {
         sieteCitasDeRamos();
 
@@ -103,6 +107,7 @@ class DisponibilidadServiceTest {
     }
 
     @Test
+    @DisplayName("CP-26: paciente con cita en otra especialidad el mismo dia -> PACIENTE_YA_TIENE_CITA")
     void validar_pacienteYaTieneCita() {
         CitaDTO enPediatria = new CitaDTO(citas.nextIdentity(), PACIENTE, "", "", VARGAS, "", TipoEspecialidad.PEDIATRIA,
                 OTRO_CONSULTORIO, DIA, LocalTime.of(15, 0), 1, EstadoCita.PROGRAMADA);
@@ -129,6 +134,7 @@ class DisponibilidadServiceTest {
     // ---- [5a] Cita solapada o solicitud simultanea ganadora ----
 
     @Test
+    @DisplayName("CP-28: una cita que se cruza con otra del mismo medico es rechazada por solapamiento")
     void validar_solapada() {
         // El medico tiene una cita 08:45-09:15 (en otro consultorio): la candidata 09:00-09:30 se cruza.
         cita(RAMOS, 200, OTRO_CONSULTORIO, LocalTime.of(8, 45), EstadoCita.PROGRAMADA);

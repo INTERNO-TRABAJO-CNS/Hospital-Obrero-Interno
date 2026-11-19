@@ -12,23 +12,33 @@ public class FakeSolicitudRepository implements SolicitudRepository {
     public final List<SolicitudDTO> solicitudes = new ArrayList<>();
 
     private long ultimoId = 0;
+    private long ultimoOrden = 0;
 
     @Override
     public synchronized long nextIdentity() {
         return ++ultimoId;
     }
 
-    /** Si ya existe una solicitud con ese id la reemplaza. */
+    /**
+     * Si ya existe una solicitud con ese id la reemplaza (conservando su orden de llegada, como la base). Como la
+     * secuencia citas.solicitud_orden_seq, una solicitud nueva con ordenLlegada 0 recibe el siguiente orden.
+     */
     @Override
     public synchronized void store(SolicitudDTO s) {
         ultimoId = Math.max(ultimoId, s.solicitudId());
         for (int i = 0; i < solicitudes.size(); i++) {
             if (solicitudes.get(i).solicitudId() == s.solicitudId()) {
-                solicitudes.set(i, s);
+                solicitudes.set(i, conOrden(s, solicitudes.get(i).ordenLlegada()));
                 return;
             }
         }
-        solicitudes.add(s);
+        solicitudes.add(conOrden(s, s.ordenLlegada() > 0 ? s.ordenLlegada() : ultimoOrden + 1));
+    }
+
+    private SolicitudDTO conOrden(SolicitudDTO s, long orden) {
+        ultimoOrden = Math.max(ultimoOrden, orden);
+        return new SolicitudDTO(s.solicitudId(), s.pacienteId(), s.especialidad(), s.diaSolicitado(), s.prioridad(),
+                orden, s.estado(), s.citaId());
     }
 
     @Override

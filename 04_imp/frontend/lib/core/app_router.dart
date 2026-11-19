@@ -683,9 +683,3 @@ Future<void> _irSegunRol(BuildContext context, Sesion sesion) async {
       mensajes.showSnackBar(SnackBar(content: Text(motivo)));
   }
 }
-
-void _pronto(BuildContext context, String pantalla) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('$pantalla estará disponible pronto.')),
-  );
-}

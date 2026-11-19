@@ -1,0 +1,26 @@
+﻿EVIDENCIA DE CASOS DE PRUEBA
+Fecha:    2026-11-19 08:51:14
+Rama:     feature/T100-algoritmos-ejecucion (13bb4a1)
+Comando:  ./mvnw test -Dtest=AsignacionServiceTest,DisponibilidadServiceTest,CitaServiceTest,PgAsignacionIT,PgAgendaRepositoryIT
+Maven:    BUILD SUCCESS
+Casos:    14 de 14 aprobados
+
+Caso  Resultado Prueba                                                                                                                      Clase                     Segundos
+----  --------- ------                                                                                                                      -----                     --------
+CP-17 APROBADA  CP-17: tres solicitudes que llegan en orden se asignan en ese mismo orden                                                   AsignacionServiceTest     0.002   
+CP-18 APROBADA  CP-18: una solicitud de prioridad 2 se atiende despues de todas las de prioridad 1                                          AsignacionServiceTest     0.001   
+CP-19 APROBADA  CP-19: sin cupo el dia pedido -> NO HAY CUPOS y queda EN_ESPERA para el siguiente dia habil                                 AsignacionServiceTest     0.002   
+CP-20 APROBADA  CP-20: tras 15 dias habiles sin cupo la solicitud pasa a SIN_CUPO                                                           AsignacionServiceTest     0.003   
+CP-21 APROBADA  CP-21: si el paciente ya tiene una cita ese dia, la solicitud no se asigna                                                  AsignacionServiceTest     0.001   
+CP-22 APROBADA  CP-22: al registrar la cita, la solicitud queda marcada como ASIGNADA                                                       CitaServiceTest           0.001   
+CP-23 APROBADA  CP-23: 10 solicitudes simultaneas para 3 huecos crean exactamente 3 citas, sin duplicados (PostgreSQL)                      PgAsignacionIT            0.288   
+CP-24 APROBADA  CP-24: medico, horario y consultorio libres -> DISPONIBLE                                                                   DisponibilidadServiceTest 0.0     
+CP-25 APROBADA  CP-25: medico con 7 citas ese dia -> MEDICO_COMPLETO                                                                        DisponibilidadServiceTest 0.0     
+CP-26 APROBADA  CP-26: paciente con cita en otra especialidad el mismo dia -> PACIENTE_YA_TIENE_CITA                                        DisponibilidadServiceTest 0.0     
+CP-27 APROBADA  CP-27: un consultorio ocupado en ese horario no puede asignarse a otra cita                                                 DisponibilidadServiceTest 0.0     
+CP-28 APROBADA  CP-28: una cita que se cruza con otra del mismo medico es rechazada por solapamiento                                        DisponibilidadServiceTest 0.001   
+CP-29 APROBADA  CP-29: dos hilos piden el mismo hueco a la vez y solo uno lo confirma (PostgreSQL)                                          PgAgendaRepositoryIT      2.503   
+HU-07 APROBADA  HU-07: la cita confirmada se guarda con paciente, especialidad, medico, fecha, hora, consultorio, ficha y estado PROGRAMADA CitaServiceTest           0.001   
+
+
+
