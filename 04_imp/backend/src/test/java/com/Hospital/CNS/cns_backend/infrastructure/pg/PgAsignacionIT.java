@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.Hospital.CNS.cns_backend.lib.DB;
@@ -123,6 +124,7 @@ class PgAsignacionIT {
     }
 
     @Test
+    @DisplayName("CP-23: 10 solicitudes simultaneas para 3 huecos crean exactamente 3 citas, sin duplicados (PostgreSQL)")
     void IT_concurrencia_10solicitudes_3huecos() throws Exception {
         for (int i = 0; i < SOLICITUDES; i++) {
             nuevaSolicitud(pacienteIds.get(i), DIA, EstadoSolicitud.PENDIENTE);

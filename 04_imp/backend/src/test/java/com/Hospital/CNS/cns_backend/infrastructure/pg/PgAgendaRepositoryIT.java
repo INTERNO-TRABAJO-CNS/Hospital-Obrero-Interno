@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.Hospital.CNS.cns_backend.lib.DB;
@@ -127,6 +128,7 @@ class PgAgendaRepositoryIT {
     }
 
     @Test
+    @DisplayName("CP-29: dos hilos piden el mismo hueco a la vez y solo uno lo confirma (PostgreSQL)")
     void IT_dosSolicitudesMismoHueco_soloUnaCitaGuardada() throws Exception {
         DisponibilidadService service = new DisponibilidadService(agenda, citas);
         LocalTime hora = LocalTime.of(9, 0);
