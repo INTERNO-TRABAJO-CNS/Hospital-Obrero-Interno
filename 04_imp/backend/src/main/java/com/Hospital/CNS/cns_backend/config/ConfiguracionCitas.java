@@ -14,6 +14,7 @@ import com.Hospital.CNS.cns_backend.model.citas.AsignacionService;
 import com.Hospital.CNS.cns_backend.model.citas.CalendarioHabil;
 import com.Hospital.CNS.cns_backend.model.citas.CitaService;
 import com.Hospital.CNS.cns_backend.model.citas.DisponibilidadService;
+import com.Hospital.CNS.cns_backend.model.citas.SolicitudService;
 import com.Hospital.CNS.cns_backend.model.compartido.AgendaEventos;
 import com.Hospital.CNS.cns_backend.model.compartido.CambioCitaRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.CitaRepository;
@@ -56,6 +57,13 @@ public class ConfiguracionCitas {
     @Bean
     CalendarioHabil calendarioHabil(DiaNoHabilRepository dias) {
         return new CalendarioHabil(dias);
+    }
+
+    /** CU-04 (T100-06): el paciente registra la solicitud; la cola de abajo la asigna. */
+    @Bean
+    SolicitudService solicitudService(SolicitudRepository solicitudes, CitaRepository citas,
+                                      CalendarioHabil calendario, Reloj reloj) {
+        return new SolicitudService(solicitudes, citas, calendario, reloj);
     }
 
     @Bean

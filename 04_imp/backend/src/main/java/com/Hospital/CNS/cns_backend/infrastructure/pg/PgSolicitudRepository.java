@@ -83,6 +83,11 @@ public class PgSolicitudRepository implements SolicitudRepository {
     }
 
     @Override
+    public List<SolicitudDTO> porPaciente(long pacienteId) {
+        return consultar(SELECCION + " where paciente_id = ? order by orden_llegada desc", pacienteId);
+    }
+
+    @Override
     public boolean pacienteTieneSolicitudActivaEnDia(long pacienteId, LocalDate dia) {
         String sql = "select exists (select 1 from citas.solicitud where paciente_id = ? and dia_solicitado = ? "
                 + "and estado in ('PENDIENTE', 'EN_ESPERA'))";
