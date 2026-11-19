@@ -33,13 +33,26 @@ public class FakeSolicitudRepository implements SolicitudRepository {
 
     @Override
     public synchronized Optional<SolicitudDTO> porId(long solicitudId) {
-        return solicitudes.stream().filter(s -> s.solicitudId() == solicitudId).findFirst();
+        return solicitudes.stream()
+                .filter(s -> s.solicitudId() == solicitudId)
+                .findFirst();
+    }
+
+    /** Lista las solicitudes de un paciente, de la más reciente a la más antigua. */
+    @Override
+    public synchronized List<SolicitudDTO> porPaciente(long pacienteId) {
+        return solicitudes.stream()
+                .filter(s -> s.pacienteId() == pacienteId)
+                .sorted(Comparator.comparingLong(SolicitudDTO::ordenLlegada).reversed())
+                .toList();
     }
 
     @Override
     public synchronized boolean pacienteTieneSolicitudActivaEnDia(long pacienteId, LocalDate dia) {
         return solicitudes.stream()
-                .anyMatch(s -> s.pacienteId() == pacienteId && s.diaSolicitado().equals(dia) && esActiva(s));
+                .anyMatch(s -> s.pacienteId() == pacienteId
+                        && s.diaSolicitado().equals(dia)
+                        && esActiva(s));
     }
 
     /** PENDIENTE o EN_ESPERA con dia solicitado hasta {@code hasta}; orden: prioridad y luego ordenLlegada. */
@@ -47,12 +60,14 @@ public class FakeSolicitudRepository implements SolicitudRepository {
     public synchronized List<SolicitudDTO> siguientesParaProcesar(LocalDate hasta, int max) {
         return solicitudes.stream()
                 .filter(s -> esActiva(s) && !s.diaSolicitado().isAfter(hasta))
-                .sorted(Comparator.comparingInt(SolicitudDTO::prioridad).thenComparingLong(SolicitudDTO::ordenLlegada))
+                .sorted(Comparator.comparingInt(SolicitudDTO::prioridad)
+                        .thenComparingLong(SolicitudDTO::ordenLlegada))
                 .limit(max)
                 .toList();
     }
 
     private static boolean esActiva(SolicitudDTO s) {
-        return s.estado() == EstadoSolicitud.PENDIENTE || s.estado() == EstadoSolicitud.EN_ESPERA;
+        return s.estado() == EstadoSolicitud.PENDIENTE
+                || s.estado() == EstadoSolicitud.EN_ESPERA;
     }
 }

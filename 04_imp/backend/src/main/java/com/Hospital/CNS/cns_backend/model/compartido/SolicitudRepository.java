@@ -5,15 +5,16 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SolicitudRepository {
+
     long nextIdentity();
 
-    void store(SolicitudDTO s);
+    void store(SolicitudDTO solicitud);
 
     Optional<SolicitudDTO> porId(long solicitudId);
 
-    /** PENDIENTE o EN_ESPERA. */
+    List<SolicitudDTO> porPaciente(long pacienteId);
+
     boolean pacienteTieneSolicitudActivaEnDia(long pacienteId, LocalDate dia);
 
-    /** Orden: prioridad, ordenLlegada. */
     List<SolicitudDTO> siguientesParaProcesar(LocalDate hasta, int max);
 }
