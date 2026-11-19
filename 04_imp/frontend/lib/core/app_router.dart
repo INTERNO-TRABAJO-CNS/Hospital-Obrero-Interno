@@ -8,6 +8,7 @@ import '../models/catalogo/especialidad.dart';
 import '../models/medico/medico_actual.dart';
 import '../services/auth_service.dart';
 import '../services/catalogo_service.dart';
+import '../services/cancelacion_service.dart';
 import '../services/cirugias_service.dart';
 import '../services/cuentas_service.dart';
 import '../services/enfermeria_service.dart';
@@ -92,7 +93,8 @@ List<OpcionMenu> menuMedico(MedicoActual medico) {
   if (!medico.especialidad.esBasica) {
     return [
       const OpcionMenu('Agenda de fichas internas', RutasMedico.fichasInternas),
-      if (medico.operaEnQuirofano && medico.especialidad != Especialidad.terapiaIntensiva)
+      if (medico.operaEnQuirofano &&
+          medico.especialidad != Especialidad.terapiaIntensiva)
         const OpcionMenu('Cirugías', RutasMedico.cirugias),
     ];
   }
@@ -118,7 +120,9 @@ class PantallaMarcador extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: Text(titulo, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineSmall),
+        child: Text(titulo,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headlineSmall),
       ),
     );
   }
@@ -126,7 +130,8 @@ class PantallaMarcador extends StatelessWidget {
 
 /// Navegador y mensajes de la app (para volver al login cuando la sesion vence).
 final GlobalKey<NavigatorState> navegadorApp = GlobalKey<NavigatorState>();
-final GlobalKey<ScaffoldMessengerState> mensajesApp = GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<ScaffoldMessengerState> mensajesApp =
+    GlobalKey<ScaffoldMessengerState>();
 
 /// Se usa en `MaterialApp.onGenerateRoute`.
 Route<dynamic> generarRuta(RouteSettings ajustes) {
@@ -157,7 +162,8 @@ Widget _pagina(String nombre) {
         builder: (context) => RegistroTitularView(
           controller: sesionApp,
           alRegistrar: (sesion) => _irSegunRol(context, sesion),
-          alVolver: () => Navigator.of(context).pushReplacementNamed(AppRutas.login),
+          alVolver: () =>
+              Navigator.of(context).pushReplacementNamed(AppRutas.login),
         ),
       );
     case AppRutas.paciente:
@@ -167,14 +173,22 @@ Widget _pagina(String nombre) {
                 builder: (context) => AppShell(
                   rutaActual: nombre,
                   destinos: const [
-                    DestinoShell(etiqueta: 'Inicio', icono: Icons.home_outlined, ruta: AppRutas.paciente),
-                    DestinoShell(etiqueta: 'Salir', icono: Icons.logout, ruta: AppRutas.salir),
+                    DestinoShell(
+                        etiqueta: 'Inicio',
+                        icono: Icons.home_outlined,
+                        ruta: AppRutas.paciente),
+                    DestinoShell(
+                        etiqueta: 'Salir',
+                        icono: Icons.logout,
+                        ruta: AppRutas.salir),
                   ],
                   child: HomePacienteView(
                     sesion: sesion,
-                    alSolicitarCita: () => _pronto(context, 'Solicitar cita'), // T100-06
+                    alSolicitarCita: () =>
+                        _pronto(context, 'Solicitar cita'), // T100-06
                     alMisCitas: () => _pronto(context, 'Mis citas'), // T100-07
-                    alRegistrarBeneficiario: () => Navigator.of(context).pushNamed(AppRutas.beneficiario),
+                    alRegistrarBeneficiario: () =>
+                        Navigator.of(context).pushNamed(AppRutas.beneficiario),
                   ),
                 ),
               ));
@@ -188,26 +202,43 @@ Widget _pagina(String nombre) {
                 ),
               ));
     case AppRutas.enfermeria:
-      return _personal(Rol.enfermeria, nombre, 'Fichas del día', menuEnfermeria,
-          (s) => FichasDiaView(servicio: enfermeriaApp, usuario: _usuarioHistorial(s)));
-    case AppRutas.enfermeriaConfirmar:
-      return _personal(Rol.enfermeria, nombre, 'Confirmar asistencia', menuEnfermeria,
-          (s) => ConfirmarAsistenciaView(servicio: enfermeriaApp, usuario: _usuarioHistorial(s)));
-    case AppRutas.enfermeriaHistorial:
-      return _personal(Rol.enfermeria, nombre, 'Historial de cambios', menuEnfermeria,
-          (_) => HistorialCambiosView(servicio: historialApp));
-    case AppRutas.admin:
-      return _personal(Rol.administrador, nombre, 'Catálogos', menuAdmin,
-          (_) => CatalogosView(servicio: catalogoApp, quirofanos: quirofanosApp, cuentas: cuentasApp));
-    case AppRutas.adminSupervision:
-      return _personal(Rol.administrador, nombre, 'Supervisión en tiempo real', menuAdmin,
-          (_) => SupervisionView(servicio: supervisionApp));
-    case AppRutas.adminReportes:
       return _personal(
-          Rol.administrador, nombre, 'Reportes e indicadores', menuAdmin, (_) => ReportesView(servicio: reportesApp));
+          Rol.enfermeria,
+          nombre,
+          'Fichas del día',
+          menuEnfermeria,
+          (s) => FichasDiaView(
+              servicio: enfermeriaApp, usuario: _usuarioHistorial(s)));
+    case AppRutas.enfermeriaConfirmar:
+      return _personal(
+          Rol.enfermeria,
+          nombre,
+          'Confirmar asistencia',
+          menuEnfermeria,
+          (s) => ConfirmarAsistenciaView(
+              servicio: enfermeriaApp, usuario: _usuarioHistorial(s)));
+    case AppRutas.enfermeriaHistorial:
+      return _personal(Rol.enfermeria, nombre, 'Historial de cambios',
+          menuEnfermeria, (_) => HistorialCambiosView(servicio: historialApp));
+    case AppRutas.admin:
+      return _personal(
+          Rol.administrador,
+          nombre,
+          'Catálogos',
+          menuAdmin,
+          (_) => CatalogosView(
+              servicio: catalogoApp,
+              quirofanos: quirofanosApp,
+              cuentas: cuentasApp));
+    case AppRutas.adminSupervision:
+      return _personal(Rol.administrador, nombre, 'Supervisión en tiempo real',
+          menuAdmin, (_) => SupervisionView(servicio: supervisionApp));
+    case AppRutas.adminReportes:
+      return _personal(Rol.administrador, nombre, 'Reportes e indicadores',
+          menuAdmin, (_) => ReportesView(servicio: reportesApp));
     case AppRutas.adminHistorial:
-      return _personal(Rol.administrador, nombre, 'Historial de cambios', menuAdmin,
-          (_) => HistorialCambiosView(servicio: historialApp));
+      return _personal(Rol.administrador, nombre, 'Historial de cambios',
+          menuAdmin, (_) => HistorialCambiosView(servicio: historialApp));
     case AppRutas.tv:
       return const AppShell(
         rutaActual: AppRutas.tv,
@@ -233,7 +264,9 @@ Widget _paginaMedico(String nombre) {
     }
     final menu = menuMedico(medico);
     final uri = Uri.parse(nombre);
-    final camino = uri.path.startsWith('/medico/pacientes/') ? RutasMedico.historial : uri.path;
+    final camino = uri.path.startsWith('/medico/pacientes/')
+        ? RutasMedico.historial
+        : uri.path;
     final coinciden = [
       for (final op in menu)
         if (camino == op.ruta || camino.startsWith('${op.ruta}/')) op.ruta
@@ -255,7 +288,8 @@ Widget _paginaMedico(String nombre) {
   });
 }
 
-(String, Widget) _vistaMedico(String ruta, Map<String, String> consulta, MedicoActual medico) {
+(String, Widget) _vistaMedico(
+    String ruta, Map<String, String> consulta, MedicoActual medico) {
   final partes = Uri.parse(ruta).pathSegments;
   if (partes.length == 3 && partes[1] == 'atencion') {
     final citaId = int.tryParse(partes[2]);
@@ -290,7 +324,11 @@ Widget _paginaMedico(String nombre) {
     case RutasMedico.atencion:
       return ('Atención', AtencionInicioView(agenda: agendaMedicoApp));
     case RutasMedico.historial:
-      return ('Historial del paciente', HistorialInicioView(agenda: agendaMedicoApp, servicio: historialPacienteApp));
+      return (
+        'Historial del paciente',
+        HistorialInicioView(
+            agenda: agendaMedicoApp, servicio: historialPacienteApp)
+      );
     case RutasMedico.ticketInterno:
       return (
         'Ticket interno',
@@ -303,9 +341,15 @@ Widget _paginaMedico(String nombre) {
         ),
       );
     case RutasMedico.cola:
-      return ('Cola de prioridad', ColaPrioridadView(medico: medico, fichas: fichasInternasApp));
+      return (
+        'Cola de prioridad',
+        ColaPrioridadView(medico: medico, fichas: fichasInternasApp)
+      );
     case RutasMedico.fichasInternas:
-      return ('Fichas internas de hoy', FichasInternasView(medico: medico, fichas: fichasInternasApp));
+      return (
+        'Fichas internas de hoy',
+        FichasInternasView(medico: medico, fichas: fichasInternasApp)
+      );
     case RutasMedico.cirugias:
       return ('Cirugías', CirugiasView(medico: medico, servicio: cirugiasApp));
     case RutasMedico.programarCirugia:
@@ -319,7 +363,10 @@ Widget _paginaMedico(String nombre) {
         ),
       );
     default:
-      return ('Agenda', AgendaMedicoView(agenda: agendaMedicoApp, medico: medico));
+      return (
+        'Agenda',
+        AgendaMedicoView(agenda: agendaMedicoApp, medico: medico)
+      );
   }
 }
 
@@ -333,7 +380,8 @@ Widget _conRol(Set<Rol> roles, Widget Function(Sesion sesion) pagina) {
 }
 
 /// Pantalla del personal dentro del marco del Figma (menu verde + titulo + pildora).
-Widget _personal(Rol rol, String ruta, String titulo, List<OpcionMenu> menu, Widget Function(Sesion s) contenido) {
+Widget _personal(Rol rol, String ruta, String titulo, List<OpcionMenu> menu,
+    Widget Function(Sesion s) contenido) {
   return _conRol(
       {rol},
       (sesion) => Builder(
@@ -348,7 +396,8 @@ Widget _personal(Rol rol, String ruta, String titulo, List<OpcionMenu> menu, Wid
           ));
 }
 
-String _usuarioHistorial(Sesion s) => usuarioParaHistorial(s.rol.etiqueta, s.nombre);
+String _usuarioHistorial(Sesion s) =>
+    usuarioParaHistorial(s.rol.etiqueta, s.nombre);
 
 Future<void> _cerrarSesion(BuildContext context) async {
   final navegador = Navigator.of(context);
@@ -360,6 +409,9 @@ Future<void> _cerrarSesion(BuildContext context) async {
 /// Cliente HTTP compartido: al iniciar sesion lleva el token (Authorization: Bearer).
 final ApiClient apiApp = ApiClient()..alPerderSesion = _alPerderSesion;
 
+/// CU-11: cancelacion de citas del paciente.
+final CancelacionService cancelacionApp = ApiCancelacionService(apiApp);
+
 /// El backend respondio 401 a una peticion con token: la sesion vencio o se cerro.
 void _alPerderSesion(ApiException error) {
   if (!sesionApp.autenticado) {
@@ -367,9 +419,11 @@ void _alPerderSesion(ApiException error) {
   }
   sesionApp.olvidar();
   _olvidarMedico();
-  navegadorApp.currentState?.pushNamedAndRemoveUntil(AppRutas.login, (_) => false);
+  navegadorApp.currentState
+      ?.pushNamedAndRemoveUntil(AppRutas.login, (_) => false);
   mensajesApp.currentState?.showSnackBar(
-    const SnackBar(content: Text('Tu sesión venció o se cerró. Vuelve a iniciar sesión.')),
+    const SnackBar(
+        content: Text('Tu sesión venció o se cerró. Vuelve a iniciar sesión.')),
   );
 }
 
@@ -381,46 +435,62 @@ SesionController _crearSesion() {
   if (usarFake) {
     final auth = FakeAuthService();
     // Como en el backend: la cuenta creada en el registro sirve para iniciar sesion.
-    final pacientes = FakePacienteService(alRegistrarTitular: auth.agregarCuentaPaciente);
+    final pacientes =
+        FakePacienteService(alRegistrarTitular: auth.agregarCuentaPaciente);
     return SesionController(auth: auth, pacientes: pacientes, api: apiApp);
   }
-  return SesionController(auth: ApiAuthService(apiApp), pacientes: ApiPacienteService(apiApp), api: apiApp);
+  return SesionController(
+      auth: ApiAuthService(apiApp),
+      pacientes: ApiPacienteService(apiApp),
+      api: apiApp);
 }
 
 /// CU-02: catalogos y cuentas contra el backend con el token de la sesion, o en memoria con
 /// `flutter run --dart-define=CATALOGO_FAKE=true`.
 const bool _catalogoFake = bool.fromEnvironment('CATALOGO_FAKE');
-final CatalogoService catalogoApp =
-    _catalogoFake ? FakeCatalogoService(conDatosDeEjemplo: true) : ApiCatalogoService(apiApp);
-final CuentasService cuentasApp = _catalogoFake ? FakeCuentasService() : ApiCuentasService(apiApp);
+final CatalogoService catalogoApp = _catalogoFake
+    ? FakeCatalogoService(conDatosDeEjemplo: true)
+    : ApiCatalogoService(apiApp);
+final CuentasService cuentasApp =
+    _catalogoFake ? FakeCuentasService() : ApiCuentasService(apiApp);
 
 // Sin backend todavia (enfermeria, historial, quirofanos, supervision y reportes): datos de prueba
 // en memoria. Comparten estado: confirmar una llegada aparece en el historial y en la supervision.
 final FakeHistorialCambiosService historialApp = FakeHistorialCambiosService();
-final FakeEnfermeriaService enfermeriaApp = FakeEnfermeriaService(historial: historialApp);
+final FakeEnfermeriaService enfermeriaApp =
+    FakeEnfermeriaService(historial: historialApp);
 
 /// Quirofanos (T100-19): en PostgreSQL por el backend, o en memoria con CATALOGO_FAKE.
-final QuirofanoService quirofanosApp = _catalogoFake ? FakeQuirofanoService() : ApiQuirofanoService(apiApp);
-final SupervisionService supervisionApp = FakeSupervisionService(enfermeria: enfermeriaApp, quirofanos: quirofanosApp);
+final QuirofanoService quirofanosApp =
+    _catalogoFake ? FakeQuirofanoService() : ApiQuirofanoService(apiApp);
+final SupervisionService supervisionApp = FakeSupervisionService(
+    enfermeria: enfermeriaApp, quirofanos: quirofanosApp);
 final ReportesService reportesApp = FakeReportesService();
 
 /// Medico (CU-13/14/15) contra el backend, o en memoria con `--dart-define=AUTH_FAKE=true`
 /// (o `MEDICO_FAKE=true`). Sin token, el backend responderia 401: por eso con AUTH_FAKE tambien
 /// son de prueba.
-const bool _medicoFake = bool.fromEnvironment('AUTH_FAKE') || bool.fromEnvironment('MEDICO_FAKE');
-final MedicoService medicoServicioApp =
-    _medicoFake ? FakeMedicoService(sesion: () => sesionApp.sesion) : ApiMedicoService(apiApp);
-final AtencionService atencionApp = _medicoFake ? FakeAtencionService() : ApiAtencionService(apiApp);
-final HistorialPacienteService historialPacienteApp =
-    _medicoFake ? FakeHistorialPacienteService() : ApiHistorialPacienteService(apiApp);
+const bool _medicoFake =
+    bool.fromEnvironment('AUTH_FAKE') || bool.fromEnvironment('MEDICO_FAKE');
+final MedicoService medicoServicioApp = _medicoFake
+    ? FakeMedicoService(sesion: () => sesionApp.sesion)
+    : ApiMedicoService(apiApp);
+final AtencionService atencionApp =
+    _medicoFake ? FakeAtencionService() : ApiAtencionService(apiApp);
+final HistorialPacienteService historialPacienteApp = _medicoFake
+    ? FakeHistorialPacienteService()
+    : ApiHistorialPacienteService(apiApp);
 
 // Fichas internas (CU-21..CU-23, CU-25): en PostgreSQL por el backend (T100-20..22), o en memoria con
 // AUTH_FAKE / MEDICO_FAKE.
-final FichasInternasService fichasInternasApp =
-    _medicoFake ? FakeFichasInternasService() : ApiFichasInternasService(apiApp);
+final FichasInternasService fichasInternasApp = _medicoFake
+    ? FakeFichasInternasService()
+    : ApiFichasInternasService(apiApp);
 
 // Cirugias (CU-24): en PostgreSQL por el backend (T100-23), o en memoria con AUTH_FAKE / MEDICO_FAKE.
-final CirugiasService cirugiasApp = _medicoFake ? FakeCirugiasService(fichasInternasApp) : ApiCirugiasService(apiApp);
+final CirugiasService cirugiasApp = _medicoFake
+    ? FakeCirugiasService(fichasInternasApp)
+    : ApiCirugiasService(apiApp);
 
 /// Datos del medico de la sesion y su agenda (la fecha elegida se recuerda entre pantallas).
 final MedicoController medicoApp = MedicoController(medicoServicioApp);
@@ -438,7 +508,8 @@ Widget _login() {
     builder: (context) => LoginView(
       controller: sesionApp,
       alEntrar: (sesion) => _irSegunRol(context, sesion),
-      alRegistrarse: () => Navigator.of(context).pushReplacementNamed(AppRutas.registro),
+      alRegistrarse: () =>
+          Navigator.of(context).pushReplacementNamed(AppRutas.registro),
     ),
   );
 }
@@ -457,10 +528,12 @@ Future<void> _irSegunRol(BuildContext context, Sesion sesion) async {
       final mensajes = ScaffoldMessenger.of(context);
       final resultado = await medicoApp.cargar();
       if (resultado == CargaMedico.ok) {
-        navegador.pushReplacementNamed(menuMedico(medicoApp.medico!).first.ruta);
+        navegador
+            .pushReplacementNamed(menuMedico(medicoApp.medico!).first.ruta);
         return;
       }
-      final motivo = medicoApp.error ?? 'No se pudieron cargar tus datos de médico.';
+      final motivo =
+          medicoApp.error ?? 'No se pudieron cargar tus datos de médico.';
       await sesionApp.salir();
       _olvidarMedico();
       mensajes.showSnackBar(SnackBar(content: Text(motivo)));
@@ -468,5 +541,6 @@ Future<void> _irSegunRol(BuildContext context, Sesion sesion) async {
 }
 
 void _pronto(BuildContext context, String pantalla) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$pantalla estará disponible pronto.')));
+  ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$pantalla estará disponible pronto.')));
 }
