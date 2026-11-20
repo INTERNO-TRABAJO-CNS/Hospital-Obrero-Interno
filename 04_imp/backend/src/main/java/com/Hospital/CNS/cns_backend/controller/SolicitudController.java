@@ -1,6 +1,5 @@
 package com.Hospital.CNS.cns_backend.controller;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpHeaders;
@@ -24,9 +23,8 @@ import com.Hospital.CNS.cns_backend.model.compartido.TipoEspecialidad;
 @RequestMapping("/api/v1/solicitudes")
 public class SolicitudController {
 
-    public record SolicitudRequest(
-            TipoEspecialidad especialidad,
-            LocalDate diaSolicitado) {
+    /** El paciente solo envia la especialidad: el dia, medico, hora y consultorio los asigna el sistema. */
+    public record SolicitudRequest(TipoEspecialidad especialidad) {
     }
 
     private final SolicitudService solicitudes;
@@ -55,8 +53,7 @@ public class SolicitudController {
 
         SolicitudDTO solicitud = solicitudes.solicitar(
                 usuario.personaId(),
-                datos.especialidad(),
-                datos.diaSolicitado()
+                datos.especialidad()
         );
 
         return ResultadoSolicitud.desde(solicitud);

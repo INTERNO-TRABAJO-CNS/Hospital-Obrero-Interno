@@ -13,11 +13,16 @@ import com.Hospital.CNS.cns_backend.model.compartido.SolicitudRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.TipoEspecialidad;
 
 /**
- * CU-04 (T100-06): el paciente pide una cita eligiendo solo especialidad y dia. La solicitud entra a la cola como
- * PENDIENTE; la asigna CU-05 ({@link AsignacionService}) en su turno.
+ * CU-04 (T100-06): el paciente pide una cita eligiendo SOLO la especialidad. No elige dia, medico, hora ni
+ * consultorio: la solicitud entra a la cola como PENDIENTE desde el primer dia habil (hoy si es habil) y CU-05
+ * ({@link AsignacionService}) la asigna en su turno al primer cupo libre, avanzando dia habil por dia habil hasta
+ * 15 dias habiles (despues: SIN_CUPO).
  *
- * <p>Reglas: dia habil, desde hoy hasta 15 dias habiles despues (la misma ventana que usa la asignacion), y el
- * paciente no puede tener otra cita ni otra solicitud activa ese dia.</p>
+ * <p>Regla: el paciente no puede tener otra solicitud activa (PENDIENTE o EN_ESPERA) de la misma especialidad.
+ * Si ya tiene cita en un dia, la asignacion salta ese dia.</p>
+ *
+ * <p>La reprogramacion (CU-10) si parte de un dia concreto: dia habil dentro de la ventana y sin otra cita ni
+ * solicitud activa ese dia.</p>
  */
 public class SolicitudService {
 
@@ -40,14 +45,27 @@ public class SolicitudService {
         this.reloj = Objects.requireNonNull(reloj, "reloj");
     }
 
-    /** Solicitud normal (prioridad 1). */
-    public SolicitudDTO solicitar(long pacienteId, TipoEspecialidad especialidad, LocalDate dia) {
-        return registrar(pacienteId, especialidad, dia, PRIORIDAD_NORMAL);
+    /**
+     * Solicitud normal (prioridad 1). El dia NO lo elige el paciente: la busqueda de cupo empieza el primer dia habil
+     * desde hoy.
+     */
+    public SolicitudDTO solicitar(long pacienteId, TipoEspecialidad especialidad) {
+        validarDatos(pacienteId, especialidad);
+        validarSinSolicitudActiva(pacienteId, especialidad);
+        LocalDate hoy = reloj.ahora().toLocalDate();
+        LocalDate desde = calendario.esHabil(hoy) ? hoy : calendario.siguienteDiaHabil(hoy);
+        return guardar(pacienteId, especialidad, desde, PRIORIDAD_NORMAL);
     }
 
     /** Solicitud que nace de cancelar o reprogramar una cita (CU-10): prioridad 2, va despues de las normales. */
     public SolicitudDTO solicitarReprogramada(long pacienteId, TipoEspecialidad especialidad, LocalDate dia) {
-        return registrar(pacienteId, especialidad, dia, PRIORIDAD_REPROGRAMADA);
+        validarDatos(pacienteId, especialidad);
+        if (dia == null) {
+            throw new DominioException("DATOS_INVALIDOS", "Debe indicar el dia de la reprogramacion");
+        }
+        validarDia(dia);
+        validarDisponibilidadPaciente(pacienteId, dia);
+        return guardar(pacienteId, especialidad, dia, PRIORIDAD_REPROGRAMADA);
     }
 
     public List<SolicitudDTO> listarPorPaciente(long pacienteId) {
@@ -69,11 +87,7 @@ public class SolicitudService {
         return solicitud;
     }
 
-    private SolicitudDTO registrar(long pacienteId, TipoEspecialidad especialidad, LocalDate dia, int prioridad) {
-        validarDatos(pacienteId, especialidad, dia);
-        validarDia(dia);
-        validarDisponibilidadPaciente(pacienteId, dia);
-
+    private SolicitudDTO guardar(long pacienteId, TipoEspecialidad especialidad, LocalDate dia, int prioridad) {
         long id = solicitudes.nextIdentity();
         // ordenLlegada 0: lo pone la base (secuencia citas.solicitud_orden_seq), asi es creciente aunque dos
         // pacientes pidan a la vez. Al guardarla, se vuelve a leer para devolver el orden real.
@@ -82,13 +96,23 @@ public class SolicitudService {
         return solicitudes.porId(id).orElseThrow();
     }
 
-    private static void validarDatos(long pacienteId, TipoEspecialidad especialidad, LocalDate dia) {
-        if (pacienteId <= 0 || especialidad == null || dia == null) {
-            throw new DominioException("DATOS_INVALIDOS", "Debe indicar la especialidad y el dia");
+    private static void validarDatos(long pacienteId, TipoEspecialidad especialidad) {
+        if (pacienteId <= 0 || especialidad == null) {
+            throw new DominioException("DATOS_INVALIDOS", "Debe indicar la especialidad");
         }
         if (!especialidad.esBasica()) {
             throw new DominioException("ESPECIALIDAD_INVALIDA",
                     "Solo se puede pedir Consultorio Familiar, Odontologia o Pediatria");
+        }
+    }
+
+    private void validarSinSolicitudActiva(long pacienteId, TipoEspecialidad especialidad) {
+        boolean yaTiene = solicitudes.porPaciente(pacienteId).stream()
+                .anyMatch(s -> s.especialidad() == especialidad
+                        && (s.estado() == EstadoSolicitud.PENDIENTE || s.estado() == EstadoSolicitud.EN_ESPERA));
+        if (yaTiene) {
+            throw new DominioException("YA_TIENE_SOLICITUD_ACTIVA",
+                    "Ya tiene una solicitud en curso para esta especialidad; el sistema le avisara cuando haya cupo");
         }
     }
 

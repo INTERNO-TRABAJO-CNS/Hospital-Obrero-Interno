@@ -25,14 +25,14 @@ public record ResultadoSolicitud(
 
         } else if (solicitud.estado() == EstadoSolicitud.EN_ESPERA) {
 
-            mensaje = "NO HAY CUPOS — quedó en espera para el siguiente día hábil.";
+            mensaje = "Todavía no hay cupo: el sistema sigue buscando en los siguientes días hábiles y le avisará.";
 
         } else if (solicitud.estado() == EstadoSolicitud.SIN_CUPO) {
 
             mensaje = "NO HAY CUPOS — no se encontró cupo en los próximos 15 días hábiles.";
 
         } else {
-            mensaje = "Su solicitud fue registrada correctamente y está pendiente de procesamiento.";
+            mensaje = "Su solicitud fue registrada. El sistema le asignará médico, día y hora en cuanto haya un cupo disponible.";
         }
 
         return new ResultadoSolicitud(

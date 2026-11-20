@@ -27,7 +27,7 @@ import com.Hospital.CNS.cns_backend.model.recursos.DiaNoHabilDTO;
 import com.Hospital.CNS.cns_backend.model.recursos.FakeDiaNoHabilRepository;
 
 /**
- * CU-04 (T100-06) con Fakes. Hoy: miercoles 18/11/2026 07:00. La ventana de 15 dias habiles llega hasta el
+ * CU-04 (T100-06) con Fakes: el paciente elige solo la especialidad. Hoy: miercoles 18/11/2026 07:00. La ventana de 15 dias habiles llega hasta el
  * miercoles 09/12/2026 (la misma que usa AsignacionService).
  */
 class SolicitudServiceTest {
@@ -47,20 +47,20 @@ class SolicitudServiceTest {
     private final SolicitudService service = new SolicitudService(solicitudes, citas,
             new CalendarioHabil(diasNoHabiles), new RelojFijo(AHORA));
 
-    // ---- Camino principal ----
+    // ---- Camino principal: el paciente elige SOLO la especialidad ----
 
     @Test
-    @DisplayName("CP-12: una solicitud valida (especialidad y dia habil) queda PENDIENTE en la cola con prioridad 1 "
-            + "y numero de llegada creciente")
-    void solicitudValida_quedaPendienteConPrioridad1YOrdenCreciente() {
-        SolicitudDTO primera = service.solicitar(PACIENTE, FAMILIAR, LUNES);
-        SolicitudDTO segunda = service.solicitar(OTRO_PACIENTE, TipoEspecialidad.PEDIATRIA, LUNES);
+    @DisplayName("CP-12: una solicitud valida (solo especialidad) queda PENDIENTE con prioridad 1, numero de llegada "
+            + "creciente y la busqueda empieza hoy (dia habil); el paciente no elige dia")
+    void solicitudValida_quedaPendienteDesdeHoy() {
+        SolicitudDTO primera = service.solicitar(PACIENTE, FAMILIAR);
+        SolicitudDTO segunda = service.solicitar(OTRO_PACIENTE, TipoEspecialidad.PEDIATRIA);
 
         assertEquals(EstadoSolicitud.PENDIENTE, primera.estado());
         assertEquals(1, primera.prioridad());
-        assertEquals(LUNES, primera.diaSolicitado());
+        assertEquals(HOY, primera.diaSolicitado(), "el sistema empieza a buscar cupo desde hoy");
         assertEquals(FAMILIAR, primera.especialidad());
-        assertNull(primera.citaId(), "el paciente no elige medico, hora ni consultorio: la cita la asigna CU-05");
+        assertNull(primera.citaId(), "el paciente no elige dia, medico, hora ni consultorio: la cita la asigna CU-05");
         assertTrue(primera.ordenLlegada() > 0);
         assertTrue(segunda.ordenLlegada() > primera.ordenLlegada(), "el orden de llegada es creciente");
         assertEquals(2, solicitudes.solicitudes.size());
@@ -68,74 +68,57 @@ class SolicitudServiceTest {
     }
 
     @Test
-    void ultimoDiaDeLaVentana_seAcepta() {
-        assertEquals(EstadoSolicitud.PENDIENTE, service.solicitar(PACIENTE, FAMILIAR, LIMITE).estado());
+    void hoyNoHabil_empiezaElSiguienteDiaHabil() {
+        SolicitudService enDomingo = new SolicitudService(solicitudes, citas, new CalendarioHabil(diasNoHabiles),
+                new RelojFijo(DOMINGO.atTime(9, 0)));
+
+        assertEquals(LUNES, enDomingo.solicitar(PACIENTE, FAMILIAR).diaSolicitado());
     }
 
     @Test
-    void hoy_seAcepta() {
-        assertEquals(EstadoSolicitud.PENDIENTE, service.solicitar(PACIENTE, FAMILIAR, HOY).estado());
+    void hoyFeriado_empiezaElSiguienteDiaHabil() {
+        diasNoHabiles.store(new DiaNoHabilDTO(1, HOY, "Feriado", true));
+
+        assertEquals(HOY.plusDays(1), service.solicitar(PACIENTE, FAMILIAR).diaSolicitado());
     }
 
-    // ---- Dia no habil y fuera de rango ----
+    // ---- Solicitud duplicada ----
 
     @Test
-    @DisplayName("CP-13: solicitar una cita para un domingo es rechazado con DIA_NO_HABIL")
-    void domingo_diaNoHabil() {
-        assertCodigo("DIA_NO_HABIL", () -> service.solicitar(PACIENTE, FAMILIAR, DOMINGO));
-        assertTrue(solicitudes.solicitudes.isEmpty());
-    }
+    @DisplayName("CP-15: un paciente con una solicitud en curso de la misma especialidad no puede pedir otra: "
+            + "YA_TIENE_SOLICITUD_ACTIVA")
+    void solicitudActivaMismaEspecialidad_rechazada() {
+        service.solicitar(PACIENTE, FAMILIAR);
 
-    @Test
-    void feriado_diaNoHabil() {
-        diasNoHabiles.store(new DiaNoHabilDTO(1, LUNES, "Feriado", true));
-
-        assertCodigo("DIA_NO_HABIL", () -> service.solicitar(PACIENTE, FAMILIAR, LUNES));
-    }
-
-    @Test
-    @DisplayName("CP-14: solicitar para un dia habil mas alla de los 15 dias habiles es rechazado con FUERA_DE_RANGO")
-    void masAllaDe15DiasHabiles_fueraDeRango() {
-        LocalDate jueves = LIMITE.plusDays(1);
-
-        assertCodigo("FUERA_DE_RANGO", () -> service.solicitar(PACIENTE, FAMILIAR, jueves));
-        assertTrue(solicitudes.solicitudes.isEmpty());
-    }
-
-    @Test
-    void diaPasado_fueraDeRango() {
-        assertCodigo("FUERA_DE_RANGO", () -> service.solicitar(PACIENTE, FAMILIAR, HOY.minusDays(1)));
-    }
-
-    // ---- El paciente ya tiene cita ese dia ----
-
-    @Test
-    @DisplayName("CP-15: un paciente que ya tiene cita ese dia en otra especialidad no puede solicitar otra: "
-            + "YA_TIENE_CITA_ESE_DIA")
-    void citaEnOtraEspecialidadEseDia_yaTieneCita() {
-        cita(PACIENTE, TipoEspecialidad.PEDIATRIA, LUNES, EstadoCita.PROGRAMADA);
-
-        assertCodigo("YA_TIENE_CITA_ESE_DIA", () -> service.solicitar(PACIENTE, FAMILIAR, LUNES));
-        assertTrue(solicitudes.solicitudes.isEmpty());
-    }
-
-    @Test
-    void solicitudActivaEseDia_yaTieneCita() {
-        service.solicitar(PACIENTE, FAMILIAR, LUNES);
-
-        assertCodigo("YA_TIENE_CITA_ESE_DIA",
-                () -> service.solicitar(PACIENTE, TipoEspecialidad.ODONTOLOGIA, LUNES));
+        assertCodigo("YA_TIENE_SOLICITUD_ACTIVA", () -> service.solicitar(PACIENTE, FAMILIAR));
         assertEquals(1, solicitudes.solicitudes.size());
     }
 
     @Test
-    void citaCanceladaEseDia_noImpide() {
-        cita(PACIENTE, FAMILIAR, LUNES, EstadoCita.CANCELADA);
+    void solicitudEnEsperaMismaEspecialidad_rechazada() {
+        SolicitudDTO s = service.solicitar(PACIENTE, FAMILIAR);
+        solicitudes.store(conEstado(s, EstadoSolicitud.EN_ESPERA));
 
-        assertEquals(EstadoSolicitud.PENDIENTE, service.solicitar(PACIENTE, FAMILIAR, LUNES).estado());
+        assertCodigo("YA_TIENE_SOLICITUD_ACTIVA", () -> service.solicitar(PACIENTE, FAMILIAR));
     }
 
-    // ---- Reprogramacion ----
+    @Test
+    void otraEspecialidad_seAcepta() {
+        service.solicitar(PACIENTE, FAMILIAR);
+
+        assertEquals(EstadoSolicitud.PENDIENTE,
+                service.solicitar(PACIENTE, TipoEspecialidad.ODONTOLOGIA).estado());
+    }
+
+    @Test
+    void solicitudAnteriorAsignadaOSinCupo_noImpide() {
+        SolicitudDTO s = service.solicitar(PACIENTE, FAMILIAR);
+        solicitudes.store(conEstado(s, EstadoSolicitud.SIN_CUPO));
+
+        assertEquals(EstadoSolicitud.PENDIENTE, service.solicitar(PACIENTE, FAMILIAR).estado());
+    }
+
+    // ---- Reprogramacion (CU-10): parte de un dia concreto ----
 
     @Test
     @DisplayName("CP-16: una solicitud de reprogramacion entra a la cola con prioridad 2")
@@ -143,42 +126,71 @@ class SolicitudServiceTest {
         SolicitudDTO s = service.solicitarReprogramada(PACIENTE, FAMILIAR, LUNES);
 
         assertEquals(2, s.prioridad());
+        assertEquals(LUNES, s.diaSolicitado());
         assertEquals(EstadoSolicitud.PENDIENTE, s.estado());
+    }
+
+    @Test
+    @DisplayName("CP-13: reprogramar para un domingo es rechazado con DIA_NO_HABIL")
+    void reprogramacionDomingo_diaNoHabil() {
+        assertCodigo("DIA_NO_HABIL", () -> service.solicitarReprogramada(PACIENTE, FAMILIAR, DOMINGO));
+        assertTrue(solicitudes.solicitudes.isEmpty());
+    }
+
+    @Test
+    @DisplayName("CP-14: reprogramar mas alla de los 15 dias habiles o a un dia pasado es FUERA_DE_RANGO")
+    void reprogramacionFueraDeVentana_fueraDeRango() {
+        assertEquals(EstadoSolicitud.PENDIENTE, service.solicitarReprogramada(PACIENTE, FAMILIAR, LIMITE).estado());
+        assertCodigo("FUERA_DE_RANGO",
+                () -> service.solicitarReprogramada(OTRO_PACIENTE, FAMILIAR, LIMITE.plusDays(1)));
+        assertCodigo("FUERA_DE_RANGO",
+                () -> service.solicitarReprogramada(OTRO_PACIENTE, FAMILIAR, HOY.minusDays(1)));
+    }
+
+    @Test
+    void reprogramacionConCitaEseDia_yaTieneCita() {
+        cita(PACIENTE, TipoEspecialidad.PEDIATRIA, LUNES, EstadoCita.PROGRAMADA);
+
+        assertCodigo("YA_TIENE_CITA_ESE_DIA", () -> service.solicitarReprogramada(PACIENTE, FAMILIAR, LUNES));
     }
 
     // ---- Datos invalidos ----
 
     @Test
     void especialidadInterna_especialidadInvalida() {
-        assertCodigo("ESPECIALIDAD_INVALIDA",
-                () -> service.solicitar(PACIENTE, TipoEspecialidad.CARDIOLOGIA, LUNES));
+        assertCodigo("ESPECIALIDAD_INVALIDA", () -> service.solicitar(PACIENTE, TipoEspecialidad.CARDIOLOGIA));
     }
 
     @Test
-    void sinEspecialidadOSinDia_datosInvalidos() {
-        assertCodigo("DATOS_INVALIDOS", () -> service.solicitar(PACIENTE, null, LUNES));
-        assertCodigo("DATOS_INVALIDOS", () -> service.solicitar(PACIENTE, FAMILIAR, null));
+    void sinEspecialidad_datosInvalidos() {
+        assertCodigo("DATOS_INVALIDOS", () -> service.solicitar(PACIENTE, null));
+        assertCodigo("DATOS_INVALIDOS", () -> service.solicitarReprogramada(PACIENTE, FAMILIAR, null));
     }
 
     // ---- Consultas (Mis citas) ----
 
     @Test
     void listar_soloLasDelPaciente_masRecienteprimero() {
-        SolicitudDTO lunes = service.solicitar(PACIENTE, FAMILIAR, LUNES);
-        SolicitudDTO martes = service.solicitar(PACIENTE, FAMILIAR, LUNES.plusDays(1));
-        service.solicitar(OTRO_PACIENTE, FAMILIAR, LUNES);
+        SolicitudDTO familiar = service.solicitar(PACIENTE, FAMILIAR);
+        SolicitudDTO odonto = service.solicitar(PACIENTE, TipoEspecialidad.ODONTOLOGIA);
+        service.solicitar(OTRO_PACIENTE, FAMILIAR);
 
         List<Long> ids = service.listarPorPaciente(PACIENTE).stream().map(SolicitudDTO::solicitudId).toList();
 
-        assertEquals(List.of(martes.solicitudId(), lunes.solicitudId()), ids);
+        assertEquals(List.of(odonto.solicitudId(), familiar.solicitudId()), ids);
     }
 
     @Test
     void consultar_deOtroPaciente_noEsDelPaciente() {
-        SolicitudDTO s = service.solicitar(PACIENTE, FAMILIAR, LUNES);
+        SolicitudDTO s = service.solicitar(PACIENTE, FAMILIAR);
 
         assertCodigo("NO_ES_DEL_PACIENTE", () -> service.consultar(OTRO_PACIENTE, s.solicitudId()));
         assertCodigo("NO_ENCONTRADA", () -> service.consultar(PACIENTE, 999));
+    }
+
+    private static SolicitudDTO conEstado(SolicitudDTO s, EstadoSolicitud estado) {
+        return new SolicitudDTO(s.solicitudId(), s.pacienteId(), s.especialidad(), s.diaSolicitado(), s.prioridad(),
+                s.ordenLlegada(), estado, s.citaId());
     }
 
     private void cita(long pacienteId, TipoEspecialidad especialidad, LocalDate dia, EstadoCita estado) {
