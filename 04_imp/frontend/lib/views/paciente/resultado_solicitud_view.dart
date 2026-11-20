@@ -98,7 +98,7 @@ class ResultadoSolicitudView extends StatelessWidget {
                           resultado.solicitudId.toString()),
                       _dato('Especialidad', _nombreEspecialidad()),
                       _dato(
-                        'Día solicitado',
+                        'Buscando cupo desde',
                         _formatearFecha(resultado.diaSolicitado),
                       ),
                       _dato('Orden de llegada',

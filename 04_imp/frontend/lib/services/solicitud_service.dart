@@ -3,10 +3,8 @@ import '../models/catalogo/especialidad.dart';
 import '../models/solicitud/solicitud.dart';
 
 abstract class SolicitudService {
-  Future<ResultadoSolicitud> solicitar(
-    Especialidad especialidad,
-    DateTime dia,
-  );
+  /// El paciente solo envía la especialidad: el día, médico, hora y consultorio los asigna el sistema.
+  Future<ResultadoSolicitud> solicitar(Especialidad especialidad);
 
   Future<ResultadoSolicitud> consultar(int solicitudId);
 
@@ -19,21 +17,10 @@ class ApiSolicitudService implements SolicitudService {
   final ApiClient _api;
 
   @override
-  Future<ResultadoSolicitud> solicitar(
-    Especialidad especialidad,
-    DateTime dia,
-  ) async {
-    final fecha =
-        '${dia.year.toString().padLeft(4, '0')}-'
-        '${dia.month.toString().padLeft(2, '0')}-'
-        '${dia.day.toString().padLeft(2, '0')}';
-
+  Future<ResultadoSolicitud> solicitar(Especialidad especialidad) async {
     final respuesta = await _api.post(
       '/api/v1/solicitudes',
-      {
-        'especialidad': especialidad.codigo,
-        'diaSolicitado': fecha,
-      },
+      {'especialidad': especialidad.codigo},
     );
 
     return leerRespuesta(

@@ -19,92 +19,12 @@ final SolicitudController controller;
 
 class _SolicitarCitaViewState extends State<SolicitarCitaView> {
   Especialidad? especialidadSeleccionada;
-  DateTime? fechaSeleccionada;
-
-  DateTime _sumarDiasHabiles(DateTime fecha, int cantidad) {
-    var resultado = fecha;
-    var contados = 0;
-
-    while (contados < cantidad) {
-      resultado = resultado.add(const Duration(days: 1));
-
-      if (resultado.weekday >= DateTime.monday &&
-          resultado.weekday <= DateTime.friday) {
-        contados++;
-      }
-    }
-
-    return resultado;
-  }
-
-  bool _esDiaHabil(DateTime fecha) {
-    return fecha.weekday >= DateTime.monday &&
-        fecha.weekday <= DateTime.friday;
-  }
-
-  Future<void> _seleccionarFecha() async {
-    final hoy = DateUtils.dateOnly(DateTime.now());
-    final primerDia = hoy.add(const Duration(days: 1));
-    final ultimoDia = _sumarDiasHabiles(hoy, 15);
-
-    final fecha = await showDatePicker(
-      context: context,
-      initialDate: primerDia,
-      firstDate: primerDia,
-      lastDate: ultimoDia,
-      selectableDayPredicate: _esDiaHabil,
-      helpText: 'Seleccione el día de su solicitud',
-      cancelText: 'Cancelar',
-      confirmText: 'Aceptar',
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context),
-          child: child!,
-        );
-      },
-    );
-
-    if (fecha != null) {
-      setState(() {
-        fechaSeleccionada = fecha;
-      });
-    }
-  }
-
-  String _formatearFecha(DateTime fecha) {
-    const dias = [
-      'lunes',
-      'martes',
-      'miércoles',
-      'jueves',
-      'viernes',
-      'sábado',
-      'domingo',
-    ];
-
-    const meses = [
-      'enero',
-      'febrero',
-      'marzo',
-      'abril',
-      'mayo',
-      'junio',
-      'julio',
-      'agosto',
-      'septiembre',
-      'octubre',
-      'noviembre',
-      'diciembre',
-    ];
-
-    return '${dias[fecha.weekday - 1]}, ${fecha.day} de ${meses[fecha.month - 1]}';
-  }
 
   Future<void> _continuar() async {
-  if (especialidadSeleccionada == null || fechaSeleccionada == null) {
+  if (especialidadSeleccionada == null) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Seleccione una especialidad y un día.'),
+        content: Text('Seleccione una especialidad.'),
       ),
     );
     return;
@@ -112,7 +32,6 @@ class _SolicitarCitaViewState extends State<SolicitarCitaView> {
 
   final resultado = await widget.controller.solicitar(
     especialidadSeleccionada!,
-    fechaSeleccionada!,
   );
 
   if (!mounted) return;
@@ -161,13 +80,14 @@ class _SolicitarCitaViewState extends State<SolicitarCitaView> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Seleccione la especialidad y el día que desea recibir atención.',
+                'Seleccione la especialidad. El sistema le asignará médico, día y hora '
+                'en cuanto haya un cupo disponible y le avisará.',
                 style: tema.textTheme.bodyMedium,
               ),
               const SizedBox(height: 28),
 
               Text(
-                '1. Seleccione una especialidad',
+                'Seleccione una especialidad',
                 style: tema.textTheme.titleMedium,
               ),
               const SizedBox(height: 12),
@@ -224,32 +144,6 @@ class _SolicitarCitaViewState extends State<SolicitarCitaView> {
               }),
 
               const SizedBox(height: 24),
-
-              Text(
-                '2. Seleccione un día',
-                style: tema.textTheme.titleMedium,
-              ),
-              const SizedBox(height: 12),
-
-              Card(
-                child: ListTile(
-                  leading: Icon(
-                    Icons.calendar_month,
-                    color: colores.primary,
-                    size: 32,
-                  ),
-                  title: Text(
-                    fechaSeleccionada == null
-                        ? 'Elegir fecha'
-                        : _formatearFecha(fechaSeleccionada!),
-                  ),
-                  subtitle: const Text(
-                    'Próximos 15 días hábiles',
-                  ),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: _seleccionarFecha,
-                ),
-              ),
 
               const SizedBox(height: 28),
 

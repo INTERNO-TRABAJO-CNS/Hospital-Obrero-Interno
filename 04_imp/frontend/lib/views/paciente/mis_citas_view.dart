@@ -183,7 +183,7 @@ class _MisCitasViewState extends State<MisCitasView> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Día solicitado: ${_fecha(solicitud.diaSolicitado)}',
+                  'Buscando cupo desde: ${_fecha(solicitud.diaSolicitado)}',
                 ),
               ],
             ),

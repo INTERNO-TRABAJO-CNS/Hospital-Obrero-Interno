@@ -17,17 +17,14 @@ class SolicitudController extends ChangeNotifier {
 
   List<ResultadoSolicitud> solicitudes = [];
 
-  Future<ResultadoSolicitud?> solicitar(
-    Especialidad especialidad,
-    DateTime dia,
-  ) async {
+  Future<ResultadoSolicitud?> solicitar(Especialidad especialidad) async {
     cargando = true;
     error = null;
     resultado = null;
     notifyListeners();
 
     try {
-      resultado = await _service.solicitar(especialidad, dia);
+      resultado = await _service.solicitar(especialidad);
       return resultado;
     } on ApiException catch (e) {
       error = e.mensaje;
