@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
 import '../controllers/sesion_controller.dart';
+import '../controllers/notificaciones_controller.dart';
 import '../models/auth/sesion.dart';
 import '../services/auth_service.dart';
 import '../services/catalogo_service.dart';
 import '../services/fake_catalogo_service.dart';
 import '../services/paciente_service.dart';
+import '../services/notificaciones_service.dart';
 import '../views/admin/catalogos_view.dart';
 import '../views/auth/login_view.dart';
 import '../views/auth/registro_titular_view.dart';
 import '../views/paciente/home_paciente_view.dart';
+import '../views/paciente/notificaciones_view.dart';
 import '../views/paciente/registro_beneficiario_view.dart';
 import '../views/shell/app_shell.dart';
 import 'api_client.dart';
@@ -23,6 +26,7 @@ class AppRutas {
   static const String salir = '/salir';
   static const String registro = '/registro';
   static const String paciente = '/paciente';
+  static const String notificaciones = '/paciente/notificaciones';
   static const String beneficiario = '/paciente/beneficiario';
   static const String medico = '/medico';
   static const String enfermeria = '/enfermeria';
@@ -70,6 +74,7 @@ Route<dynamic> generarRuta(RouteSettings ajustes) {
                 rutaActual: nombre,
                 destinos: const [
                   DestinoShell(etiqueta: 'Inicio', icono: Icons.home_outlined, ruta: AppRutas.paciente),
+                  DestinoShell(etiqueta: 'Notificaciones', icono: Icons.notifications_outlined, ruta: AppRutas.notificaciones),
                   DestinoShell(etiqueta: 'Salir', icono: Icons.logout, ruta: AppRutas.salir),
                 ],
                 child: HomePacienteView(
@@ -77,6 +82,24 @@ Route<dynamic> generarRuta(RouteSettings ajustes) {
                   alSolicitarCita: () => _pronto(context, 'Solicitar cita'), // T100-06
                   alMisCitas: () => _pronto(context, 'Mis citas'), // T100-07
                   alRegistrarBeneficiario: () => Navigator.of(context).pushNamed(AppRutas.beneficiario),
+                ),
+              ),
+            );
+    case AppRutas.notificaciones:
+      final sesion = sesionApp.sesion;
+      pagina = sesion == null || sesion.rol != Rol.paciente
+          ? _login()
+          : AppShell(
+              rutaActual: nombre,
+              destinos: const [
+                DestinoShell(etiqueta: 'Inicio', icono: Icons.home_outlined, ruta: AppRutas.paciente),
+                DestinoShell(etiqueta: 'Notificaciones', icono: Icons.notifications_outlined, ruta: AppRutas.notificaciones),
+                DestinoShell(etiqueta: 'Salir', icono: Icons.logout, ruta: AppRutas.salir),
+              ],
+              child: NotificacionesView(
+                controller: NotificacionesController(
+                  RestNotificacionesService(apiApp),
+                  sesion.personaId,
                 ),
               ),
             );
