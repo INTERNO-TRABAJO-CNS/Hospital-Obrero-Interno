@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../models/sesion_dto.dart';
+import '../models/auth/sesion.dart';
 
 class MenuPage extends StatelessWidget {
-  const MenuPage({super.key, required this.sesion, required this.onLogout});
+  const MenuPage({
+    super.key,
+    required this.sesion,
+    required this.permisos,
+    required this.onLogout,
+  });
 
-  final SesionDto sesion;
+  final Sesion sesion;
+  final Set<String> permisos;
   final VoidCallback onLogout;
 
   static const _options = <_MenuOption>[
@@ -49,12 +55,12 @@ class MenuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final availableOptions = _options
-        .where((option) => sesion.permisos.contains(option.permission))
+        .where((option) => permisos.contains(option.permission))
         .toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Menu - ${sesion.rol}'),
+        title: Text('Menu - ${sesion.rol.codigo}'),
         actions: [
           IconButton(
             onPressed: onLogout,
@@ -66,7 +72,7 @@ class MenuPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          Text('Bienvenido, ${sesion.nombreUsuario}'),
+          Text('Bienvenido, ${sesion.nombre}'),
           const SizedBox(height: 24),
           if (availableOptions.isEmpty)
             const Text('No tienes opciones habilitadas.')
