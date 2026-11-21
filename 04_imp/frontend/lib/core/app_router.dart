@@ -1,12 +1,15 @@
+
 import 'package:flutter/material.dart';
 
 import '../controllers/enfermeria_controller.dart';
+import '../controllers/fichas_controller.dart';
 import '../controllers/sesion_controller.dart';
 import '../models/auth/sesion.dart';
 import '../services/auth_service.dart';
 import '../services/catalogo_service.dart';
 import '../services/cuentas_service.dart';
 import '../services/enfermeria_service.dart';
+import '../services/fichas_service.dart';
 import '../services/fake_catalogo_service.dart';
 import '../services/historial_cambios_service.dart';
 import '../services/paciente_service.dart';
@@ -25,6 +28,7 @@ import '../views/enfermeria/fichas_dia_view.dart';
 import '../views/paciente/home_paciente_view.dart';
 import '../views/paciente/registro_beneficiario_view.dart';
 import '../views/shell/app_shell.dart';
+import '../views/tv/tv_fichas_view.dart';
 import 'api_client.dart';
 import 'responsive.dart';
 
@@ -172,10 +176,10 @@ Widget _pagina(String nombre) {
       return _personal(Rol.administrador, nombre, 'Historial de cambios', menuAdmin,
           (_) => HistorialCambiosView(servicio: historialApp));
     case AppRutas.tv:
-      return const AppShell(
+      return AppShell(
         rutaActual: AppRutas.tv,
-        destinos: [],
-        child: PantallaMarcador(titulo: 'Fichas del dia'),
+        destinos: const [],
+        child: TvFichasView(controller: fichasTvController),
       );
     default:
       return _login();
@@ -217,6 +221,11 @@ Future<void> _cerrarSesion(BuildContext context) async {
 
 /// Cliente HTTP compartido: al iniciar sesion lleva el token (Authorization: Bearer).
 final ApiClient apiApp = ApiClient()..alPerderSesion = _alPerderSesion;
+
+/// Servicio y controlador de las fichas para la pantalla de TV.
+final FichasService fichasTvService = FichasService(apiApp);
+final FichasController fichasTvController =
+    FichasController(fichasService: fichasTvService);
 
 /// El backend respondio 401 a una peticion con token: la sesion vencio o se cerro.
 void _alPerderSesion(ApiException error) {

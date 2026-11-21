@@ -1,47 +1,49 @@
 package com.Hospital.CNS.cns_backend.model.operaciones;
 
-import com.Hospital.CNS.cns_backend.model.compartido.CitaRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.CitaDTO;
 import com.Hospital.CNS.cns_backend.model.compartido.EstadoCita;
+import com.Hospital.CNS.cns_backend.model.compartido.FakeCitaRepository;
+import com.Hospital.CNS.cns_backend.model.compartido.FichaTvDTO;
+import com.Hospital.CNS.cns_backend.model.compartido.RelojFijo;
 import com.Hospital.CNS.cns_backend.model.compartido.TipoEspecialidad;
-import com.Hospital.CNS.cns_backend.model.compartido.Reloj;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 class FichasDelDiaServiceTest {
 
-    private CitaRepository citaRepository;
-    private Reloj reloj;
+    private FakeCitaRepository citaRepository;
+    private RelojFijo reloj;
     private FichasDelDiaService service;
+
     private final LocalDate HOY = LocalDate.of(2026, 11, 14);
 
     @BeforeEach
     void setUp() {
-        citaRepository = Mockito.mock(CitaRepository.class);
-        reloj = Mockito.mock(Reloj.class);
-        when(reloj.ahora()).thenReturn(HOY.atStartOfDay());
+        citaRepository = new FakeCitaRepository();
+        reloj = new RelojFijo(HOY.atStartOfDay());
         service = new FichasDelDiaService(citaRepository, reloj);
+    }
+
+    private CitaDTO crearCita(long id, LocalDate fecha, LocalTime hora, int ficha, String paciente, String medico) {
+        return new CitaDTO(
+                id, 100L + id, paciente, "AF-" + id,
+                200L + id, medico, TipoEspecialidad.CARDIOLOGIA, 1,
+                fecha, hora, ficha, EstadoCita.PROGRAMADA
+        );
     }
 
     @Test
     void buscar_porMedico() {
-        CitaDTO cita = new CitaDTO(
-            1L, 100L, "Juan Perez", "12345", 
-            200L, "Dr. Pérez", TipoEspecialidad.CARDIOLOGIA, 1, 
-            HOY, LocalTime.of(10, 0), 1, EstadoCita.PROGRAMADA
+        citaRepository.citas.add(
+                crearCita(1L, HOY, LocalTime.of(10, 0), 1, "Juan Perez", "Dr. Pérez")
         );
-        
-        when(citaRepository.delDia(HOY)).thenReturn(List.of(cita));
 
         List<CitaDTO> resultado = service.buscar(CriterioFicha.MEDICO, "Pérez");
 
@@ -50,7 +52,7 @@ class FichasDelDiaServiceTest {
     }
 
     @Test
-    void buscar_fechaDistintaDeHoy_rechaza() {
+    void buscar_sinCriterio_rechaza() {
         assertThrows(IllegalArgumentException.class, () -> {
             service.buscar(null, "Valor");
         });
@@ -58,13 +60,9 @@ class FichasDelDiaServiceTest {
 
     @Test
     void buscar_sinCoincidencias_vacio() {
-        CitaDTO cita = new CitaDTO(
-            1L, 100L, "Juan Perez", "12345", 
-            200L, "Dr. Pérez", TipoEspecialidad.CARDIOLOGIA, 1, 
-            HOY, LocalTime.of(10, 0), 1, EstadoCita.PROGRAMADA
+        citaRepository.citas.add(
+                crearCita(1L, HOY, LocalTime.of(10, 0), 1, "Juan Perez", "Dr. Pérez")
         );
-        
-        when(citaRepository.delDia(HOY)).thenReturn(List.of(cita));
 
         List<CitaDTO> resultado = service.buscar(CriterioFicha.PACIENTE, "Inexistente");
 
@@ -72,18 +70,32 @@ class FichasDelDiaServiceTest {
     }
 
     @Test
-    void listadoTv_soloDeHoy() {
-        CitaDTO cita = new CitaDTO(
-            1L, 100L, "Juan Perez", "12345", 
-            200L, "Dr. Pérez", TipoEspecialidad.CARDIOLOGIA, 1, 
-            HOY, LocalTime.of(10, 0), 1, EstadoCita.PROGRAMADA
-        );
-        
-        when(citaRepository.delDia(HOY)).thenReturn(List.of(cita));
+    void listadoDelDia_excluyeCitasDeOtraFecha() {
+        CitaDTO citaHoy = crearCita(1L, HOY, LocalTime.of(9, 0), 1, "Ana López", "Dra. Gómez");
+        CitaDTO citaManana = crearCita(2L, HOY.plusDays(1), LocalTime.of(11, 0), 2, "Carlos Ruiz", "Dr. Pérez");
+        citaRepository.citas.addAll(List.of(citaHoy, citaManana));
 
-        List<CitaDTO> resultado = service.listadoParaTv();
+        List<CitaDTO> resultado = service.listadoDelDia();
 
         assertEquals(1, resultado.size());
-        assertEquals(1L, resultado.get(0).citaId());
+        assertEquals("Ana López", resultado.get(0).nombrePaciente());
+        assertEquals("AF-1", resultado.get(0).numeroAfiliado());
+    }
+
+    @Test
+    void listadoTv_soloDeHoy() {
+        citaRepository.citas.addAll(List.of(
+                crearCita(1L, HOY, LocalTime.of(10, 0), 5, "Juan Perez", "Dr. Pérez"),
+                crearCita(2L, HOY.minusDays(1), LocalTime.of(8, 0), 9, "Otro Paciente", "Dr. Pérez")
+        ));
+
+        List<FichaTvDTO> resultado = service.listadoParaTv();
+
+        assertEquals(1, resultado.size());
+        assertEquals(5, resultado.get(0).numeroFicha());
+        assertEquals(LocalTime.of(10, 0), resultado.get(0).hora());
+        assertEquals(TipoEspecialidad.CARDIOLOGIA, resultado.get(0).especialidad());
+        assertEquals(1, resultado.get(0).consultorio());
+        assertEquals(EstadoCita.PROGRAMADA, resultado.get(0).estado());
     }
 }
