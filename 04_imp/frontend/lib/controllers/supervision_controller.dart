@@ -19,13 +19,21 @@ enum PestanaSupervision {
   final String titulo;
 }
 
-/// Supervision del administrador (solo lectura). Se vuelve a pedir cada [intervalo].
+/// Supervision del administrador (solo lectura). Las citas comunes se vuelven a pedir apenas el
+/// WebSocket avisa un cambio (RNF-08); ademas se refresca cada [intervalo] por si se corta la conexion.
 class SupervisionController extends ChangeNotifier with AvisoSeguro {
   SupervisionController(this._servicio, {this.intervalo = const Duration(seconds: 15)});
 
   final SupervisionService _servicio;
   final Duration intervalo;
   Timer? _temporizador;
+  StreamSubscription<void>? _cambios;
+
+  /// La pestaña de citas comunes muestra datos de prueba (sin backend).
+  bool get citasDePrueba => _servicio.citasDePrueba;
+
+  /// Datos de prueba en la pestaña actual (fichas internas y quirofanos todavia no tienen backend).
+  bool get datosDePrueba => pestana != PestanaSupervision.citas || citasDePrueba;
 
   PestanaSupervision pestana = PestanaSupervision.citas;
 
@@ -44,6 +52,17 @@ class SupervisionController extends ChangeNotifier with AvisoSeguro {
     cargar();
     _temporizador?.cancel();
     _temporizador = Timer.periodic(intervalo, (_) => cargar());
+    _escucharCambios();
+  }
+
+  /// Cada cambio de cita recarga las citas comunes. Si la conexion se corta, queda el refresco periodico.
+  void _escucharCambios() {
+    _cambios?.cancel();
+    _cambios = _servicio.cambios().listen((_) {
+      if (pestana == PestanaSupervision.citas) {
+        cargar();
+      }
+    }, onError: (Object _) {});
   }
 
   Future<void> cargar() async {
@@ -86,6 +105,7 @@ class SupervisionController extends ChangeNotifier with AvisoSeguro {
   @override
   void dispose() {
     _temporizador?.cancel();
+    _cambios?.cancel();
     super.dispose();
   }
 }

@@ -595,12 +595,23 @@ final FakeEnfermeriaService enfermeriaApp =
 final QuirofanoService quirofanosApp =
     _catalogoFake ? FakeQuirofanoService() : ApiQuirofanoService(apiApp);
 
-final SupervisionService supervisionApp = FakeSupervisionService(
+/// Supervision y reportes del administrador (T100-04, CU-19/CU-20). Con AUTH_FAKE o REPORTES_FAKE
+/// usan datos de prueba; si no, el backend (fichas internas y quirofanos siguen siendo de prueba).
+const bool _reportesFake =
+    bool.fromEnvironment('AUTH_FAKE') || bool.fromEnvironment('REPORTES_FAKE');
+
+final SupervisionService _supervisionPrueba = FakeSupervisionService(
   enfermeria: enfermeriaApp,
   quirofanos: quirofanosApp,
 );
 
-final ReportesService reportesApp = FakeReportesService();
+final SupervisionService supervisionApp = _reportesFake
+    ? _supervisionPrueba
+    : ApiSupervisionService(apiApp, respaldo: _supervisionPrueba);
+
+final ReportesService reportesApp = _reportesFake
+    ? FakeReportesService()
+    : ApiReportesService(apiApp, respaldo: FakeReportesService());
 
 /// Médico (CU-13/14/15).
 const bool _medicoFake =

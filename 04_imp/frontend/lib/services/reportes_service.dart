@@ -1,18 +1,187 @@
+import '../core/api_client.dart';
+import '../models/catalogo/especialidad.dart';
 import '../models/catalogo/medico.dart';
 import '../models/comun/fechas.dart';
+import '../models/comun/fechas_iso.dart';
+import '../models/enfermeria/ficha_dia.dart' show EstadoCita;
 import '../models/reportes/reporte.dart';
+import '../models/reportes/reporte_api.dart';
+import 'catalogo_service.dart' show listaDe, unoDe;
 
 /// Reportes e indicadores del administrador.
 abstract class ReportesService {
   /// Reporte de la semana actual (lunes a viernes).
   Future<Reporte> reporte(TipoReporte tipo);
+
+  /// `true` si ese reporte muestra datos de prueba (sin backend).
+  bool esDePrueba(TipoReporte tipo);
 }
 
-/// De prueba: cifras fijas parecidas a las del Figma. El backend todavia no calcula reportes.
+/// CU-19/CU-20 con el backend (GET /api/v1/admin/reportes/...), siempre de la semana actual (lunes a
+/// viernes). Un indicador sin datos que lo respalden se muestra como «Sin datos» (CU-20 3a). Fichas
+/// internas y quirofanos todavia no se calculan en el backend: se piden a [respaldo] (datos de prueba).
+class ApiReportesService implements ReportesService {
+  ApiReportesService(this._api, {required ReportesService respaldo, DateTime Function()? reloj})
+      : _respaldo = respaldo,
+        _reloj = reloj ?? DateTime.now;
+
+  final ApiClient _api;
+  final ReportesService _respaldo;
+  final DateTime Function() _reloj;
+
+  static const String _base = '/api/v1/admin/reportes';
+  static const String sinDatos = 'Sin datos';
+  static const String _notaTiempos = 'Tiempos de espera y de atención por separado no se miden: solo confirmación → fin';
+
+  @override
+  bool esDePrueba(TipoReporte tipo) => tipo == TipoReporte.internasYQuirofanos;
+
+  @override
+  Future<Reporte> reporte(TipoReporte tipo) {
+    switch (tipo) {
+      case TipoReporte.porMedico:
+        return _porMedico();
+      case TipoReporte.porEstado:
+        return _porEstado();
+      case TipoReporte.porEspecialidad:
+        return _porEspecialidad();
+      case TipoReporte.porConsultorio:
+        return _porConsultorio();
+      case TipoReporte.internasYQuirofanos:
+        return _respaldo.reporte(tipo);
+    }
+  }
+
+  /// Lunes y viernes de la semana actual.
+  Map<String, String> _semana() {
+    final hoy = soloFecha(_reloj());
+    final lunes = hoy.subtract(Duration(days: hoy.weekday - 1));
+    return {'desde': isoDe(lunes), 'hasta': isoDe(lunes.add(const Duration(days: 4)))};
+  }
+
+  Future<List<T>> _lista<T>(String ruta, T Function(Map<String, dynamic>) convertir) async =>
+      listaDe(await _api.get('$_base/$ruta', consulta: _semana()), convertir);
+
+  Future<IndicadoresGestion> _indicadores() async =>
+      unoDe(await _api.get('$_base/indicadores', consulta: _semana()), IndicadoresGestion.desdeJson);
+
+  Future<Reporte> _porMedico() async {
+    final (medicos, ind) = await (_lista('cumplimiento', CumplimientoMedico.desdeJson), _indicadores()).wait;
+    final carga = ind.fichasPorMedicoDia;
+    final minutos = ind.minutosConfirmacionFin;
+    return Reporte(
+      titulo: 'Fichas atendidas por día (meta mínima $cupoMinimo, máximo $cupoMaximo)',
+      filas: [
+        for (final m in medicos)
+          FilaGrafico(
+            etiqueta: m.nombreMedico,
+            valor: m.promedioDiario,
+            texto: m.bajoMeta
+                ? '${_numero(m.promedioDiario)} fichas · bajo la meta'
+                : '${_numero(m.promedioDiario)} fichas',
+            alerta: m.bajoMeta,
+          ),
+      ],
+      maximo: cupoMaximo,
+      indicadores: [
+        Indicador('${ind.solicitudes} solicitudes', 'Demanda (semana)'),
+        Indicador('${ind.canceladas} (${ind.canceladasAutomaticas} automáticas)', 'Cancelaciones'),
+        Indicador(carga == null ? sinDatos : '${carga.toStringAsFixed(1)} fichas/médico/día', 'Carga de trabajo'),
+        Indicador('${ind.sinCupo} solicitudes', 'Sin cupo'),
+      ],
+      nota: minutos == null ? '$_notaTiempos.' : '$_notaTiempos (promedio de la semana: ${minutos.round()} min).',
+    );
+  }
+
+  Future<Reporte> _porEstado() async {
+    final conteos = await _lista('estado', ConteoEstado.desdeJson);
+    ConteoEstado de(EstadoCita e) => conteos.firstWhere((c) => c.estado == e.codigo,
+        orElse: () => ConteoEstado(estado: e.codigo, cantidad: 0, automaticas: 0));
+    final atendidas = de(EstadoCita.atendida);
+    final confirmadas = de(EstadoCita.asistenciaConfirmada);
+    final programadas = de(EstadoCita.programada);
+    final canceladas = de(EstadoCita.cancelada);
+    final total = conteos.fold(0, (n, c) => n + c.cantidad);
+    String porcentaje(int n) => total == 0 ? sinDatos : '${(n * 100 / total).round()} %';
+    return Reporte(
+      titulo: 'Fichas por estado (semana ${semanaLaboral(_reloj())})',
+      filas: [
+        FilaGrafico(etiqueta: 'Atendidas', valor: atendidas.cantidad, texto: '${atendidas.cantidad} fichas'),
+        FilaGrafico(
+            etiqueta: 'Asist. confirmada', valor: confirmadas.cantidad, texto: '${confirmadas.cantidad} fichas'),
+        FilaGrafico(etiqueta: 'Programadas', valor: programadas.cantidad, texto: '${programadas.cantidad} fichas'),
+        FilaGrafico(
+          etiqueta: 'Canceladas',
+          valor: canceladas.cantidad,
+          texto: '${canceladas.cantidad} fichas (${canceladas.automaticas} automáticas)',
+          alerta: true,
+        ),
+      ],
+      maximo: total,
+      indicadores: [
+        Indicador('$total fichas', 'Total (semana)'),
+        Indicador(porcentaje(atendidas.cantidad), 'Atendidas'),
+        Indicador(porcentaje(canceladas.cantidad), 'Canceladas'),
+        Indicador('${canceladas.automaticas}', 'Canceladas automáticamente'),
+      ],
+      nota: 'Cancelada (automática): el paciente no confirmó su llegada 30 minutos antes de la cita.',
+    );
+  }
+
+  Future<Reporte> _porEspecialidad() async {
+    final (grupos, ind) = await (_lista('especialidad', ConteoGrupo.desdeJson), _indicadores()).wait;
+    final total = grupos.fold(0, (n, g) => n + g.cantidad);
+    final orden = [...grupos]..sort((a, b) => b.cantidad.compareTo(a.cantidad));
+    String nombre(String codigo) => Especialidad.desdeCodigo(codigo).nombre;
+    return Reporte(
+      titulo: 'Solicitudes por especialidad básica (semana ${semanaLaboral(_reloj())})',
+      filas: [
+        for (final g in orden) FilaGrafico(etiqueta: nombre(g.grupo), valor: g.cantidad, texto: '${g.cantidad} solicitudes'),
+      ],
+      maximo: orden.isEmpty ? 0 : orden.first.cantidad,
+      indicadores: [
+        Indicador('$total solicitudes', 'Demanda (semana)'),
+        Indicador('${ind.sinCupo} solicitudes', 'Sin cupo'),
+        Indicador(total == 0 ? sinDatos : nombre(orden.first.grupo), 'La más pedida'),
+        Indicador(total == 0 ? sinDatos : nombre(orden.last.grupo), 'La menos pedida'),
+      ],
+      nota: 'Las especialidades internas no las pide el paciente: llegan por ficha interna '
+          '(ver «Fichas internas y quirófanos»).',
+    );
+  }
+
+  Future<Reporte> _porConsultorio() async {
+    final grupos = await _lista('consultorio', ConteoGrupo.desdeJson);
+    final total = grupos.fold(0, (n, g) => n + g.cantidad);
+    final masUsado = grupos.isEmpty ? null : grupos.reduce((a, b) => b.cantidad > a.cantidad ? b : a);
+    return Reporte(
+      titulo: 'Fichas atendidas por consultorio (semana ${semanaLaboral(_reloj())})',
+      filas: [
+        for (final g in grupos) FilaGrafico(etiqueta: g.grupo, valor: g.cantidad, texto: '${g.cantidad} fichas'),
+      ],
+      maximo: masUsado?.cantidad ?? 0,
+      indicadores: [
+        Indicador('${grupos.length}', 'Consultorios en uso'),
+        Indicador(masUsado?.grupo ?? sinDatos, 'El más usado'),
+        Indicador('$total fichas', 'Atendidas (semana)'),
+        Indicador(grupos.isEmpty ? sinDatos : (total / grupos.length).toStringAsFixed(1), 'Fichas por consultorio'),
+      ],
+      nota: 'Cuenta las fichas atendidas en cada consultorio, sin importar el médico.',
+    );
+  }
+
+  /// 7 -> "7"; 5.5 -> "5.5".
+  static String _numero(double n) => n == n.roundToDouble() ? '${n.round()}' : n.toStringAsFixed(1);
+}
+
+/// De prueba: cifras fijas parecidas a las del Figma.
 class FakeReportesService implements ReportesService {
   FakeReportesService({DateTime Function()? reloj}) : _reloj = reloj ?? DateTime.now;
 
   final DateTime Function() _reloj;
+
+  @override
+  bool esDePrueba(TipoReporte tipo) => true;
 
   @override
   Future<Reporte> reporte(TipoReporte tipo) async {
