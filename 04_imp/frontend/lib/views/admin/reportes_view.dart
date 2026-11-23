@@ -52,13 +52,19 @@ class _ReportesViewState extends State<ReportesView> {
               const Cargando()
             else ...[
               GraficoBarras(titulo: r.titulo, filas: r.filas, maximo: r.maximo),
+              if (r.filas.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(top: 8),
+                  child: Text('No hay información disponible para este reporte en la semana.',
+                      style: TextStyle(color: ColoresCns.textoSuave)),
+                ),
               const SizedBox(height: 16),
               FilaIndicadores(indicadores: [
                 for (final i in r.indicadores) TarjetaIndicador(valor: i.valor, etiqueta: i.etiqueta),
               ]),
               NotaPie(r.nota),
             ],
-            const AvisoDatosPrueba(),
+            if (widget.servicio.esDePrueba(_c.tipo)) const AvisoDatosPrueba(),
           ],
         );
       },
