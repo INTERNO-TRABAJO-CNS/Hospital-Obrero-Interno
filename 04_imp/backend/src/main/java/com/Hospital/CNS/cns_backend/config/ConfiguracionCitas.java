@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import com.Hospital.CNS.cns_backend.infrastructure.eventos.RegistroAgendaEventos;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgAgendaRepository;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgCambioCitaRepository;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgSolicitudRepository;
@@ -28,7 +27,7 @@ import com.Hospital.CNS.cns_backend.model.recursos.MedicoRepository;
 
 /**
  * Citas (T100-02 CU-06 y T100-03 CU-05/CU-07): une su model con PostgreSQL y activa el proceso que asigna la cola
- * cada 5 segundos. AgendaEventos solo escribe en el log hasta que T100-25 agregue el WebSocket.
+ * cada 5 segundos. AgendaEventos lo declara ConfiguracionReportes (T100-04): avisa por WebSocket.
  */
 @Configuration
 @EnableScheduling
@@ -47,11 +46,6 @@ public class ConfiguracionCitas {
     @Bean
     AgendaRepository agendaRepository(CitaRepository citas) {
         return new PgAgendaRepository(citas);
-    }
-
-    @Bean
-    AgendaEventos agendaEventos() {
-        return new RegistroAgendaEventos();
     }
 
     @Bean
