@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../controllers/catalogo_controller.dart';
 import '../../models/catalogo/dia_no_habil.dart';
+import '../comun/cns_widgets.dart';
 import 'catalogo_widgets.dart';
 
 const List<String> _meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
@@ -22,31 +23,28 @@ class CatalogoDiasView extends StatelessWidget {
       listenable: controller,
       builder: (context, _) {
         final dias = controller.diasActivos;
-        return PanelCatalogo(
-          titulo: 'Días no hábiles',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TablaCatalogo(
-                columnas: const [ColumnaTabla('Fecha', flex: 2), ColumnaTabla('Descripción', flex: 3)],
-                filaFija: const [Text('Sáb–Dom'), Text('Fin de semana (automático)')],
-                filas: [
-                  for (final d in dias) [Text(fechaCorta(d.fecha)), Text(d.descripcion)],
-                ],
-                alTocarFila: (i) => _abrirFormulario(context, dias[i]),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Subtitulo('Días no hábiles'),
+            TablaCatalogo(
+              columnas: const [ColumnaTabla('Fecha', flex: 2), ColumnaTabla('Descripción', flex: 3)],
+              filaFija: const [Text('Sáb–Dom'), Text('Fin de semana (automático)')],
+              filas: [
+                for (final d in dias) [Text(fechaCorta(d.fecha)), Text(d.descripcion)],
+              ],
+              alTocarFila: (i) => _abrirFormulario(context, dias[i]),
+            ),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton(
+                key: const Key('dia_agregar'),
+                onPressed: () => _abrirFormulario(context, null),
+                child: const Text('Agregar día no hábil'),
               ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: FilledButton.icon(
-                  key: const Key('dia_agregar'),
-                  onPressed: () => _abrirFormulario(context, null),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Agregar día no hábil'),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );

@@ -15,6 +15,8 @@ class CnsApp extends StatelessWidget {
     return MaterialApp(
       title: 'CNS Hospital Obrero',
       debugShowCheckedModeBanner: false,
+      navigatorKey: navegadorApp,
+      scaffoldMessengerKey: mensajesApp,
       theme: AppTheme.claro(),
       darkTheme: AppTheme.oscuro(),
       themeMode: ThemeMode.system,

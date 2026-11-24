@@ -21,6 +21,8 @@ import com.Hospital.CNS.cns_backend.model.historial.HistorialService;
 
 class HistorialControllerTest {
 
+    private final SesionesDePrueba sesiones = new SesionesDePrueba();
+
     private static final LocalDate HOY = LocalDate.of(2026, 11, 10);
 
     private MockMvc mvc;
@@ -31,7 +33,7 @@ class HistorialControllerTest {
         citas = new FakeCitaRepository();
         HistorialService service = new HistorialService(new FakeHistorialRepository(), citas,
                 new RelojFijo(HOY.atTime(12, 0)));
-        mvc = MockMvcBuilders.standaloneSetup(new HistorialController(service, new ResolutorUsuario()))
+        mvc = MockMvcBuilders.standaloneSetup(new HistorialController(service, sesiones.resolutor()))
                 .setControllerAdvice(new ManejadorErrores())
                 .build();
     }
@@ -41,7 +43,7 @@ class HistorialControllerTest {
         citas.store(cita(1, 100, 7, HOY, LocalTime.of(8, 0), 1, EstadoCita.ATENDIDA));
 
         mvc.perform(get("/api/v1/medico/pacientes/100/historial")
-                        .header("X-Usuario-Id", "50").header("X-Rol", "MEDICO").header("X-Persona-Id", "7"))
+                        .header("Authorization", sesiones.bearer(50, "MEDICO", 7)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.pacienteId").value(100))
                 .andExpect(jsonPath("$.citasPasadas.length()").value(1));
@@ -50,7 +52,7 @@ class HistorialControllerTest {
     @Test
     void historial_pacienteAjeno_403() throws Exception {
         mvc.perform(get("/api/v1/medico/pacientes/100/historial")
-                        .header("X-Usuario-Id", "50").header("X-Rol", "MEDICO").header("X-Persona-Id", "7"))
+                        .header("Authorization", sesiones.bearer(50, "MEDICO", 7)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.codigo").value("PACIENTE_FUERA_DE_AGENDA"));
     }
@@ -58,7 +60,7 @@ class HistorialControllerTest {
     @Test
     void historial_rolEnfermeria_403() throws Exception {
         mvc.perform(get("/api/v1/medico/pacientes/100/historial")
-                        .header("X-Usuario-Id", "50").header("X-Rol", "ENFERMERIA").header("X-Persona-Id", "7"))
+                        .header("Authorization", sesiones.bearer(50, "ENFERMERIA", 7)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.codigo").value("ACCESO_DENEGADO"));
     }

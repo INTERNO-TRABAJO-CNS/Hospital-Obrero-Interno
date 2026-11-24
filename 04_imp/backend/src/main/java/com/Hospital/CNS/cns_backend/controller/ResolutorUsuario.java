@@ -4,56 +4,41 @@ import java.util.function.Function;
 
 import org.springframework.stereotype.Component;
 
-import com.Hospital.CNS.cns_backend.model.compartido.DominioException;
-import com.Hospital.CNS.cns_backend.model.compartido.RolUsuario;
+import com.Hospital.CNS.cns_backend.model.identidad.AuthService;
+import com.Hospital.CNS.cns_backend.model.identidad.UsuarioSesion;
 
 /**
- * TEMPORAL: lo reemplaza Spring Security de S3-08.
- * Lee el usuario de los headers X-Usuario-Id, X-Rol y X-Persona-Id para poder
- * probar con Postman y con el cliente Flutter sin login real.
+ * Identifica a quien hace la peticion a partir de su token ({@code Authorization: Bearer <token>}), que se
+ * obtiene con POST /api/v1/auth/login. Reemplaza a las cabeceras temporales X-Usuario-Id / X-Rol / X-Persona-Id,
+ * que ya no se aceptan (decision PV-11 del 13/11/2026).
  *
- * Uso en un controller: {@code resolutor.resolver(request::getHeader)}.
+ * <p>Uso en un controller: {@code resolutor.resolver(cabeceras::getFirst)}. Sin token o con uno invalido:
+ * NO_AUTENTICADO (401); vencido: SESION_VENCIDA (401).</p>
  */
 @Component
 public class ResolutorUsuario {
 
-    public static final String HEADER_USUARIO_ID = "X-Usuario-Id";
-    public static final String HEADER_ROL = "X-Rol";
-    public static final String HEADER_PERSONA_ID = "X-Persona-Id";
+    public static final String HEADER_AUTORIZACION = "Authorization";
+    private static final String PREFIJO = "Bearer ";
+
+    private final AuthService auth;
+
+    public ResolutorUsuario(AuthService auth) {
+        this.auth = auth;
+    }
 
     /** @param cabecera funcion que devuelve el valor de un header (o null si no viene). */
     public UsuarioAutenticado resolver(Function<String, String> cabecera) {
-        return resolver(
-                cabecera.apply(HEADER_USUARIO_ID),
-                cabecera.apply(HEADER_ROL),
-                cabecera.apply(HEADER_PERSONA_ID));
+        UsuarioSesion u = auth.usuarioDelToken(token(cabecera.apply(HEADER_AUTORIZACION)));
+        return new UsuarioAutenticado(u.usuarioId(), u.rol(), u.personaId());
     }
 
-    public UsuarioAutenticado resolver(String usuarioId, String rol, String personaId) {
-        long usuario = numero(HEADER_USUARIO_ID, usuarioId);
-        long persona = numero(HEADER_PERSONA_ID, personaId);
-        return new UsuarioAutenticado(usuario, rol(rol), persona);
-    }
-
-    private static long numero(String header, String valor) {
-        if (valor == null || valor.isBlank()) {
-            throw new DominioException("ENCABEZADO_FALTANTE", "Falta el encabezado " + header);
+    /** El token de un valor "Bearer xxx" (o null si no tiene ese formato). */
+    static String token(String autorizacion) {
+        if (autorizacion == null || !autorizacion.regionMatches(true, 0, PREFIJO, 0, PREFIJO.length())) {
+            return null;
         }
-        try {
-            return Long.parseLong(valor.trim());
-        } catch (NumberFormatException e) {
-            throw new DominioException("ENCABEZADO_INVALIDO", "El encabezado " + header + " debe ser un numero");
-        }
-    }
-
-    private static RolUsuario rol(String valor) {
-        if (valor == null || valor.isBlank()) {
-            throw new DominioException("ENCABEZADO_FALTANTE", "Falta el encabezado " + HEADER_ROL);
-        }
-        try {
-            return RolUsuario.valueOf(valor.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new DominioException("ROL_INVALIDO", "Rol desconocido: " + valor);
-        }
+        String token = autorizacion.substring(PREFIJO.length()).trim();
+        return token.isEmpty() ? null : token;
     }
 }

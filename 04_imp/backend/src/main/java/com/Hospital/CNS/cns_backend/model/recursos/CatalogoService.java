@@ -9,6 +9,7 @@ import com.Hospital.CNS.cns_backend.model.compartido.EstadoCita;
 import com.Hospital.CNS.cns_backend.model.compartido.Reloj;
 import com.Hospital.CNS.cns_backend.model.compartido.RelojSistema;
 import com.Hospital.CNS.cns_backend.model.compartido.TipoEspecialidad;
+import com.Hospital.CNS.cns_backend.model.compartido.Transaccion;
 
 /**
  * CU-02: el administrador mantiene los catalogos (medicos, consultorios, horarios, dias no habiles).
@@ -17,8 +18,15 @@ import com.Hospital.CNS.cns_backend.model.compartido.TipoEspecialidad;
  * Codigos de error (DominioException): DATOS_INVALIDOS, VALIDACION_CUPO, VALIDACION_DURACION,
  * VALIDACION_FECHA, NO_ENCONTRADA, CAMBIO_AFECTA_CITAS, HORARIO_SOLAPADO, CONSULTORIO_DUPLICADO,
  * DIA_NO_HABIL_DUPLICADO. Las bajas son logicas (activo=false): nada se borra fisicamente.</p>
+ *
+ * <p>Dar de baja un medico o un consultorio tambien da de baja sus horarios (en la misma transaccion), para que
+ * la asignacion automatica no use franjas de recursos que ya no atienden.</p>
  */
 public class CatalogoService {
+
+    public static final int NOMBRE_MEDICO_MAXIMO = 100;
+    public static final int NOMBRE_CONSULTORIO_MAXIMO = 80;
+    public static final int DESCRIPCION_DIA_MAXIMA = 200;
 
     private final MedicoRepository medicos;
     private final ConsultorioRepository consultorios;
@@ -26,6 +34,7 @@ public class CatalogoService {
     private final DiaNoHabilRepository diasNoHabiles;
     private final CitaRepository citas;
     private final Reloj reloj;
+    private final Transaccion transaccion;
 
     public CatalogoService(MedicoRepository m, ConsultorioRepository c, HorarioRepository h,
                            DiaNoHabilRepository d, CitaRepository citas) {
@@ -35,12 +44,18 @@ public class CatalogoService {
     /** Igual que el anterior pero con reloj propio (las pruebas usan RelojFijo). */
     public CatalogoService(MedicoRepository m, ConsultorioRepository c, HorarioRepository h,
                            DiaNoHabilRepository d, CitaRepository citas, Reloj reloj) {
+        this(m, c, h, d, citas, reloj, Transaccion.DIRECTA);
+    }
+
+    public CatalogoService(MedicoRepository m, ConsultorioRepository c, HorarioRepository h,
+                           DiaNoHabilRepository d, CitaRepository citas, Reloj reloj, Transaccion transaccion) {
         this.medicos = m;
         this.consultorios = c;
         this.horarios = h;
         this.diasNoHabiles = d;
         this.citas = citas;
         this.reloj = reloj;
+        this.transaccion = transaccion;
     }
 
     // ------------------------------------------------------------------ medicos
@@ -70,7 +85,10 @@ public class CatalogoService {
         if (citas.contarProgramadasDelMedico(id) > 0) {
             throw afectaCitas("El medico tiene citas programadas: no se puede dar de baja");
         }
-        medicos.store(actual.conActivo(false).aDTO());
+        transaccion.ejecutar(() -> {
+            medicos.store(actual.conActivo(false).aDTO());
+            darDeBajaHorarios(horarios.delMedico(id));
+        });
     }
 
     public List<MedicoDTO> listarMedicos(TipoEspecialidad filtro) {
@@ -83,7 +101,7 @@ public class CatalogoService {
         if (d == null || !Consultorio.desde(d).isValid()) {
             throw new DominioException("DATOS_INVALIDOS", "El consultorio necesita un nombre");
         }
-        String nombre = d.nombre().trim();
+        String nombre = nombreConsultorio(d);
         if (consultorios.existeActivoConNombre(nombre)) {
             throw new DominioException("CONSULTORIO_DUPLICADO", "Ya existe un consultorio con ese nombre");
         }
@@ -98,7 +116,7 @@ public class CatalogoService {
         if (d == null || !Consultorio.desde(d).isValid()) {
             throw new DominioException("DATOS_INVALIDOS", "El consultorio necesita un nombre");
         }
-        String nombre = d.nombre().trim();
+        String nombre = nombreConsultorio(d);
         boolean cambiaNombre = !nombre.equalsIgnoreCase(actual.getNombre());
         if (cambiaNombre && consultorios.existeActivoConNombre(nombre)) {
             throw new DominioException("CONSULTORIO_DUPLICADO", "Ya existe un consultorio con ese nombre");
@@ -116,7 +134,10 @@ public class CatalogoService {
         if (citas.contarProgramadasEnConsultorio(id) > 0) {
             throw afectaCitas("El consultorio tiene citas programadas: no se puede dar de baja");
         }
-        consultorios.store(actual.conActivo(false).aDTO());
+        transaccion.ejecutar(() -> {
+            consultorios.store(actual.conActivo(false).aDTO());
+            darDeBajaHorarios(horarios.delConsultorio(id));
+        });
     }
 
     public List<ConsultorioDTO> listarConsultorios() {
@@ -192,6 +213,11 @@ public class CatalogoService {
         if (datos == null || !Medico.desde(datos).datosBasicosValidos()) {
             throw new DominioException("DATOS_INVALIDOS", "El medico necesita nombres, apellidos y especialidad");
         }
+        if (datos.nombres().trim().length() > NOMBRE_MEDICO_MAXIMO
+                || datos.apellidos().trim().length() > NOMBRE_MEDICO_MAXIMO) {
+            throw new DominioException("DATOS_INVALIDOS",
+                    "Nombres y apellidos no pueden pasar de " + NOMBRE_MEDICO_MAXIMO + " caracteres");
+        }
         Medico medico = Medico.desde(datos);
         if (!medico.cupoValido()) {
             throw new DominioException("VALIDACION_CUPO",
@@ -253,6 +279,10 @@ public class CatalogoService {
         if (d == null || !DiaNoHabil.desde(d).datosBasicosValidos()) {
             throw new DominioException("DATOS_INVALIDOS", "El dia no habil necesita fecha y descripcion");
         }
+        if (d.descripcion().trim().length() > DESCRIPCION_DIA_MAXIMA) {
+            throw new DominioException("DATOS_INVALIDOS",
+                    "La descripcion no puede pasar de " + DESCRIPCION_DIA_MAXIMA + " caracteres");
+        }
         DiaNoHabil dia = DiaNoHabil.desde(d);
         if (!revisarFecha) {
             return dia;
@@ -276,6 +306,23 @@ public class CatalogoService {
         if (existente.activo() && existente.horarioId() != idPropio
                 && nuevo.seSolapaCon(HorarioMedico.desde(existente))) {
             throw new DominioException("HORARIO_SOLAPADO", mensaje);
+        }
+    }
+
+    private static String nombreConsultorio(ConsultorioDTO d) {
+        String nombre = d.nombre().trim();
+        if (nombre.length() > NOMBRE_CONSULTORIO_MAXIMO) {
+            throw new DominioException("DATOS_INVALIDOS",
+                    "El nombre del consultorio no puede pasar de " + NOMBRE_CONSULTORIO_MAXIMO + " caracteres");
+        }
+        return nombre;
+    }
+
+    private void darDeBajaHorarios(List<HorarioDTO> lista) {
+        for (HorarioDTO h : lista) {
+            if (h.activo()) {
+                horarios.store(HorarioMedico.desde(h).conActivo(false).aDTO());
+            }
         }
     }
 

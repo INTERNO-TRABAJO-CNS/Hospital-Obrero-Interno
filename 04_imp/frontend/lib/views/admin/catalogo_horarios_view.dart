@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../controllers/catalogo_controller.dart';
 import '../../models/catalogo/horario.dart';
+import '../comun/cns_widgets.dart';
 import 'catalogo_widgets.dart';
 
 /// CU-02 · "Horarios de medicos" (Figma "ADMIN CATALOGO HORARIOS Y DIAS NO HABILES").
@@ -17,44 +18,41 @@ class CatalogoHorariosView extends StatelessWidget {
       listenable: controller,
       builder: (context, _) {
         final grupos = controller.gruposHorario;
-        return PanelCatalogo(
-          titulo: 'Horarios de médicos',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TablaCatalogo(
-                columnas: const [
-                  ColumnaTabla('Médico', flex: 3),
-                  ColumnaTabla('Día', flex: 2),
-                  ColumnaTabla('Inicio', flex: 2),
-                  ColumnaTabla('Fin', flex: 2),
-                  ColumnaTabla('Cons.', flex: 3),
-                ],
-                filas: [
-                  for (final g in grupos)
-                    [
-                      Text(controller.nombreMedico(g.medicoId)),
-                      Text(g.diasTexto),
-                      Text(horaATexto(g.inicio)),
-                      Text(horaATexto(g.fin)),
-                      Text(controller.nombreConsultorio(g.consultorioId)),
-                    ],
-                ],
-                alTocarFila: (i) => _abrirFormulario(context, grupos[i]),
-                textoVacio: 'No hay horarios registrados',
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Subtitulo('Horarios de médicos'),
+            TablaCatalogo(
+              columnas: const [
+                ColumnaTabla('Médico', flex: 3),
+                ColumnaTabla('Día', flex: 2),
+                ColumnaTabla('Inicio', flex: 2),
+                ColumnaTabla('Fin', flex: 2),
+                ColumnaTabla('Cons.', flex: 3),
+              ],
+              filas: [
+                for (final g in grupos)
+                  [
+                    Text(controller.nombreMedico(g.medicoId)),
+                    Text(g.diasTexto),
+                    Text(horaATexto(g.inicio)),
+                    Text(horaATexto(g.fin)),
+                    Text(controller.nombreConsultorio(g.consultorioId)),
+                  ],
+              ],
+              alTocarFila: (i) => _abrirFormulario(context, grupos[i]),
+              textoVacio: 'No hay horarios registrados',
+            ),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton(
+                key: const Key('horario_agregar'),
+                onPressed: () => _abrirFormulario(context, null),
+                child: const Text('Agregar horario'),
               ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: FilledButton.icon(
-                  key: const Key('horario_agregar'),
-                  onPressed: () => _abrirFormulario(context, null),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Agregar horario'),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );

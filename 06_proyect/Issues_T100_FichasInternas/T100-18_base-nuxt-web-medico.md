@@ -1,4 +1,6 @@
-# [T100-18][Nuxt+Java][Transversal] Base de la web del médico en Nuxt (Vue) y CORS en el backend
+# [T100-18][Flutter+Java][Transversal] Base de la web del médico en Flutter y CORS en el backend
+
+> **Actualización 15/11/2026:** el proyecto ya no usa Nuxt. Todas las pantallas del médico (general, pediatría, odontología y especialistas) están en la **app Flutter** (`04_imp/frontend`), igual que paciente, enfermería, administrador y TV. Equivalencias: `pages/` → `lib/views/medico/`, `stores/` → `lib/controllers/`, `services/` → `lib/services/`, `models/` → `lib/models/medico/`; `npm run test` → `flutter test`. CORS del backend: `http://localhost:5050` (`flutter run -d chrome --web-port 5050`). Las rutas de `04_imp/frontend-web` que aparecen abajo son el registro de lo que se hizo en Nuxt; ese proyecto se borró.
 
 | Campo | Valor |
 |---|---|
@@ -20,14 +22,14 @@ Crear el proyecto **Nuxt** (Vue 3) que usarán **solo los médicos** (general, p
 ## Reglas de negocio que debes cumplir
 - Solo rol `MEDICO`; cualquier otro rol ve `/sin-acceso`.
 - Menú según el médico: **General / Pediatría** → Agenda, Atención, Historial, Ticket interno, Cola de prioridad. **Odontología** → Agenda, Atención, Historial. **Especialista** → Agenda de fichas internas y, si opera, Cirugías.
-- Mientras no exista Spring Security (S3-08), la sesión usa los headers temporales `X-Usuario-Id`, `X-Rol`, `X-Persona-Id` igual que `api_client.dart`. Cuando T100-05 publique `POST /api/v1/auth/login`, el login de Nuxt lo usa.
+- Mientras no exista Spring Security (S3-08), la sesión usa los headers temporales `X-Usuario-Id`, `X-Rol`, `X-Persona-Id` igual que `api_client.dart`. Cuando T100-05 publique `POST /api/v1/auth/login`, el login de Flutter lo usa.
 - Errores del backend `{codigo, mensaje}` → `ApiError` y se muestran tal cual.
 - Diseño para computadora (consultorio) y que no se rompa en tablet.
 
 ## Diagramas y documentos de referencia (solo para leer)
 - `03_des/02-arquitecturaGeneral/02_mvc.md`
 - `04_imp/frontend/lib/core/api_client.dart` (mismo comportamiento)
-- Figma `KgJK1swBix6WpC5wfDw2B6`, página COMPUTER
+- Figma `n2XbqM0jcK8ow40Nsx8uoe`, página COMPUTER
 
 ## Dónde va cada archivo (rutas desde la raíz del repositorio)
 | Ruta | Qué debe contener |
@@ -98,7 +100,7 @@ Abrir el Pull Request con **base = `feature/T100-algoritmos-ejecucion`** (no `de
 - Sin reglas de negocio en la web: el backend decide; la web muestra el resultado o el mensaje del `codigo` de error.
 - Cada *service* tiene su `Fake*` en `services/fake/` para trabajar sin backend (igual que `FakeCatalogoService` en Flutter).
 - Pruebas con Vitest (`npm run test`) para *stores* y *services*.
-- La URL del backend sale de `NUXT_PUBLIC_API_URL`; nada de usuarios ni claves escritos en el código.
+- La URL del backend sale de `--dart-define=API_URL=...`; nada de usuarios ni claves escritos en el código.
 
 ## Fuera de alcance
 - Pantallas de cada caso de uso (tarjetas T100-21…23 y T100-27…30).
@@ -106,7 +108,7 @@ Abrir el Pull Request con **base = `feature/T100-algoritmos-ejecucion`** (no `de
 
 ## Definition of Done
 - [ ] Cumple las reglas de negocio y todos los flujos alternativos listados
-- [ ] `./mvnw test` en verde (y `flutter test` / `npm run test` si la tarjeta toca Flutter / Nuxt)
+- [ ] `./mvnw test` en verde (y `flutter test` si la tarjeta toca Flutter)
 - [ ] Pantallas probadas en el tamaño que corresponde (celular / escritorio)
 - [ ] PR hacia la rama T100 aprobado por el revisor e integrado por Benjamín
 - [ ] Tarjeta movida a **Hecho** en el tablero Kanban y resumen del PR enviado a Benjamín

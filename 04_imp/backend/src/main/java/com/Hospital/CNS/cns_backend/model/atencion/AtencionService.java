@@ -1,5 +1,6 @@
 package com.Hospital.CNS.cns_backend.model.atencion;
 
+import java.time.Period;
 import java.util.Optional;
 
 import com.Hospital.CNS.cns_backend.model.compartido.CitaDTO;
@@ -11,6 +12,11 @@ import com.Hospital.CNS.cns_backend.model.compartido.HistorialRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.RecetaDTO;
 import com.Hospital.CNS.cns_backend.model.compartido.Reloj;
 import com.Hospital.CNS.cns_backend.model.compartido.ResultadoFinalizacion;
+import com.Hospital.CNS.cns_backend.model.compartido.Transaccion;
+import com.Hospital.CNS.cns_backend.model.identidad.PacienteDTO;
+import com.Hospital.CNS.cns_backend.model.identidad.PacienteRepository;
+import com.Hospital.CNS.cns_backend.model.recursos.ConsultorioDTO;
+import com.Hospital.CNS.cns_backend.model.recursos.ConsultorioRepository;
 
 /**
  * CU-15: el medico registra la receta y el fin de la atencion.
@@ -32,12 +38,35 @@ public class AtencionService {
     private final HistorialRepository historiales;
     private final FinalizacionCita finalizacion;
     private final Reloj reloj;
+    private final Transaccion transaccion;
+    private final PacienteRepository pacientes;
+    private final ConsultorioRepository consultorios;
 
     public AtencionService(CitaRepository c, HistorialRepository h, FinalizacionCita fin, Reloj reloj) {
+        this(c, h, fin, reloj, Transaccion.DIRECTA, null, null);
+    }
+
+    public AtencionService(CitaRepository c, HistorialRepository h, FinalizacionCita fin, Reloj reloj,
+                           Transaccion transaccion) {
+        this(c, h, fin, reloj, transaccion, null, null);
+    }
+
+    /**
+     * Con {@link Transaccion} real, receta + fin (y su compensacion) se guardan juntos: si algo lanza una
+     * excepcion no queda nada a medias, y nadie ve la receta antes de que la cita quede ATENDIDA.
+     *
+     * @param pacientes    puede ser null; sirve para mostrar edad y si es titular (Figma de la atencion)
+     * @param consultorios puede ser null; sirve para mostrar el nombre del consultorio y no su id
+     */
+    public AtencionService(CitaRepository c, HistorialRepository h, FinalizacionCita fin, Reloj reloj,
+                           Transaccion transaccion, PacienteRepository pacientes, ConsultorioRepository consultorios) {
         this.citas = c;
         this.historiales = h;
         this.finalizacion = fin;
         this.reloj = reloj;
+        this.transaccion = transaccion;
+        this.pacientes = pacientes;
+        this.consultorios = consultorios;
     }
 
     /** Datos autocompletados. Errores como DominioException: NO_ENCONTRADA, NO_ES_DE_SU_AGENDA, ESTADO_NO_PERMITE. */
@@ -48,9 +77,16 @@ public class AtencionService {
         if (permiso != null) {
             throw new DominioException(permiso.name(), mensaje(permiso));
         }
+        Optional<PacienteDTO> paciente = pacientes == null ? Optional.empty() : pacientes.porId(cita.pacienteId());
+        Integer edad = paciente.map(p -> Period.between(p.fechaNacimiento(), reloj.ahora().toLocalDate()).getYears())
+                .orElse(null);
+        Boolean titular = paciente.map(PacienteDTO::titular).orElse(null);
+        String nombreConsultorio = consultorios == null ? null
+                : consultorios.porId(cita.consultorio()).map(ConsultorioDTO::nombre).orElse(null);
         return new DatosAtencionDTO(cita.citaId(), cita.pacienteId(), cita.nombrePaciente(), cita.numeroAfiliado(),
                 cita.numeroFicha(), cita.fecha(), cita.hora(), cita.especialidad(), cita.especialidad().categoria(),
-                cita.consultorio(), cita.nombreMedico(), cita.especialidad().puedeDerivar());
+                cita.consultorio(), cita.nombreMedico(), cita.especialidad().puedeDerivar(), cita.estado(), edad,
+                titular, nombreConsultorio);
     }
 
     public ResultadoAtencion registrar(long citaId, long medicoId, String medicacion) {
@@ -66,12 +102,15 @@ public class AtencionService {
         if (!recetaValida(medicacion)) {
             return ResultadoAtencion.RECETA_INVALIDA;
         }
+        return transaccion.ejecutar(() -> guardarRecetaYFinalizar(cita, medicoId, medicacion.strip()));
+    }
 
+    private ResultadoAtencion guardarRecetaYFinalizar(CitaDTO cita, long medicoId, String medicacion) {
         RecetaDTO guardada = historiales.agregarReceta(new RecetaDTO(0, cita.citaId(), cita.pacienteId(),
-                medicacion.strip(), reloj.ahora(), cita.numeroFicha()));
+                medicacion, reloj.ahora(), cita.numeroFicha()));
         ResultadoFinalizacion fin;
         try {
-            fin = finalizacion.finalizar(citaId, medicoId);
+            fin = finalizacion.finalizar(cita.citaId(), medicoId);
         } catch (RuntimeException e) {
             historiales.eliminarReceta(guardada.recetaId());
             throw e;

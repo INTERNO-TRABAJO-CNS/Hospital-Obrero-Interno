@@ -35,6 +35,25 @@ class ManejadorErroresTest {
     }
 
     @Test
+    void codigosDeSesionDuplicadosEIntentos() {
+        assertEquals(401, estado("NO_AUTENTICADO"));
+        assertEquals(401, estado("SESION_VENCIDA"));
+        assertEquals(409, estado("CONSULTORIO_DUPLICADO"));
+        assertEquals(409, estado("DIA_NO_HABIL_DUPLICADO"));
+        assertEquals(429, estado("INTENTOS_EXCEDIDOS"));
+    }
+
+    @Test
+    void errorInesperado_500SinDetallesParaElCliente() {
+        ResponseEntity<ManejadorErrores.ErrorRespuesta> r = manejador.manejarInesperado(
+                new IllegalStateException("No se pudo conectar a PostgreSQL: clave incorrecta"));
+
+        assertEquals(500, r.getStatusCode().value());
+        assertEquals("ERROR_INTERNO", r.getBody().codigo());
+        assertEquals(false, r.getBody().mensaje().contains("PostgreSQL"));
+    }
+
+    @Test
     void unCodigoDesconocidoEsReglaDeNegocio422() {
         assertEquals(422, estado("LIMITE_FICHAS_MEDICO"));
     }

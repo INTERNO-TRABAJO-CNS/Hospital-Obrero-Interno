@@ -7,9 +7,10 @@ import '../models/catalogo/especialidad.dart';
 import '../models/catalogo/horario.dart';
 import '../models/catalogo/medico.dart';
 import '../services/catalogo_service.dart';
+import 'aviso_seguro.dart';
 
 /// Pestañas de la pantalla Catalogos (chips del Figma).
-enum SeccionCatalogo { medicos, consultorios, horarios }
+enum SeccionCatalogo { medicos, consultorios, horarios, quirofanos, pacientes, cuentas }
 
 /// Horarios de un medico en un consultorio con la misma hora, agrupados por dias
 /// (en pantalla: "Lun–Vie 08:00–12:00"). El backend guarda un horario por dia.
@@ -46,7 +47,7 @@ String textoDias(Set<DiaSemana> dias) {
 ///
 /// Solo valida formato y llama al [CatalogoService]; las reglas las aplica el
 /// backend. Cada accion devuelve `null` si salio bien o el mensaje para mostrar.
-class CatalogoController extends ChangeNotifier {
+class CatalogoController extends ChangeNotifier with AvisoSeguro {
   CatalogoController(this._servicio);
 
   final CatalogoService _servicio;
@@ -67,7 +68,7 @@ class CatalogoController extends ChangeNotifier {
   Future<void> cargar() async {
     cargando = true;
     errorCarga = null;
-    notifyListeners();
+    notificar();
     try {
       final r = await Future.wait([
         _servicio.listarMedicos(),
@@ -83,18 +84,18 @@ class CatalogoController extends ChangeNotifier {
       errorCarga = mensajeDe(e);
     } finally {
       cargando = false;
-      notifyListeners();
+      notificar();
     }
   }
 
   void cambiarSeccion(SeccionCatalogo nueva) {
     seccion = nueva;
-    notifyListeners();
+    notificar();
   }
 
   void filtrarPorEspecialidad(Especialidad? especialidad) {
     filtroEspecialidad = especialidad;
-    notifyListeners();
+    notificar();
   }
 
   List<Medico> get medicosFiltrados =>
@@ -246,7 +247,7 @@ class CatalogoController extends ChangeNotifier {
     } on ApiException catch (e) {
       return mensajeDe(e);
     } finally {
-      notifyListeners();
+      notificar();
     }
   }
 }

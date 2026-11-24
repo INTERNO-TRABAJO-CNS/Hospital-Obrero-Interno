@@ -20,6 +20,8 @@ import com.Hospital.CNS.cns_backend.model.compartido.FakeHistorialRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.RecetaDTO;
 import com.Hospital.CNS.cns_backend.model.compartido.RelojFijo;
 import com.Hospital.CNS.cns_backend.model.compartido.TipoEspecialidad;
+import com.Hospital.CNS.cns_backend.model.identidad.FakePacienteRepository;
+import com.Hospital.CNS.cns_backend.model.identidad.PacienteDTO;
 
 /** CU-14 con FakeHistorialRepository y FakeCitaRepository (sin BD). */
 class HistorialServiceTest {
@@ -110,5 +112,39 @@ class HistorialServiceTest {
 
         assertEquals(EstadoCita.ASISTENCIA_CONFIRMADA, citas.porId(1).orElseThrow().estado());
         assertTrue(historiales.recetas.isEmpty());
+    }
+
+    // ------------------------------------- datos del paciente y buscador (Figma del historial, 13/11/2026)
+
+    @Test
+    void verHistorial_conPacientes_traeAfiliacionTitularYEdad() {
+        FakePacienteRepository pacientes = new FakePacienteRepository();
+        pacientes.store(new PacienteDTO(PACIENTE, "AF-10001", "4512301", "Ana", "Quispe", LocalDate.of(2002, 3, 1), true));
+        HistorialService conPacientes = new HistorialService(historiales, citas, new RelojFijo(HOY.atTime(10, 0)),
+                pacientes);
+        citas.store(cita(1, PACIENTE, MEDICO, HOY, LocalTime.of(11, 0), 3, EstadoCita.PROGRAMADA));
+
+        HistorialPacienteDTO h = conPacientes.verHistorial(MEDICO, PACIENTE);
+
+        assertEquals("AF-10001", h.numeroAfiliado());
+        assertEquals(true, h.titular());
+        assertEquals(24, h.edad());
+    }
+
+    @Test
+    void buscarEnAgenda_soloPacientesDeSuAgenda() {
+        FakePacienteRepository pacientes = new FakePacienteRepository();
+        pacientes.store(new PacienteDTO(PACIENTE, "AF-10001", "4512301", "Ana", "Quispe", LocalDate.of(2002, 3, 1), true));
+        pacientes.store(new PacienteDTO(101, "AF-10001", "9000001", "Sofia", "Quispe", LocalDate.of(2018, 1, 1), false));
+        HistorialService conPacientes = new HistorialService(historiales, citas, new RelojFijo(HOY.atTime(10, 0)),
+                pacientes);
+        citas.store(cita(1, PACIENTE, MEDICO, HOY, LocalTime.of(11, 0), 3, EstadoCita.PROGRAMADA));
+        citas.store(cita(2, 101, 9, HOY, LocalTime.of(11, 0), 1, EstadoCita.PROGRAMADA));
+
+        List<PacienteDeAgendaDTO> encontrados = conPacientes.buscarEnAgenda(MEDICO, "AF-10001");
+
+        assertEquals(1, encontrados.size());
+        assertEquals(PACIENTE, encontrados.get(0).pacienteId());
+        assertTrue(conPacientes.buscarEnAgenda(MEDICO, " ").isEmpty());
     }
 }

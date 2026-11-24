@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 class ApiException implements Exception {
   const ApiException(this.codigo, this.mensaje, {this.estado});
 
-  /// Codigo del backend (ej. NO_ENCONTRADA) o SIN_CONEXION / SIN_RESPUESTA / ERROR_HTTP.
+  /// Codigo del backend (ej. NO_ENCONTRADA) o SIN_CONEXION / SIN_RESPUESTA / ERROR_HTTP / RESPUESTA_INVALIDA.
   final String codigo;
   final String mensaje;
 
@@ -16,6 +16,16 @@ class ApiException implements Exception {
 
   @override
   String toString() => 'ApiException($codigo, $mensaje)';
+}
+
+/// Convierte una respuesta con [convertir]. Si el JSON no tiene la forma esperada (por ejemplo un
+/// rol o una especialidad que esta version no conoce) lanza RESPUESTA_INVALIDA en vez de adivinar.
+T leerRespuesta<T>(T Function() convertir) {
+  try {
+    return convertir();
+  } on FormatException catch (e) {
+    throw ApiException('RESPUESTA_INVALIDA', 'El servidor envió datos que esta versión no reconoce (${e.message}).');
+  }
 }
 
 /// Cliente HTTP unico de la app. Todas las pantallas llaman al backend por aqui.
@@ -27,19 +37,19 @@ class ApiClient {
       : _cliente = cliente ?? http.Client(),
         urlBase = _sinBarraFinal(urlBase ?? urlBaseConfigurada);
 
-  static const String urlBaseConfigurada =
-      String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8080');
+  static const String urlBaseConfigurada = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8080');
 
   static const Duration _espera = Duration(seconds: 15);
 
   final http.Client _cliente;
   final String urlBase;
 
-  // TEMPORAL: el backend lee estos datos de los headers X-Usuario-Id, X-Rol y
-  // X-Persona-Id hasta que exista el login real.
-  int? usuarioId;
-  String? rol;
-  int? personaId;
+  /// Token de la sesion (lo entrega `POST /api/v1/auth/login`). Viaja como `Authorization: Bearer`.
+  String? token;
+
+  /// Se llama cuando una peticion que llevaba token recibe 401 (sesion vencida o cerrada):
+  /// la app olvida la sesion y vuelve al login.
+  void Function(ApiException error)? alPerderSesion;
 
   Future<Map<String, dynamic>> get(String ruta, {Map<String, String>? consulta}) {
     return _enviar(() => _cliente.get(_uri(ruta, consulta), headers: _cabeceras()));
@@ -68,9 +78,7 @@ class ApiClient {
   Map<String, String> _cabeceras() => {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        if (usuarioId != null) 'X-Usuario-Id': '$usuarioId',
-        if (rol != null) 'X-Rol': rol!,
-        if (personaId != null) 'X-Persona-Id': '$personaId',
+        if (token != null) 'Authorization': 'Bearer $token',
       };
 
   Uri _uri(String ruta, [Map<String, String>? consulta]) {
@@ -83,15 +91,22 @@ class ApiClient {
   }
 
   Future<Map<String, dynamic>> _enviar(Future<http.Response> Function() peticion) async {
+    final conToken = token != null;
+    final http.Response respuesta;
     try {
-      final respuesta = await peticion().timeout(_espera);
-      return _procesar(respuesta);
-    } on ApiException {
-      rethrow;
+      respuesta = await peticion().timeout(_espera);
     } on TimeoutException {
-      throw const ApiException('SIN_RESPUESTA', 'El servidor no respondio a tiempo');
+      throw const ApiException('SIN_RESPUESTA', 'El servidor no respondió a tiempo');
     } catch (_) {
       throw const ApiException('SIN_CONEXION', 'No se pudo conectar con el servidor');
+    }
+    try {
+      return _procesar(respuesta);
+    } on ApiException catch (e) {
+      if (e.estado == 401 && conToken) {
+        alPerderSesion?.call(e);
+      }
+      rethrow;
     }
   }
 
@@ -125,6 +140,5 @@ class ApiClient {
     );
   }
 
-  static String _sinBarraFinal(String url) =>
-      url.endsWith('/') ? url.substring(0, url.length - 1) : url;
+  static String _sinBarraFinal(String url) => url.endsWith('/') ? url.substring(0, url.length - 1) : url;
 }

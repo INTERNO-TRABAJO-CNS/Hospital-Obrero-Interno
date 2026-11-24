@@ -3,6 +3,7 @@ package com.Hospital.CNS.cns_backend.model.atencion;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.Hospital.CNS.cns_backend.model.compartido.EstadoCita;
 import com.Hospital.CNS.cns_backend.model.compartido.TipoEspecialidad;
 
 /**
@@ -10,10 +11,13 @@ import com.Hospital.CNS.cns_backend.model.compartido.TipoEspecialidad;
  *
  * <p>{@code consulta} es la especialidad de la cita: una basica (Medico General, Odontologia, Pediatria)
  * o una interna (las 10 especialidades de derivacion); {@code categoriaConsulta} dice cual de las dos.
- * {@code puedeDerivar} habilita el boton «Generar ticket interno» (solo Medico General y Pediatria).</p>
+ * {@code puedeDerivar} habilita el boton «Generar ticket interno» (solo Medico General y Pediatria).
+ * {@code edad} y {@code titular} (lo muestra el Figma: «24 anios», «Titular») son null si no se conoce al
+ * paciente. {@code nombreConsultorio} es el nombre del catalogo («Consultorio 1»), o null si no se conoce.</p>
  */
 public record DatosAtencionDTO(long citaId, long pacienteId, String nombrePaciente, String numeroAfiliado,
                                int numeroFicha, LocalDate fecha, LocalTime hora, TipoEspecialidad consulta,
                                TipoEspecialidad.Categoria categoriaConsulta, int consultorio, String medico,
-                               boolean puedeDerivar) {
+                               boolean puedeDerivar, EstadoCita estado, Integer edad, Boolean titular,
+                               String nombreConsultorio) {
 }

@@ -19,7 +19,8 @@ class NotificacionDto {
       citaId: (json['citaId'] as num?)?.toInt() ?? 0,
       tipo: json['tipo'] as String? ?? '',
       mensaje: json['mensaje'] as String? ?? '',
-      creadaEn: DateTime.tryParse(json['creadaEn'] as String? ?? '') ?? DateTime.now(),
+      creadaEn: DateTime.tryParse(json['fechaHora'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 
@@ -29,7 +30,7 @@ class NotificacionDto {
       'citaId': citaId,
       'tipo': tipo,
       'mensaje': mensaje,
-      'creadaEn': creadaEn.toIso8601String(),
+      'fechaHora': creadaEn.toIso8601String(),
     };
   }
 }

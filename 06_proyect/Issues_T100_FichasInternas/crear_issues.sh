@@ -30,7 +30,7 @@ command -v gh >/dev/null || { echo "Falta gh (https://cli.github.com)"; exit 1; 
 [ "$DRY" = "1" ] || gh auth status >/dev/null 2>&1 || { echo "Ejecuta primero: gh auth login"; exit 1; }
 
 echo "== 1) Etiquetas nuevas =="
-for l in "tec:nuxt|41B883" "tec:postgresql|336791" "tec:websocket|FBCA04" "tipo:ajuste|D93F0B" "tipo:prueba|0052CC"          "tipo:documentacion|C2E0C6" "modulo:fichas-internas|E99695" "modulo:quirofano|B60205"          "modelo-v:requisitos|5319E7" "modelo-v:integracion|5319E7" "modelo-v:aceptacion|5319E7"; do
+for l in "tec:postgresql|336791" "tec:websocket|FBCA04" "tipo:ajuste|D93F0B" "tipo:prueba|0052CC"          "tipo:documentacion|C2E0C6" "modulo:fichas-internas|E99695" "modulo:quirofano|B60205"          "modelo-v:requisitos|5319E7" "modelo-v:integracion|5319E7" "modelo-v:aceptacion|5319E7"; do
   run gh label create "${l%%|*}" --color "${l##*|}" --repo "$REPO" --force
 done
 
@@ -62,19 +62,19 @@ while IFS='|' read -r ID ARCHIVO DUENO MILESTONE ETIQUETAS; do
 done <<'LISTA'
 16|T100-16_fichas-internas-modelo-v.md|Benjamín|Sprint 4 - Gestion de citas|fase:construccion,tipo:documentacion,modelo-v:requisitos,modulo:fichas-internas,modulo:quirofano
 17|T100-17_contratos-fichas-quirofano.md|Benjamín|Sprint 4 - Gestion de citas|fase:construccion,tipo:tarea,rama:T100,tec:java,tec:postgresql,modulo:fichas-internas,modulo:quirofano
-18|T100-18_base-nuxt-web-medico.md|Benjamín|Sprint 4 - Gestion de citas|fase:construccion,tipo:tarea,rama:T100,tec:nuxt,tec:java
+18|T100-18_base-nuxt-web-medico.md|Benjamín|Sprint 4 - Gestion de citas|fase:construccion,tipo:tarea,rama:T100,tec:flutter,tec:java
 19|T100-19_cu02-especialistas-quirofanos.md|Benjamín|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:tarea,rama:T100,tec:java,tec:flutter,caso-uso:CU-02,modulo:quirofano
 20|T100-20_cu21-cu22-ficha-interna-prioridad.md|Benjamín|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:tarea,rama:T100,tec:java,caso-uso:CU-21+CU-22,modulo:fichas-internas
-21|T100-21_cu21-cu25-web-ticket-interno-cola.md|Benjamín|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:tarea,rama:T100,tec:nuxt,tec:java,caso-uso:CU-21+CU-25,modulo:fichas-internas
-22|T100-22_cu23-agenda-especialista.md|Benjamín|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:tarea,rama:T100,tec:java,tec:nuxt,caso-uso:CU-23,modulo:fichas-internas
-23|T100-23_cu24-programar-cirugia-quirofano.md|Benjamín|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:tarea,rama:T100,tec:java,tec:nuxt,caso-uso:CU-24,modulo:quirofano
+21|T100-21_cu21-cu25-web-ticket-interno-cola.md|Benjamín|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:tarea,rama:T100,tec:flutter,tec:java,caso-uso:CU-21+CU-25,modulo:fichas-internas
+22|T100-22_cu23-agenda-especialista.md|Benjamín|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:tarea,rama:T100,tec:java,tec:flutter,caso-uso:CU-23,modulo:fichas-internas
+23|T100-23_cu24-programar-cirugia-quirofano.md|Benjamín|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:tarea,rama:T100,tec:java,tec:flutter,caso-uso:CU-24,modulo:quirofano
 24|T100-24_ajuste-cu05-cu06-edad-cruces.md|Benjamín|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:ajuste,rama:T100,tec:java,tec:postgresql,caso-uso:CU-05+CU-06
 25|T100-25_ajuste-cu19-cu20-supervision-fichas-quirofanos.md|Benjamín|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:ajuste,rama:T100,tec:java,tec:flutter,tec:websocket,caso-uso:CU-19+CU-20,modulo:fichas-internas,modulo:quirofano
 26|T100-26_ajuste-cu03-cu04-edad-pediatria.md|Matías|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:ajuste,rama:T100,tec:java,tec:flutter,caso-uso:CU-03+CU-04
-27|T100-27_ajuste-cu13-agenda-medico-nuxt.md|Alejandro|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:ajuste,rama:T100,tec:nuxt,caso-uso:CU-13
-28|T100-28_ajuste-cu14-historial-nuxt.md|Alex|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:ajuste,rama:T100,tec:java,tec:nuxt,caso-uso:CU-14
-29|T100-29_ajuste-cu15-atencion-nuxt.md|Abigail|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:ajuste,rama:T100,tec:nuxt,caso-uso:CU-15
-30|T100-30_ajuste-cu16-notificacion-ticket-impreso.md|Abigail|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:ajuste,rama:T100,tec:java,tec:flutter,tec:nuxt,caso-uso:CU-16
+27|T100-27_ajuste-cu13-agenda-medico-nuxt.md|Alejandro|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:ajuste,rama:T100,tec:flutter,caso-uso:CU-13
+28|T100-28_ajuste-cu14-historial-nuxt.md|Alex|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:ajuste,rama:T100,tec:java,tec:flutter,caso-uso:CU-14
+29|T100-29_ajuste-cu15-atencion-nuxt.md|Abigail|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:ajuste,rama:T100,tec:flutter,caso-uso:CU-15
+30|T100-30_ajuste-cu16-notificacion-ticket-impreso.md|Abigail|Sprint 5 - Integracion y seguimiento|fase:construccion,tipo:ajuste,rama:T100,tec:java,tec:flutter,caso-uso:CU-16
 31|T100-31_pruebas-integracion-concurrencia.md|Benjamín|Sprint 6 - Validacion y entrega|fase:construccion,tipo:prueba,rama:T100,tec:java,tec:postgresql,modelo-v:integracion
 32|T100-32_pruebas-aceptacion-sistema.md|Benjamín|Sprint 6 - Validacion y entrega|fase:construccion,tipo:prueba,modelo-v:aceptacion
 LISTA

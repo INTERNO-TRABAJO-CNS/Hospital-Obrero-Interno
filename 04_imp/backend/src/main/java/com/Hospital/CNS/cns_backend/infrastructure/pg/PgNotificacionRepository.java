@@ -1,10 +1,9 @@
 package com.Hospital.CNS.cns_backend.infrastructure.pg;
 
-import java.sql.Timestamp;
 import java.util.List;
 
-import com.Hospital.CNS.cns_backend.model.comunicacion.NotificacionDTO;
 import com.Hospital.CNS.cns_backend.model.comunicacion.NotificacionRepository;
+import com.Hospital.CNS.cns_backend.model.compartido.NotificacionDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -17,40 +16,33 @@ public class PgNotificacionRepository implements NotificacionRepository {
     }
 
     @Override
-    public void store(NotificacionDTO notificacion) {
-        jdbc.update(
-                "INSERT INTO notificacion (paciente_id, cita_id, tipo, mensaje, creada_en) VALUES (?, ?, ?, ?, ?)",
-                notificacion.pacienteId(),
-                notificacion.citaId(),
-                notificacion.tipo(),
-                notificacion.mensaje(),
-                Timestamp.from(notificacion.creadaEn()));
-    }
-
-    @Override
     public List<NotificacionDTO> delPaciente(long pacienteId) {
         return jdbc.query(
-                "SELECT paciente_id, cita_id, tipo, mensaje, creada_en FROM notificacion WHERE paciente_id = ? ORDER BY creada_en DESC",
+                "SELECT id, paciente_id, cita_id, ficha_id, cirugia_id, tipo, mensaje, fecha_hora "
+                        + "FROM notificacion.notificacion WHERE paciente_id = ? ORDER BY fecha_hora DESC",
                 (rs, rowNum) -> new NotificacionDTO(
+                        rs.getLong("id"),
                         rs.getLong("paciente_id"),
-                        rs.getLong("cita_id"),
+                        nullableLong(rs, "cita_id"),
+                        nullableLong(rs, "ficha_id"),
+                        nullableLong(rs, "cirugia_id"),
                         rs.getString("tipo"),
                         rs.getString("mensaje"),
-                        rs.getTimestamp("creada_en").toInstant()),
+                        rs.getTimestamp("fecha_hora").toLocalDateTime()),
                 pacienteId);
-    }
-
-    @Override
-    public void marcarAvisoEnviado(long citaId) {
-        jdbc.update("UPDATE notificacion SET aviso_enviado = true WHERE cita_id = ? AND tipo = 'AVISO_T45'", citaId);
     }
 
     @Override
     public boolean avisoYaEnviado(long citaId) {
         Integer count = jdbc.queryForObject(
-                "SELECT COUNT(*) FROM notificacion WHERE cita_id = ? AND tipo = 'AVISO_T45' AND aviso_enviado = true",
+                "SELECT COUNT(*) FROM notificacion.notificacion WHERE cita_id = ? AND tipo = 'AVISO_T45'",
                 Integer.class,
                 citaId);
         return count != null && count > 0;
+    }
+
+    private static Long nullableLong(java.sql.ResultSet resultSet, String column) throws java.sql.SQLException {
+        long value = resultSet.getLong(column);
+        return resultSet.wasNull() ? null : value;
     }
 }

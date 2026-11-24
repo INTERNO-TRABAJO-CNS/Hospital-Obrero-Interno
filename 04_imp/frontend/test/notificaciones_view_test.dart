@@ -24,6 +24,18 @@ class StreamingNotificacionesService implements NotificacionesService {
 }
 
 void main() {
+  test('lee la fecha con el nombre enviado por el backend', () {
+    final notificacion = NotificacionDto.fromJson({
+      'pacienteId': 7,
+      'citaId': 8,
+      'tipo': 'AVISO_T45',
+      'mensaje': 'Su cita será cancelada.',
+      'fechaHora': '2026-11-10T12:00:00',
+    });
+
+    expect(notificacion.creadaEn, DateTime(2026, 11, 10, 12));
+  });
+
   testWidgets('muestra la bandeja de notificaciones', (tester) async {
     final service = StreamingNotificacionesService([
       NotificacionDto(

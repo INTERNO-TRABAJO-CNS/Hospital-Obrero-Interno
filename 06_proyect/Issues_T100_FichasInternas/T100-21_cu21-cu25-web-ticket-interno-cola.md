@@ -1,4 +1,6 @@
-# [T100-21][Nuxt+Java][CU-21/25] Web del médico general: formulario «Ticket interno» y cola de prioridad por especialidad
+# [T100-21][Flutter+Java][CU-21/25] Web del médico general: formulario «Ticket interno» y cola de prioridad por especialidad
+
+> **Actualización 15/11/2026:** el proyecto ya no usa Nuxt. Todas las pantallas del médico (general, pediatría, odontología y especialistas) están en la **app Flutter** (`04_imp/frontend`), igual que paciente, enfermería, administrador y TV. Equivalencias: `pages/` → `lib/views/medico/`, `stores/` → `lib/controllers/`, `services/` → `lib/services/`, `models/` → `lib/models/medico/`; `npm run test` → `flutter test`. CORS del backend: `http://localhost:5050` (`flutter run -d chrome --web-port 5050`). El proyecto Nuxt (`04_imp/frontend-web`) se borró.
 
 | Campo | Valor |
 |---|---|
@@ -36,12 +38,12 @@ Implementar la pantalla de la pizarra «Ticket interno» (Afiliado · Especialid
 | `04_imp/backend/src/main/java/com/Hospital/CNS/cns_backend/model/fichasinternas/ColaPrioridadService.java + ItemColaDTO.java` | `cola(long medicoId, TipoEspecialidad esp)`: ordenada con `ComparadorPrioridad` |
 | `04_imp/backend/src/main/java/com/Hospital/CNS/cns_backend/controller/FichaInternaController.java` | agregar el `GET …/cola` |
 | `04_imp/backend/src/test/java/com/Hospital/CNS/cns_backend/model/fichasinternas/ColaPrioridadServiceTest.java` | orden y tabla correcta |
-| `04_imp/frontend-web/pages/medico/ticket-interno.vue` | formulario + resultado |
-| `04_imp/frontend-web/pages/medico/cola.vue` | tabla de la cola |
-| `04_imp/frontend-web/stores/fichaInterna.ts, stores/cola.ts` | estado de la pantalla y mensajes por código |
-| `04_imp/frontend-web/services/fichaInternaService.ts + services/fake/fakeFichaInternaService.ts` | `generar`, `ticket`, `cola`, `buscarPaciente` |
-| `04_imp/frontend-web/models/fichaInterna.ts` | `Gravedad`, `SolicitudFichaInterna`, `TicketFichaInterna`, `ItemCola` |
-| `04_imp/frontend-web/tests/fichaInterna.test.ts, tests/cola.test.ts` | Vitest |
+| `04_imp/frontend/lib/views/medico/ticket_interno_view.dart` | formulario + resultado |
+| `04_imp/frontend/lib/views/medico/cola_prioridad_view.dart` | tabla de la cola |
+| `04_imp/frontend/lib/controllers/fichas_internas_controller.dart (TicketInternoController, ColaPrioridadController)` | estado de la pantalla y mensajes por código |
+| `04_imp/frontend/lib/services/fichas_internas_service.dart` (interfaz + Fake) | `generar`, `ticket`, `cola`, `buscarPaciente` |
+| `04_imp/frontend/lib/models/medico/ficha_interna.dart` | `Gravedad`, `SolicitudFichaInterna`, `TicketFichaInterna`, `ItemCola` |
+| `04_imp/frontend/test/medico/fichas_y_cirugias_test.dart` | `flutter test` |
 
 ## Paso a paso
 1. Rama `feature/T100-21-cu21-cu25-web-ticket-interno-cola`.
@@ -78,11 +80,11 @@ Abrir el Pull Request con **base = `feature/T100-algoritmos-ejecucion`** (no `de
 - **En el PR solo código y migraciones** (nada de `.md`, capturas ni documentación). Cambios fuera de las carpetas de la tabla: pedirlos antes a Benjamín.
 - Si necesitas cambiar un contrato de `model/compartido`, **no lo cambies**: abre un comentario en este issue y avisa a Benjamín.
 - Nada «demasiado automático»: el sistema calcula y propone; las acciones las dispara una persona (médico, especialista, administrador). El único proceso programado nuevo es el de fichas EN_ESPERA (T100-20).
-- **MVC también en la web:** `pages/` = vista, `stores/` (Pinia) = controlador de interfaz, `services/` = llamadas REST, `models/` = tipos. Una página **nunca** llama `fetch` directo: usa su *store* y el *store* usa el *service*.
+- **MVC en Flutter:** `views/` = vista, `controllers/` = controlador, `services/` = llamadas REST, `models/` = datos. Una vista **nunca** llama a `http` directo: usa su *controller* y el *controller* usa el *service*.
 - Sin reglas de negocio en la web: el backend decide; la web muestra el resultado o el mensaje del `codigo` de error.
 - Cada *service* tiene su `Fake*` en `services/fake/` para trabajar sin backend (igual que `FakeCatalogoService` en Flutter).
-- Pruebas con Vitest (`npm run test`) para *stores* y *services*.
-- La URL del backend sale de `NUXT_PUBLIC_API_URL`; nada de usuarios ni claves escritos en el código.
+- Pruebas con `flutter test` para *controllers*, *services* y vistas.
+- La URL del backend sale de `--dart-define=API_URL=...`; nada de usuarios ni claves escritos en el código.
 
 ## Fuera de alcance
 - Agenda del médico (T100-27).
@@ -90,7 +92,7 @@ Abrir el Pull Request con **base = `feature/T100-algoritmos-ejecucion`** (no `de
 
 ## Definition of Done
 - [ ] Cumple las reglas de negocio y todos los flujos alternativos listados
-- [ ] `./mvnw test` en verde (y `flutter test` / `npm run test` si la tarjeta toca Flutter / Nuxt)
+- [ ] `./mvnw test` en verde (y `flutter test` si la tarjeta toca Flutter)
 - [ ] Pantallas probadas en el tamaño que corresponde (celular / escritorio)
 - [ ] PR hacia la rama T100 aprobado por el revisor e integrado por Benjamín
 - [ ] Tarjeta movida a **Hecho** en el tablero Kanban y resumen del PR enviado a Benjamín

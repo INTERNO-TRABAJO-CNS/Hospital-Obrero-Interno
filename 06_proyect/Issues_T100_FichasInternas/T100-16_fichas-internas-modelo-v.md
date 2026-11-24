@@ -1,5 +1,7 @@
 # [T100-16][Docs][Modelo V] Requisitos y diseño de fichas internas, quirófanos y ajustes (RF-21…25, CU-21…25)
 
+> **Actualización 15/11/2026:** el proyecto ya no usa Nuxt. Todas las pantallas del médico (general, pediatría, odontología y especialistas) están en la **app Flutter** (`04_imp/frontend`), igual que paciente, enfermería, administrador y TV. Equivalencias: `pages/` → `lib/views/medico/`, `stores/` → `lib/controllers/`, `services/` → `lib/services/`, `models/` → `lib/models/medico/`; `npm run test` → `flutter test`. CORS del backend: `http://localhost:5050` (`flutter run -d chrome --web-port 5050`). El proyecto Nuxt (`04_imp/frontend-web`) se borró.
+
 | Campo | Valor |
 |---|---|
 | Milestone | Sprint 4 - Gestion de citas (vence 2026-11-12) |
@@ -32,7 +34,7 @@ Dejar por escrito, **antes de cerrar el Sprint 4**, todo lo acordado el 10/11/20
 ## Dónde va cada archivo (rutas desde la raíz del repositorio)
 | Ruta | Qué debe contener |
 |---|---|
-| `02_req/archivos-md/Matriz_de_Requisitos_y_Trazabilidad_CNS.md` | RF-21 Derivar a especialidad (ficha interna) · RF-22 Asignar ficha interna por prioridad (desplazamiento, EN_ESPERA, Terapia Intensiva) · RF-23 Atender ficha interna (especialista) · RF-24 Programar cirugía sin choques · RF-25 Consultar cola de prioridad. Modificar RF-04 (Pediatría < 10 años), RF-05 (≥ 60 años), RF-06 (cruce de horario con fichas internas y cirugías), RF-13 (agenda en web), RF-16 (ticket impreso), RF-19/20 (20 tablas + quirófanos). RNF-07 (web del médico en Nuxt) y **RNF-09 nuevo** (cero choques en quirófano garantizado por la BD). RU-14 nuevo. |
+| `02_req/archivos-md/Matriz_de_Requisitos_y_Trazabilidad_CNS.md` | RF-21 Derivar a especialidad (ficha interna) · RF-22 Asignar ficha interna por prioridad (desplazamiento, EN_ESPERA, Terapia Intensiva) · RF-23 Atender ficha interna (especialista) · RF-24 Programar cirugía sin choques · RF-25 Consultar cola de prioridad. Modificar RF-04 (Pediatría < 10 años), RF-05 (≥ 60 años), RF-06 (cruce de horario con fichas internas y cirugías), RF-13 (agenda en web), RF-16 (ticket impreso), RF-19/20 (20 tablas + quirófanos). RNF-07 (web del médico en Flutter) y **RNF-09 nuevo** (cero choques en quirófano garantizado por la BD). RU-14 nuevo. |
 | `02_req/archivos-md/Especificacion_de_Casos_de_Uso_CNS.md` | CU-21 Generar ficha interna · CU-22 Asignar ficha interna por prioridad (Sistema) · CU-23 Atender ficha interna · CU-24 Programar cirugía en quirófano · CU-25 Consultar cola de prioridad. Actualizar CU-02, 04, 05, 06, 13, 14, 15, 16, 19, 20 y la tabla de actores (Médico General, Médico de Pediatría, Especialista). |
 | `03_des/02-arquitecturaGeneral/04_reglas_negocio.md` | RN-17…RN-28 (ver lista de reglas en el LEEME) |
 | `03_des/02-arquitecturaGeneral/11_decisiones_pendientes.md` | PV-19 horario de quirófanos · PV-20 cirugías de Cardiología, Nefrología, Neumología y Endocrinología (> 12 h, si hay tiempo) · PV-21 una sola ficha interna activa por paciente · PV-22 qué parte del historial ve el especialista |

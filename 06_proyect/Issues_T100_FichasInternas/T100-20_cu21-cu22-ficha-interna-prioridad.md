@@ -1,5 +1,7 @@
 # [T100-20][Java][CU-21/22] Generar ficha interna y asignarla por cola de prioridad (urgencia, desplazamiento, en espera y Terapia Intensiva)
 
+> **Actualización 15/11/2026:** el proyecto ya no usa Nuxt. Todas las pantallas del médico (general, pediatría, odontología y especialistas) están en la **app Flutter** (`04_imp/frontend`), igual que paciente, enfermería, administrador y TV. Equivalencias: `pages/` → `lib/views/medico/`, `stores/` → `lib/controllers/`, `services/` → `lib/services/`, `models/` → `lib/models/medico/`; `npm run test` → `flutter test`. CORS del backend: `http://localhost:5050` (`flutter run -d chrome --web-port 5050`). El proyecto Nuxt (`04_imp/frontend-web`) se borró.
+
 | Campo | Valor |
 |---|---|
 | Milestone | Sprint 5 - Integracion y seguimiento (vence 2026-11-20) |
@@ -124,7 +126,7 @@ Abrir el Pull Request con **base = `feature/T100-algoritmos-ejecucion`** (no `de
 
 ## Definition of Done
 - [ ] Cumple las reglas de negocio y todos los flujos alternativos listados
-- [ ] `./mvnw test` en verde (y `flutter test` / `npm run test` si la tarjeta toca Flutter / Nuxt)
+- [ ] `./mvnw test` en verde (y `flutter test` si la tarjeta toca Flutter)
 - [ ] Pantallas probadas en el tamaño que corresponde (celular / escritorio)
 - [ ] PR hacia la rama T100 aprobado por el revisor e integrado por Benjamín
 - [ ] Tarjeta movida a **Hecho** en el tablero Kanban y resumen del PR enviado a Benjamín

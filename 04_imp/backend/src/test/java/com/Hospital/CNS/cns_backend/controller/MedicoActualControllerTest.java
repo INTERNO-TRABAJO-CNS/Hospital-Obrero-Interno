@@ -16,6 +16,8 @@ import com.Hospital.CNS.cns_backend.model.recursos.MedicoDTO;
 
 class MedicoActualControllerTest {
 
+    private final SesionesDePrueba sesiones = new SesionesDePrueba();
+
     private MockMvc mvc;
 
     @BeforeEach
@@ -25,15 +27,14 @@ class MedicoActualControllerTest {
         medicos.store(new MedicoDTO(8, "Luis", "Choque", TipoEspecialidad.ODONTOLOGIA, 45, 5, true));
         medicos.store(new MedicoDTO(9, "Eva", "Flores", TipoEspecialidad.DERMATOLOGIA, 20, 5, true));
         mvc = MockMvcBuilders.standaloneSetup(
-                        new MedicoActualController(new MedicoActualService(medicos), new ResolutorUsuario()))
+                        new MedicoActualController(new MedicoActualService(medicos), sesiones.resolutor()))
                 .setControllerAdvice(new ManejadorErrores())
                 .build();
     }
 
     @Test
     void yo_pediatra_200_puedeDerivar() throws Exception {
-        mvc.perform(get("/api/v1/medico/yo").header("X-Usuario-Id", "1").header("X-Rol", "MEDICO")
-                        .header("X-Persona-Id", "7"))
+        mvc.perform(get("/api/v1/medico/yo").header("Authorization", sesiones.bearer(1, "MEDICO", 7)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nombre").value("Rosa Mamani"))
                 .andExpect(jsonPath("$.especialidad").value("PEDIATRIA"))
@@ -43,29 +44,25 @@ class MedicoActualControllerTest {
 
     @Test
     void yo_odontologo_noDeriva() throws Exception {
-        mvc.perform(get("/api/v1/medico/yo").header("X-Usuario-Id", "1").header("X-Rol", "MEDICO")
-                        .header("X-Persona-Id", "8"))
+        mvc.perform(get("/api/v1/medico/yo").header("Authorization", sesiones.bearer(1, "MEDICO", 8)))
                 .andExpect(jsonPath("$.puedeDerivar").value(false));
     }
 
     @Test
     void yo_dermatologo_opera() throws Exception {
-        mvc.perform(get("/api/v1/medico/yo").header("X-Usuario-Id", "1").header("X-Rol", "MEDICO")
-                        .header("X-Persona-Id", "9"))
+        mvc.perform(get("/api/v1/medico/yo").header("Authorization", sesiones.bearer(1, "MEDICO", 9)))
                 .andExpect(jsonPath("$.operaEnQuirofano").value(true));
     }
 
     @Test
     void yo_paciente_403() throws Exception {
-        mvc.perform(get("/api/v1/medico/yo").header("X-Usuario-Id", "1").header("X-Rol", "PACIENTE")
-                        .header("X-Persona-Id", "7"))
+        mvc.perform(get("/api/v1/medico/yo").header("Authorization", sesiones.bearer(1, "PACIENTE", 7)))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void yo_medicoInexistente_404() throws Exception {
-        mvc.perform(get("/api/v1/medico/yo").header("X-Usuario-Id", "1").header("X-Rol", "MEDICO")
-                        .header("X-Persona-Id", "99"))
+        mvc.perform(get("/api/v1/medico/yo").header("Authorization", sesiones.bearer(1, "MEDICO", 99)))
                 .andExpect(status().isNotFound());
     }
 }

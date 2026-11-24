@@ -1,12 +1,5 @@
 package com.Hospital.CNS.cns_backend.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -16,6 +9,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.Hospital.CNS.cns_backend.model.compartido.CitaDTO;
@@ -35,6 +34,8 @@ import com.Hospital.CNS.cns_backend.model.recursos.FakeMedicoRepository;
  */
 class AdminCatalogoControllerTest {
 
+    private final SesionesDePrueba sesiones = new SesionesDePrueba();
+
     private static final String MEDICO_PEDIATRA =
             "{\"nombres\":\"Juan\",\"apellidos\":\"Perez\",\"especialidad\":\"PEDIATRIA\","
                     + "\"duracionCitaMin\":30,\"cupoMaximoDia\":6}";
@@ -48,7 +49,7 @@ class AdminCatalogoControllerTest {
         CatalogoService service = new CatalogoService(new FakeMedicoRepository(), new FakeConsultorioRepository(),
                 new FakeHorarioRepository(), new FakeDiaNoHabilRepository(), citas,
                 new RelojFijo(LocalDateTime.of(2026, 11, 9, 8, 0)));
-        mvc = MockMvcBuilders.standaloneSetup(new AdminCatalogoController(service, new ResolutorUsuario()))
+        mvc = MockMvcBuilders.standaloneSetup(new AdminCatalogoController(service, sesiones.resolutor()))
                 .setControllerAdvice(new ManejadorErrores())
                 .build();
     }
@@ -58,7 +59,7 @@ class AdminCatalogoControllerTest {
     @Test
     void controller_sinRolAdmin_403() throws Exception {
         mvc.perform(get("/api/v1/admin/medicos")
-                        .header("X-Usuario-Id", "1").header("X-Rol", "PACIENTE").header("X-Persona-Id", "1"))
+                        .header("Authorization", sesiones.bearer(1, "PACIENTE", 1)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.codigo").value("ACCESO_DENEGADO"));
     }
@@ -66,15 +67,22 @@ class AdminCatalogoControllerTest {
     @Test
     void controller_rolMedico_403_tambienEnEscritura() throws Exception {
         mvc.perform(post("/api/v1/admin/medicos").contentType(MediaType.APPLICATION_JSON).content(MEDICO_PEDIATRA)
-                        .header("X-Usuario-Id", "1").header("X-Rol", "MEDICO").header("X-Persona-Id", "1"))
+                        .header("Authorization", sesiones.bearer(1, "MEDICO", 1)))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    void controller_sinEncabezados_400() throws Exception {
+    void controller_sinToken_401() throws Exception {
         mvc.perform(get("/api/v1/admin/consultorios"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.codigo").value("ENCABEZADO_FALTANTE"));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.codigo").value("NO_AUTENTICADO"));
+    }
+
+    @Test
+    void controller_cabecerasTemporalesDeAdmin_yaNoSirven_401() throws Exception {
+        mvc.perform(get("/api/v1/admin/consultorios")
+                        .header("X-Usuario-Id", "1").header("X-Rol", "ADMINISTRADOR").header("X-Persona-Id", "1"))
+                .andExpect(status().isUnauthorized());
     }
 
     // --------------------------------------------------------------- medicos
@@ -255,8 +263,8 @@ class AdminCatalogoControllerTest {
     private static final String HORARIO_LUNES = "{\"medicoId\":1,\"consultorioId\":1,\"diaSemana\":\"MONDAY\","
             + "\"horaInicio\":\"08:00\",\"horaFin\":\"12:00\"}";
 
-    private static MockHttpServletRequestBuilder admin(MockHttpServletRequestBuilder peticion) {
-        return peticion.header("X-Usuario-Id", "1").header("X-Rol", "ADMINISTRADOR").header("X-Persona-Id", "1");
+    private MockHttpServletRequestBuilder admin(MockHttpServletRequestBuilder peticion) {
+        return peticion.header("Authorization", sesiones.bearer(1, "ADMINISTRADOR", 1));
     }
 
     private void crearMedicoPediatra() throws Exception {

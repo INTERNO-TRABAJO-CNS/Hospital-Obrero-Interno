@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../controllers/catalogo_controller.dart';
+import '../../core/app_theme.dart';
 import '../../models/catalogo/especialidad.dart';
 import '../../models/catalogo/medico.dart';
+import '../comun/cns_widgets.dart';
 import 'catalogo_widgets.dart';
 
-/// CU-02 · Catalogo de medicos (Figma COMPUTER "ADMIN CATALOGO MEDICOS"):
-/// tabla a la izquierda y panel "Nuevo / editar medico" a la derecha.
+/// CU-02 · Catalogo de medicos (Figma "ADMIN CATALOGO MEDICOS v2"): tabla con el tipo
+/// (BÁSICA / INTERNA) y panel "Nuevo / editar médico" con las 13 especialidades agrupadas.
 class CatalogoMedicosView extends StatefulWidget {
   const CatalogoMedicosView({super.key, required this.controller});
 
@@ -86,7 +88,7 @@ class _CatalogoMedicosViewState extends State<CatalogoMedicosView> {
   Future<void> _darDeBaja() async {
     final m = _seleccionado!;
     final ok = await confirmar(context, 'Dar de baja',
-        '¿Dar de baja a ${m.nombreCompleto}? Dejará de recibir citas nuevas (no se borra).');
+        '¿Dar de baja a ${m.nombreCompleto}? Dejará de recibir citas nuevas y sus horarios se desactivan (no se borra).');
     if (!ok || !mounted) {
       return;
     }
@@ -113,34 +115,45 @@ class _CatalogoMedicosViewState extends State<CatalogoMedicosView> {
     final lista = _c.medicosFiltrados;
     final i = lista.indexWhere((m) => m.id == _seleccionado?.id);
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Align(
           alignment: Alignment.centerRight,
-          child: DropdownButton<Especialidad?>(
-            value: _c.filtroEspecialidad,
-            hint: const Text('Todas las especialidades'),
-            onChanged: _c.filtrarPorEspecialidad,
-            items: [
-              const DropdownMenuItem(value: null, child: Text('Todas las especialidades')),
-              for (final e in Especialidad.values) DropdownMenuItem(value: e, child: Text(e.nombre)),
-            ],
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(color: ColoresCns.blanco, borderRadius: BorderRadius.circular(20)),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<Especialidad?>(
+                key: const Key('medico_filtro'),
+                value: _c.filtroEspecialidad,
+                isDense: true,
+                style: const TextStyle(fontSize: 12, color: ColoresCns.texto),
+                hint: const Text('Todas las especialidades'),
+                onChanged: _c.filtrarPorEspecialidad,
+                items: [
+                  const DropdownMenuItem(value: null, child: Text('Todas las especialidades')),
+                  for (final e in Especialidad.values) DropdownMenuItem(value: e, child: Text(e.nombre)),
+                ],
+              ),
+            ),
           ),
         ),
-        const SizedBox(height: 8),
         TablaCatalogo(
           columnas: const [
             ColumnaTabla('Médico', flex: 3),
             ColumnaTabla('Especialidad', flex: 3),
+            ColumnaTabla('Tipo', flex: 2),
             ColumnaTabla('Duración', flex: 2),
             ColumnaTabla('Cupo/día', flex: 2),
-            ColumnaTabla('Estado', flex: 3),
+            ColumnaTabla('Estado', flex: 2),
           ],
           filas: [
             for (final m in lista)
               [
                 Text(m.nombreCompleto),
                 Text(m.especialidad.nombre),
+                ChipEstado(m.especialidad.esBasica ? 'BASICA' : 'INTERNA', texto: m.especialidad.categoria.etiqueta),
                 Text('${m.duracionCitaMin} min'),
                 Text('${m.cupoMaximoDia}'),
                 EstadoChip(activo: m.activo),
@@ -150,6 +163,8 @@ class _CatalogoMedicosViewState extends State<CatalogoMedicosView> {
           alTocarFila: (fila) => _seleccionar(lista[fila]),
           textoVacio: 'No hay médicos registrados',
         ),
+        const NotaPie('Las 3 básicas las pide el paciente; las 10 internas solo se asignan por ficha interna. '
+            'La duración debe estar en el rango de la especialidad y el cupo entre $cupoMinimo y $cupoMaximo.'),
       ],
     );
   }
@@ -157,77 +172,118 @@ class _CatalogoMedicosViewState extends State<CatalogoMedicosView> {
   Widget _panel() {
     final editando = _seleccionado != null;
     return PanelCatalogo(
-      titulo: editando ? 'Editar médico' : 'Nuevo médico',
+      titulo: 'Nuevo / editar médico',
+      subtitulo: editando ? 'Editando: ${_seleccionado!.nombreCompleto}' : null,
       child: Form(
         key: _formulario,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextFormField(
-              key: const Key('medico_nombres'),
-              controller: _nombres,
-              decoration: const InputDecoration(labelText: 'Nombres', hintText: 'Dr. ...'),
-              validator: validarTexto,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              key: const Key('medico_apellidos'),
-              controller: _apellidos,
-              decoration: const InputDecoration(labelText: 'Apellidos'),
-              validator: validarTexto,
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<Especialidad>(
-              isExpanded: true,
-              key: ValueKey('medico_especialidad_$_version'),
-              initialValue: _especialidad,
-              decoration: const InputDecoration(labelText: 'Especialidad'),
-              items: [
-                for (final e in Especialidad.values) DropdownMenuItem(value: e, child: Text(e.nombre)),
-              ],
-              onChanged: (e) => setState(() => _especialidad = e ?? _especialidad),
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              key: const Key('medico_duracion'),
-              controller: _duracion,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Duración de ficha (min)',
-                helperText: 'General 30–45 · Odonto 45–60 · Pediatría 30–45 (esta: ${_especialidad.rango})',
-                helperMaxLines: 2,
+            CampoCns(
+              etiqueta: 'Nombres',
+              child: TextFormField(
+                key: const Key('medico_nombres'),
+                controller: _nombres,
+                decoration: const InputDecoration(hintText: 'Ej. Raúl'),
+                validator: validarTexto,
               ),
-              validator: validarEntero,
             ),
-            const SizedBox(height: 12),
-            TextFormField(
-              key: const Key('medico_cupo'),
-              controller: _cupo,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Cupo diario ($cupoMinimo a $cupoMaximo)'),
-              validator: validarEntero,
+            CampoCns(
+              etiqueta: 'Apellidos',
+              child: TextFormField(
+                key: const Key('medico_apellidos'),
+                controller: _apellidos,
+                decoration: const InputDecoration(hintText: 'Ej. Vargas'),
+                validator: validarTexto,
+              ),
+            ),
+            CampoCns(
+              etiqueta: 'Especialidad',
+              child: DropdownButtonFormField<Especialidad>(
+                key: ValueKey('medico_especialidad_$_version'),
+                isExpanded: true,
+                initialValue: _especialidad,
+                items: _opcionesEspecialidad(),
+                selectedItemBuilder: (_) => [
+                  for (final e in _ordenOpciones)
+                    e == null ? const SizedBox.shrink() : Text(e.nombre, style: const TextStyle(fontSize: 13)),
+                ],
+                onChanged: (e) => setState(() => _especialidad = e ?? _especialidad),
+              ),
+            ),
+            CampoCns(
+              etiqueta: 'Duración de la ficha (min)',
+              ayuda: 'Rango de ${_especialidad.nombre}: ${_especialidad.duracionMin}–${_especialidad.duracionMax} min.',
+              child: TextFormField(
+                key: const Key('medico_duracion'),
+                controller: _duracion,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(hintText: 'Ej. 40'),
+                validator: validarEntero,
+              ),
+            ),
+            CampoCns(
+              etiqueta: 'Cupo por día',
+              ayuda: 'Entre $cupoMinimo y $cupoMaximo fichas.',
+              child: TextFormField(
+                key: const Key('medico_cupo'),
+                controller: _cupo,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(hintText: 'Ej. 7'),
+                validator: validarEntero,
+              ),
             ),
             MensajeError(_error),
-            const SizedBox(height: 16),
             FilledButton(
               key: const Key('medico_guardar'),
               onPressed: _guardando ? null : _guardar,
               child: Text(_guardando ? 'Guardando…' : 'Guardar'),
             ),
-            const SizedBox(height: 8),
-            OutlinedButton(
+            const SizedBox(height: 10),
+            BotonPeligro(
               key: const Key('medico_baja'),
-              onPressed: editando && _seleccionado!.activo ? _darDeBaja : null,
-              style: OutlinedButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
-              child: const Text('Dar de baja'),
+              texto: 'Dar de baja',
+              alTocar: editando && _seleccionado!.activo ? _darDeBaja : null,
             ),
-            if (editando)
-              TextButton(onPressed: () => _seleccionar(null), child: const Text('Nuevo médico')),
-            const SizedBox(height: 8),
-            Text('No se aplica si afecta citas programadas.', style: Theme.of(context).textTheme.bodySmall),
+            if (editando) TextButton(onPressed: () => _seleccionar(null), child: const Text('Nuevo médico')),
+            const SizedBox(height: 6),
+            const Text('No se aplica si afecta citas programadas.',
+                style: TextStyle(fontSize: 11, color: ColoresCns.textoSuave)),
           ],
         ),
       ),
     );
+  }
+
+  /// Orden del desplegable: encabezado BÁSICAS, las 3 basicas, encabezado INTERNAS, las 10 internas.
+  /// `null` marca un encabezado.
+  static final List<Especialidad?> _ordenOpciones = [
+    null,
+    ...Especialidad.basicas,
+    null,
+    ...Especialidad.internas,
+  ];
+
+  List<DropdownMenuItem<Especialidad>> _opcionesEspecialidad() {
+    var grupo = 0;
+    return [
+      for (final e in _ordenOpciones)
+        if (e == null)
+          DropdownMenuItem<Especialidad>(
+            enabled: false,
+            child: Text(grupo++ == 0 ? 'BÁSICAS' : 'INTERNAS',
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ColoresCns.menu)),
+          )
+        else
+          DropdownMenuItem<Especialidad>(
+            value: e,
+            child: Row(
+              children: [
+                Expanded(child: Text(e.nombre, style: const TextStyle(fontSize: 13))),
+                Text(e.rango, style: const TextStyle(fontSize: 11, color: ColoresCns.textoSuave)),
+              ],
+            ),
+          ),
+    ];
   }
 }
