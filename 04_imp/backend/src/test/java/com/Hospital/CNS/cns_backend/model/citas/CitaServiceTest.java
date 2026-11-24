@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.Hospital.CNS.cns_backend.model.compartido.CambioCitaDTO;
@@ -49,6 +50,7 @@ class CitaServiceTest {
     }
 
     @Test
+    @DisplayName("CP-22: al registrar la cita, la solicitud queda marcada como ASIGNADA")
     void citaService_marcaSolicitudAsignada() {
         CitaDTO cita = service.registrar(asignacion(10, PACIENTE, LocalTime.of(8, 0)));
 
@@ -58,6 +60,7 @@ class CitaServiceTest {
     }
 
     @Test
+    @DisplayName("HU-07: la cita confirmada se guarda con paciente, especialidad, medico, fecha, hora, consultorio, ficha y estado PROGRAMADA")
     void registrar_creaCitaProgramadaConTodosLosDatos() {
         CitaDTO cita = service.registrar(asignacion(10, PACIENTE, LocalTime.of(8, 0)));
 

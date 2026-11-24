@@ -8,7 +8,9 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.Hospital.CNS.cns_backend.model.compartido.CitaDTO;
@@ -74,20 +76,28 @@ class AsignacionServiceTest {
     // ---- Cola ----
 
     @Test
+    @DisplayName("CP-17: tres solicitudes que llegan en orden se asignan en ese mismo orden")
     void asigna_enOrdenDeLlegada() {
         medico(RAMOS, LUNES.getDayOfWeek(), LocalTime.of(8, 0), LocalTime.of(10, 0));
+        // Se guardan desordenadas; el orden de llegada es 11 -> 10 -> 12.
         solicitud(10, 100, LUNES, 1, 2);
+        solicitud(12, 102, LUNES, 1, 3);
         solicitud(11, 101, LUNES, 1, 1);
 
         assertEquals(ResultadoAsignacion.ASIGNADA, service.procesarSiguiente());
         assertEquals(ResultadoAsignacion.ASIGNADA, service.procesarSiguiente());
+        assertEquals(ResultadoAsignacion.ASIGNADA, service.procesarSiguiente());
 
         assertEquals(101, citaDe(11).pacienteId());
-        assertEquals(LocalTime.of(8, 0), citaDe(11).hora());
-        assertEquals(LocalTime.of(8, 30), citaDe(10).hora());
+        assertEquals(LocalTime.of(8, 0), citaDe(11).hora(), "1ra en llegar -> 1ra hora");
+        assertEquals(LocalTime.of(8, 30), citaDe(10).hora(), "2da en llegar -> 2da hora");
+        assertEquals(LocalTime.of(9, 0), citaDe(12).hora(), "3ra en llegar -> 3ra hora");
+        assertEquals(List.of(1, 2, 3), List.of(citaDe(11).numeroFicha(), citaDe(10).numeroFicha(),
+                citaDe(12).numeroFicha()), "numero de ficha en el mismo orden");
     }
 
     @Test
+    @DisplayName("CP-18: una solicitud de prioridad 2 se atiende despues de todas las de prioridad 1")
     void prioridad2_vaDespuesDePrioridad1() {
         medico(RAMOS, LUNES.getDayOfWeek(), LocalTime.of(8, 0), LocalTime.of(8, 30));
         solicitud(10, 100, LUNES, 2, 1);
@@ -203,6 +213,7 @@ class AsignacionServiceTest {
     // ---- [2a] NO HAY CUPOS: en espera al siguiente dia habil ----
 
     @Test
+    @DisplayName("CP-19: sin cupo el dia pedido -> NO HAY CUPOS y queda EN_ESPERA para el siguiente dia habil")
     void sinCupoHoy_pasaAEnEsperaSiguienteHabil() {
         medico(RAMOS, VIERNES.getDayOfWeek(), LocalTime.of(8, 0), LocalTime.of(12, 0));
         for (int i = 0; i < 7; i++) {
@@ -234,6 +245,7 @@ class AsignacionServiceTest {
     }
 
     @Test
+    @DisplayName("CP-21: si el paciente ya tiene una cita ese dia, la solicitud no se asigna")
     void pacienteConCitaEseDia_noAsigna() {
         medico(RAMOS, LUNES.getDayOfWeek(), LocalTime.of(8, 0), LocalTime.of(10, 0));
         citas.store(new CitaDTO(citas.nextIdentity(), 100, "", "", 50, "", TipoEspecialidad.PEDIATRIA, 9, LUNES,
@@ -258,6 +270,7 @@ class AsignacionServiceTest {
     // ---- [2b] 15 dias habiles sin cupo ----
 
     @Test
+    @DisplayName("CP-20: tras 15 dias habiles sin cupo la solicitud pasa a SIN_CUPO")
     void dias15SinCupo_sinCupo() {
         solicitud(10, 100, LUNES, 1, 1);
 

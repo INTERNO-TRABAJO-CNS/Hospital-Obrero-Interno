@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import com.Hospital.CNS.cns_backend.infrastructure.eventos.RegistroAgendaEventos;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgAgendaRepository;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgCambioCitaRepository;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgSolicitudRepository;
@@ -14,6 +13,7 @@ import com.Hospital.CNS.cns_backend.model.citas.AsignacionService;
 import com.Hospital.CNS.cns_backend.model.citas.CalendarioHabil;
 import com.Hospital.CNS.cns_backend.model.citas.CitaService;
 import com.Hospital.CNS.cns_backend.model.citas.DisponibilidadService;
+import com.Hospital.CNS.cns_backend.model.citas.SolicitudService;
 import com.Hospital.CNS.cns_backend.model.compartido.AgendaEventos;
 import com.Hospital.CNS.cns_backend.model.compartido.CambioCitaRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.CitaRepository;
@@ -27,7 +27,7 @@ import com.Hospital.CNS.cns_backend.model.recursos.MedicoRepository;
 
 /**
  * Citas (T100-02 CU-06 y T100-03 CU-05/CU-07): une su model con PostgreSQL y activa el proceso que asigna la cola
- * cada 5 segundos. AgendaEventos solo escribe en el log hasta que T100-25 agregue el WebSocket.
+ * cada 5 segundos. AgendaEventos lo declara ConfiguracionReportes (T100-04): avisa por WebSocket.
  */
 @Configuration
 @EnableScheduling
@@ -49,13 +49,15 @@ public class ConfiguracionCitas {
     }
 
     @Bean
-    AgendaEventos agendaEventos() {
-        return new RegistroAgendaEventos();
-    }
-
-    @Bean
     CalendarioHabil calendarioHabil(DiaNoHabilRepository dias) {
         return new CalendarioHabil(dias);
+    }
+
+    /** CU-04 (T100-06): el paciente registra la solicitud; la cola de abajo la asigna. */
+    @Bean
+    SolicitudService solicitudService(SolicitudRepository solicitudes, CitaRepository citas,
+                                      CalendarioHabil calendario, Reloj reloj) {
+        return new SolicitudService(solicitudes, citas, calendario, reloj);
     }
 
     @Bean
