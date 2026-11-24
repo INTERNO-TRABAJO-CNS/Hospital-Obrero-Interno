@@ -14,7 +14,7 @@
 	<name>cns_backend</name>
 	<description>Backend del Sistema de Gestion y Control de Citas Medicas - Hospital Obrero CNS</description>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>25</java.version>
 	</properties>
 	<dependencies>
 		<!-- Web REST (MVC), seguridad, JDBC con pool (Hikari) y migraciones con Flyway. -->
