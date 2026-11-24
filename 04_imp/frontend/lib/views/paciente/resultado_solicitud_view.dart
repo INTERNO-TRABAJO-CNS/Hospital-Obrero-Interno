@@ -20,6 +20,8 @@ class ResultadoSolicitudView extends StatelessWidget {
         return 'Cita asignada';
       case EstadoSolicitudApp.sinCupo:
         return 'Sin cupo';
+      case EstadoSolicitudApp.cancelada:
+        return 'Cancelada';
     }
   }
 
@@ -29,6 +31,7 @@ class ResultadoSolicitudView extends StatelessWidget {
         return Icons.hourglass_empty;
       case EstadoSolicitudApp.enEspera:
       case EstadoSolicitudApp.sinCupo:
+      case EstadoSolicitudApp.cancelada:
         return Icons.event_busy;
       case EstadoSolicitudApp.asignada:
         return Icons.check_circle_outline;

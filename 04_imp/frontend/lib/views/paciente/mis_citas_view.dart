@@ -37,6 +37,8 @@ class _MisCitasViewState extends State<MisCitasView> {
         return 'Asignada';
       case EstadoSolicitudApp.sinCupo:
         return 'Sin cupo';
+      case EstadoSolicitudApp.cancelada:
+        return 'Cancelada';
     }
   }
 
@@ -49,6 +51,7 @@ class _MisCitasViewState extends State<MisCitasView> {
       case EstadoSolicitudApp.asignada:
         return Colors.green;
       case EstadoSolicitudApp.sinCupo:
+      case EstadoSolicitudApp.cancelada:
         return Colors.red;
     }
   }

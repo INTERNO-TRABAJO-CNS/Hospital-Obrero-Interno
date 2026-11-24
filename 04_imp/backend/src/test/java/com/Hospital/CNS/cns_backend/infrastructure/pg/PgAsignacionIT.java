@@ -110,7 +110,7 @@ class PgAsignacionIT {
             for (long paciente : pacienteIds) {
                 borrar(conn, "delete from citas.solicitud where paciente_id = ?", paciente);
             }
-            borrar(conn, "delete from citas.cambio_cita where cita_id in "
+            borrar(conn, "delete from operaciones.cambio_cita where cita_id in "
                     + "(select id from citas.cita where medico_id = ?)", medicoId);
             borrar(conn, "delete from citas.agenda_dia where medico_id = ?", medicoId);
             borrar(conn, "delete from citas.cita where medico_id = ?", medicoId);
@@ -189,6 +189,28 @@ class PgAsignacionIT {
         List<Long> cola = solicitudes.siguientesParaProcesar(DIA, 50).stream()
                 .map(SolicitudDTO::solicitudId).filter(solicitudIds::contains).toList();
         assertEquals(List.of(primera, segunda), cola);
+    }
+
+    @Test
+    void solicitudesPaciente_reflejanCitaCancelada() throws SQLException {
+        long pacienteId = pacienteIds.get(0);
+        CitaDTO cita = cita(pacienteId, LocalTime.of(8, 0));
+        assertTrue(citas.store(cita));
+        long solicitudId = solicitudes.nextIdentity();
+        solicitudes.store(new SolicitudDTO(solicitudId, pacienteId, FAMILIAR, DIA, 1, 0,
+                EstadoSolicitud.ASIGNADA, cita.citaId()));
+        solicitudIds.add(solicitudId);
+
+        try (Connection conn = DB.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("update citas.cita set estado = 'CANCELADA' where id = ?")) {
+            stmt.setLong(1, cita.citaId());
+            assertEquals(1, stmt.executeUpdate());
+        }
+
+        SolicitudDTO enLista = solicitudes.porPaciente(pacienteId).stream()
+                .filter(s -> s.solicitudId() == solicitudId).findFirst().orElseThrow();
+        assertEquals(EstadoSolicitud.CANCELADA, enLista.estado());
+        assertEquals(EstadoSolicitud.CANCELADA, solicitudes.porId(solicitudId).orElseThrow().estado());
     }
 
     @Test

@@ -8,5 +8,7 @@ public enum EstadoSolicitud {
     PENDIENTE,
     EN_ESPERA,
     ASIGNADA,
-    SIN_CUPO
+    SIN_CUPO,
+    /** Derived for an assigned request when its linked appointment is cancelled; not stored in citas.solicitud. */
+    CANCELADA
 }

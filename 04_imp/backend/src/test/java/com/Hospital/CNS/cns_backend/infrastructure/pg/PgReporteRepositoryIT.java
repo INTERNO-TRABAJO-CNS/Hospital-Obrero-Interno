@@ -89,7 +89,7 @@ class PgReporteRepositoryIT {
             return;
         }
         try (Connection conn = DB.getConnection()) {
-            borrar(conn, "delete from citas.cambio_cita where cita_id in "
+            borrar(conn, "delete from operaciones.cambio_cita where cita_id in "
                     + "(select id from citas.cita where paciente_id = ?)", pacienteId);
             borrar(conn, "delete from citas.cita where paciente_id = ?", pacienteId);
             borrar(conn, "delete from identidad.paciente where id = ?", pacienteId);

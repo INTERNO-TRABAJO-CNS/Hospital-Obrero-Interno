@@ -31,6 +31,11 @@ public class PgSolicitudRepository implements SolicitudRepository {
 
     private static final String SELECCION = "select id, paciente_id, especialidad, dia_solicitado, prioridad, "
             + "orden_llegada, estado, cita_id from citas.solicitud";
+    private static final String SELECCION_CON_ESTADO_CITA = "select s.id, s.paciente_id, s.especialidad, "
+            + "s.dia_solicitado, s.prioridad, s.orden_llegada, "
+            + "case when s.estado = 'ASIGNADA' and c.estado = 'CANCELADA' then 'CANCELADA' "
+            + "else s.estado end as estado, s.cita_id "
+            + "from citas.solicitud s left join citas.cita c on c.id = s.cita_id";
 
     @Override
     public long nextIdentity() {
@@ -78,13 +83,14 @@ public class PgSolicitudRepository implements SolicitudRepository {
 
     @Override
     public Optional<SolicitudDTO> porId(long solicitudId) {
-        List<SolicitudDTO> r = consultar(SELECCION + " where id = ?", solicitudId);
+        List<SolicitudDTO> r = consultar(SELECCION_CON_ESTADO_CITA + " where s.id = ?", solicitudId);
         return r.isEmpty() ? Optional.empty() : Optional.of(r.get(0));
     }
 
     @Override
     public List<SolicitudDTO> porPaciente(long pacienteId) {
-        return consultar(SELECCION + " where paciente_id = ? order by orden_llegada desc", pacienteId);
+        return consultar(SELECCION_CON_ESTADO_CITA + " where s.paciente_id = ? order by s.orden_llegada desc",
+                pacienteId);
     }
 
     @Override
