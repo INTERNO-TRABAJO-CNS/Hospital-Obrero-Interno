@@ -230,6 +230,7 @@ Widget _pagina(String nombre) {
         {Rol.paciente},
         (_) => MisCitasView(
           controller: solicitudControllerApp,
+          cancelacionService: cancelacionApp,
         ),
       );
 
@@ -522,7 +523,16 @@ Future<void> _cerrarSesion(BuildContext context) async {
 /// Cliente HTTP compartido.
 final ApiClient apiApp = ApiClient()..alPerderSesion = _alPerderSesion;
 
-/// El backend respondio 401 a una peticion con token: la sesion vencio o se cerro.
+/// CU-11: cancelacion de citas del paciente.
+final CancelacionService cancelacionApp = ApiCancelacionService(apiApp);
+
+/// CU-04: servicio y controlador para solicitar y consultar citas.
+final SolicitudService solicitudServicioApp = ApiSolicitudService(apiApp);
+
+final SolicitudController solicitudControllerApp =
+    SolicitudController(service: solicitudServicioApp);
+
+/// El backend respondió 401 a una petición con token.
 void _alPerderSesion(ApiException error) {
   if (!sesionApp.autenticado) {
     return;
@@ -689,3 +699,4 @@ Future<void> _irSegunRol(BuildContext context, Sesion sesion) async {
       mensajes.showSnackBar(SnackBar(content: Text(motivo)));
   }
 }
+

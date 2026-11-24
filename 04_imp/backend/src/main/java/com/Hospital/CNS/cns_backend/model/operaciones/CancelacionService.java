@@ -17,11 +17,6 @@ import com.Hospital.CNS.cns_backend.model.compartido.Reloj;
 
 /**
  * CU-11: cancela citas a peticion del paciente o automaticamente al llegar a T-30.
- *
- * <p>Para usar este servicio en produccion, registrarlo como bean de Spring e inyectar los beans de
- * {@code CitaRepository}, {@code CambioCitaRepository}, {@code NotificacionPublicador},
- * {@code AgendaEventos} y {@code Reloj}. En particular, {@code CambioCitaRepository} y
- * {@code AgendaEventos} necesitan implementaciones de produccion registradas como beans.</p>
  */
 public class CancelacionService implements CancelacionCita {
 
