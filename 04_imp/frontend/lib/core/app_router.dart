@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../controllers/solicitud_controller.dart';
 import '../services/solicitud_service.dart';
 import '../controllers/enfermeria_controller.dart';
+import '../controllers/fichas_controller.dart';
 import '../controllers/medico_controller.dart';
 import '../controllers/sesion_controller.dart';
 import '../controllers/notificaciones_controller.dart';
@@ -14,6 +15,7 @@ import '../services/catalogo_service.dart';
 import '../services/cirugias_service.dart';
 import '../services/cuentas_service.dart';
 import '../services/enfermeria_service.dart';
+import '../services/fichas_service.dart';
 import '../services/fake_catalogo_service.dart';
 import '../services/fake_medico_service.dart';
 import '../services/fichas_internas_service.dart';
@@ -46,6 +48,7 @@ import '../views/paciente/mis_citas_view.dart';
 import '../views/paciente/registro_beneficiario_view.dart';
 import '../views/paciente/solicitar_cita_view.dart';
 import '../views/shell/app_shell.dart';
+import '../views/tv/tv_fichas_view.dart';
 import 'api_client.dart';
 import 'responsive.dart';
 import 'rutas_medico.dart';
@@ -357,10 +360,10 @@ Widget _pagina(String nombre) {
       );
 
     case AppRutas.tv:
-      return const AppShell(
+      return AppShell(
         rutaActual: AppRutas.tv,
-        destinos: [],
-        child: PantallaMarcador(titulo: 'Fichas del día'),
+        destinos: const [],
+        child: TvFichasView(controller: fichasTvController),
       );
 
     default:
@@ -565,6 +568,11 @@ final SolicitudService solicitudServicioApp = ApiSolicitudService(apiApp);
 
 final SolicitudController solicitudControllerApp =
     SolicitudController(service: solicitudServicioApp);
+
+/// Servicio y controlador de las fichas para la pantalla de TV.
+final FichasService fichasTvService = FichasService(apiApp);
+final FichasController fichasTvController =
+    FichasController(fichasService: fichasTvService);
 
 /// El backend respondió 401 a una petición con token.
 void _alPerderSesion(ApiException error) {
