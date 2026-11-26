@@ -34,6 +34,7 @@ class CitasPacienteControllerTest {
     private static final LocalDateTime AHORA = LocalDateTime.of(2026, 11, 18, 7, 0);
     private static final LocalDate JUEVES = LocalDate.of(2026, 11, 19);
     private static final long PACIENTE = 120;
+    private static final long BENEFICIARIO = 121;
 
     private final SesionesDePrueba sesiones = new SesionesDePrueba();
     private MockMvc mvc;
@@ -44,6 +45,7 @@ class CitasPacienteControllerTest {
         citas.store(cita(1, PACIENTE, 7, JUEVES, LocalTime.of(9, 30), 3, EstadoCita.PROGRAMADA));
         citas.store(cita(2, 999, 7, JUEVES, LocalTime.of(10, 0), 4, EstadoCita.PROGRAMADA));
         citas.store(cita(3, PACIENTE, 7, JUEVES.minusDays(10), LocalTime.of(8, 0), 1, EstadoCita.ATENDIDA));
+        citas.store(cita(4, BENEFICIARIO, 8, JUEVES, LocalTime.of(11, 0), 5, EstadoCita.PROGRAMADA));
         RelojFijo reloj = new RelojFijo(AHORA);
         CalendarioHabil calendario = new CalendarioHabil(new FakeDiaNoHabilRepository());
         SolicitudService solicitudes = new SolicitudService(new FakeSolicitudRepository(), citas, calendario, reloj);
@@ -51,7 +53,7 @@ class CitasPacienteControllerTest {
                 new FakeNotificacionPublicador(), new FakeAgendaEventos(), reloj);
         mvc = MockMvcBuilders.standaloneSetup(new CitasPacienteController(new ConsultaCitasPacienteService(citas),
                         new ReprogramacionService(citas, cancelacion, solicitudes, calendario, reloj),
-                        sesiones.resolutor()))
+                        SesionesDePrueba.pacientes("AF-1", PACIENTE, BENEFICIARIO), sesiones.resolutor()))
                 .setControllerAdvice(new ManejadorErrores())
                 .build();
     }
@@ -61,13 +63,31 @@ class CitasPacienteControllerTest {
     }
 
     @Test
-    void misCitas_soloLasDelPacienteDelToken() throws Exception {
+    void misCitas_lasDelTitularYSusBeneficiarios_nuncaAjenas() throws Exception {
         mvc.perform(get("/api/v1/citas/mias").header("Authorization", paciente()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].citaId").value(1))
-                .andExpect(jsonPath("$[0].estado").value("PROGRAMADA"))
-                .andExpect(jsonPath("$[1].citaId").value(3));
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$[0].citaId").value(4))
+                .andExpect(jsonPath("$[0].pacienteId").value(BENEFICIARIO))
+                .andExpect(jsonPath("$[1].citaId").value(1))
+                .andExpect(jsonPath("$[1].estado").value("PROGRAMADA"))
+                .andExpect(jsonPath("$[2].citaId").value(3));
+    }
+
+    @Test
+    void reprogramar_citaDelBeneficiario_conSuPacienteId() throws Exception {
+        mvc.perform(post("/api/v1/citas/4/reprogramar").param("pacienteId", "" + BENEFICIARIO)
+                        .header("Authorization", paciente()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.pacienteId").value(BENEFICIARIO))
+                .andExpect(jsonPath("$.prioridad").value(2));
+    }
+
+    @Test
+    void pacienteIdDeOtraAfiliacion_403() throws Exception {
+        mvc.perform(get("/api/v1/citas/2").param("pacienteId", "999").header("Authorization", paciente()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.codigo").value("NO_ES_DEL_PACIENTE"));
     }
 
     @Test

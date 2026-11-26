@@ -161,6 +161,28 @@ public class PacienteService {
         return pacientes.deLaAfiliacion(afiliado.trim());
     }
 
+    /** RN-05: el titular y sus beneficiarios (misma afiliacion), titular primero. */
+    public List<PacienteDTO> grupoFamiliar(long pacienteId) {
+        PacienteDTO propio = pacientes.porId(pacienteId)
+                .orElseThrow(() -> new DominioException("NO_ENCONTRADA", "No se encontro el paciente"));
+        return pacientes.deLaAfiliacion(propio.numeroAfiliado());
+    }
+
+    /**
+     * RN-05: el titular gestiona las citas de sus beneficiarios con su propia cuenta. Devuelve el paciente sobre el
+     * que se actua: {@code pedido} si es de su afiliacion, o el propio usuario si no se indico ninguno.
+     */
+    public long pacienteDelGrupo(long usuarioPacienteId, Long pedido) {
+        if (pedido == null || pedido == usuarioPacienteId) {
+            return usuarioPacienteId;
+        }
+        boolean esDelGrupo = grupoFamiliar(usuarioPacienteId).stream().anyMatch(p -> p.pacienteId() == pedido);
+        if (!esDelGrupo) {
+            throw new DominioException("NO_ES_DEL_PACIENTE", "Solo puede gestionar pacientes de su propia afiliacion");
+        }
+        return pedido;
+    }
+
     /** Un paciente solo registra beneficiarios o consulta pacientes de su propia afiliacion. */
     public void exigirMismaAfiliacion(long pacienteId, String afiliado) {
         String propia = pacientes.porId(pacienteId).map(PacienteDTO::numeroAfiliado).orElse(null);

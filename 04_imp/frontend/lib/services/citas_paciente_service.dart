@@ -5,7 +5,8 @@ import '../models/enfermeria/ficha_dia.dart';
 import '../models/solicitud/solicitud.dart';
 import 'cancelacion_service.dart';
 
-/// CU-08 y CU-10: las citas del paciente autenticado (el backend saca el paciente del token).
+/// CU-08 y CU-10: las citas del titular autenticado y de sus beneficiarios (RN-05). El backend saca al titular
+/// del token y verifica que el `pacienteId` de un beneficiario sea de su misma afiliacion.
 abstract class CitasPacienteService {
   /// `GET /api/v1/citas/mias`: de la mas reciente a la mas antigua.
   Future<List<CitaPaciente>> misCitas();
@@ -15,7 +16,7 @@ abstract class CitasPacienteService {
 
   /// `POST /api/v1/citas/{id}/reprogramar`: cancela la cita y deja una solicitud (prioridad 2) para el
   /// siguiente dia habil. Errores: ESTADO_NO_PERMITE, SIN_DIA_DISPONIBLE, NO_ES_DEL_PACIENTE.
-  Future<ResultadoSolicitud> reprogramar(int citaId);
+  Future<ResultadoSolicitud> reprogramar(int citaId, {int? pacienteId});
 }
 
 class ApiCitasPacienteService implements CitasPacienteService {
@@ -42,8 +43,8 @@ class ApiCitasPacienteService implements CitasPacienteService {
   }
 
   @override
-  Future<ResultadoSolicitud> reprogramar(int citaId) async {
-    final json = await _api.post('/api/v1/citas/$citaId/reprogramar');
+  Future<ResultadoSolicitud> reprogramar(int citaId, {int? pacienteId}) async {
+    final json = await _api.post('/api/v1/citas/$citaId/reprogramar${conPaciente(pacienteId)}');
     return leerRespuesta(() => ResultadoSolicitud.fromJson(json));
   }
 }
@@ -68,7 +69,7 @@ class FakeCitasPacienteService implements CitasPacienteService, CancelacionServi
   Future<CitaPaciente> detalle(int citaId) async => _buscar(citaId);
 
   @override
-  Future<void> cancelar(int citaId) async {
+  Future<void> cancelar(int citaId, {int? pacienteId}) async {
     final cita = _buscar(citaId);
     if (!cita.sePuedeModificar) {
       throw const ApiException('ESTADO_NO_PERMITE', 'Solo se puede cancelar una cita PROGRAMADA', estado: 409);
@@ -77,7 +78,7 @@ class FakeCitasPacienteService implements CitasPacienteService, CancelacionServi
   }
 
   @override
-  Future<ResultadoSolicitud> reprogramar(int citaId) async {
+  Future<ResultadoSolicitud> reprogramar(int citaId, {int? pacienteId}) async {
     final cita = _buscar(citaId);
     if (!cita.sePuedeModificar) {
       throw const ApiException('ESTADO_NO_PERMITE', 'Solo se puede reprogramar una cita PROGRAMADA', estado: 409);

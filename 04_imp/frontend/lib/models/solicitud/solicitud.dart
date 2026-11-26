@@ -35,6 +35,7 @@ class ResultadoSolicitud {
     required this.prioridad,
     required this.ordenLlegada,
     this.citaId,
+    this.pacienteId,
   });
 
   final int solicitudId;
@@ -45,6 +46,9 @@ class ResultadoSolicitud {
   final int prioridad;
   final int ordenLlegada;
   final int? citaId;
+
+  /// Paciente de la solicitud (el titular o uno de sus beneficiarios).
+  final int? pacienteId;
 
   factory ResultadoSolicitud.fromJson(Map<String, dynamic> json) {
     final codigoEspecialidad = json['especialidad'];
@@ -78,6 +82,7 @@ class ResultadoSolicitud {
       prioridad: json['prioridad'] as int,
       ordenLlegada: json['ordenLlegada'] as int,
       citaId: json['citaId'] as int?,
+      pacienteId: json['pacienteId'] as int?,
     );
   }
 }

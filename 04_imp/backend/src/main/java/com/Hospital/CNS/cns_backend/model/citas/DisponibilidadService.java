@@ -11,7 +11,7 @@ import com.Hospital.CNS.cns_backend.model.compartido.CitaRepository;
  * CU-06 (T100-02): dice si una combinacion (paciente, medico, consultorio, fecha, hora) se puede confirmar.
  *
  * <p>Orden de comprobacion (se devuelve el PRIMER motivo que falla): paciente con una cita por dia
- * &rarr; medico completo (7) &rarr; medico libre a esa hora &rarr; consultorio libre &rarr; sin solapamiento
+ * &rarr; paciente ocupado por una ficha interna o cirugia (T100-24) &rarr; medico completo (7) &rarr; medico libre a esa hora &rarr; consultorio libre &rarr; sin solapamiento
  * &rarr; bloqueo de la agenda.</p>
  *
  * <p>Concurrencia (RNF-04): el bloqueo de la agenda se PIDE antes de leer, para que las lecturas ya se hagan con
@@ -30,10 +30,17 @@ public class DisponibilidadService {
 
     private final AgendaRepository agenda;
     private final CitaRepository citas;
+    private final OcupacionPaciente ocupacionPaciente;
 
+    /** Sin fichas internas ni cirugias (pruebas con Fakes). */
     public DisponibilidadService(AgendaRepository agenda, CitaRepository citas) {
+        this(agenda, citas, OcupacionPaciente.NINGUNA);
+    }
+
+    public DisponibilidadService(AgendaRepository agenda, CitaRepository citas, OcupacionPaciente ocupacionPaciente) {
         this.agenda = Objects.requireNonNull(agenda, "agenda");
         this.citas = Objects.requireNonNull(citas, "citas");
+        this.ocupacionPaciente = Objects.requireNonNull(ocupacionPaciente, "ocupacionPaciente");
     }
 
     public ResultadoDisponibilidad validar(CombinacionCandidata c) {
@@ -42,6 +49,9 @@ public class DisponibilidadService {
 
         if (citas.pacienteTieneCitaEnFecha(c.pacienteId(), c.fecha())) {
             return ResultadoDisponibilidad.PACIENTE_YA_TIENE_CITA;
+        }
+        if (ocupacionPaciente.ocupado(c.pacienteId(), c.fecha(), c.hora(), c.fin())) {
+            return ResultadoDisponibilidad.PACIENTE_OCUPADO;
         }
         if (citas.contarDelMedicoEnFecha(c.medicoId(), c.fecha()) >= MAXIMO_CITAS_POR_DIA) {
             return ResultadoDisponibilidad.MEDICO_COMPLETO;

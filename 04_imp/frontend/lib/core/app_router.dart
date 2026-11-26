@@ -268,6 +268,7 @@ Widget _pagina(String nombre) {
         {Rol.paciente},
         (_) => SolicitarCitaView(
           controller: solicitudControllerApp,
+          numeroAfiliado: sesionApp.numeroAfiliado,
         ),
       );
 
@@ -592,11 +593,18 @@ final CitasPacienteService citasPacienteApp =
 final CancelacionService cancelacionApp =
     _citasPrueba ?? ApiCancelacionService(apiApp);
 
-/// CU-04: servicio y controlador para solicitar y consultar citas.
-final SolicitudService solicitudServicioApp = ApiSolicitudService(apiApp);
+/// CU-04: servicio y controlador para solicitar y consultar citas (especialidad y dia; el titular tambien pide para
+/// sus beneficiarios). Con AUTH_FAKE, en memoria.
+final SolicitudService solicitudServicioApp = const bool.fromEnvironment('AUTH_FAKE')
+    ? FakeSolicitudService()
+    : ApiSolicitudService(apiApp);
 
-final SolicitudController solicitudControllerApp =
-    SolicitudController(service: solicitudServicioApp);
+final SolicitudController solicitudControllerApp = SolicitudController(
+  service: solicitudServicioApp,
+  pacientes: const bool.fromEnvironment('AUTH_FAKE')
+      ? FakePacienteService(conDatosDeEjemplo: true)
+      : ApiPacienteService(apiApp),
+);
 
 /// Servicio y controlador de las fichas para la pantalla de TV.
 final FichasService fichasTvService = FichasService(apiApp);

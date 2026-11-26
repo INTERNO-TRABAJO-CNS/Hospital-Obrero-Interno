@@ -17,6 +17,6 @@ public interface SolicitudRepository {
     /** PENDIENTE o EN_ESPERA. */
     boolean pacienteTieneSolicitudActivaEnDia(long pacienteId, LocalDate dia);
 
-    /** Orden: prioridad, ordenLlegada. */
+    /** Orden: prioridad, adulto mayor (60 o mas) primero, ordenLlegada (T100-24). */
     List<SolicitudDTO> siguientesParaProcesar(LocalDate hasta, int max);
 }

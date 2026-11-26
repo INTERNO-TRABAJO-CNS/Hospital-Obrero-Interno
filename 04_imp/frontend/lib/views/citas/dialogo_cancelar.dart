@@ -11,6 +11,7 @@ Future<bool?> mostrarDialogoCancelar(
   int citaId,
   String fechaIso, {
   int? numeroFicha,
+  int? pacienteId,
 }) {
   return showDialog<bool>(
     context: context,
@@ -25,6 +26,7 @@ Future<bool?> mostrarDialogoCancelar(
             citaId: citaId,
             fechaIso: fechaIso,
             numeroFicha: numeroFicha,
+            pacienteId: pacienteId,
           ),
         ),
       ),
@@ -38,6 +40,7 @@ class _DialogoCancelar extends StatefulWidget {
     required this.citaId,
     required this.fechaIso,
     this.numeroFicha,
+    this.pacienteId,
   });
 
   final CancelacionService servicio;
@@ -46,6 +49,9 @@ class _DialogoCancelar extends StatefulWidget {
 
   /// Numero de ficha que ve el paciente (si no se conoce, se muestra el de la cita).
   final int? numeroFicha;
+
+  /// Beneficiario dueno de la cita (RN-05); null si es del titular.
+  final int? pacienteId;
 
   @override
   State<_DialogoCancelar> createState() => _DialogoCancelarState();
@@ -61,7 +67,7 @@ class _DialogoCancelarState extends State<_DialogoCancelar> {
       _error = null;
     });
     try {
-      await widget.servicio.cancelar(widget.citaId);
+      await widget.servicio.cancelar(widget.citaId, pacienteId: widget.pacienteId);
       if (mounted) {
         Navigator.of(context).pop(true);
       }

@@ -19,9 +19,11 @@ import com.Hospital.CNS.cns_backend.model.compartido.CitaDTO;
 import com.Hospital.CNS.cns_backend.model.compartido.CitaRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.DominioException;
 import com.Hospital.CNS.cns_backend.model.compartido.EstadoSolicitud;
+import com.Hospital.CNS.cns_backend.model.compartido.ReglasEdad;
 import com.Hospital.CNS.cns_backend.model.compartido.Reloj;
 import com.Hospital.CNS.cns_backend.model.compartido.SolicitudDTO;
 import com.Hospital.CNS.cns_backend.model.compartido.SolicitudRepository;
+import com.Hospital.CNS.cns_backend.model.compartido.TipoEspecialidad;
 import com.Hospital.CNS.cns_backend.model.compartido.Transaccion;
 import com.Hospital.CNS.cns_backend.model.recursos.HorarioDTO;
 import com.Hospital.CNS.cns_backend.model.recursos.HorarioRepository;
@@ -32,7 +34,10 @@ import com.Hospital.CNS.cns_backend.model.recursos.MedicoRepository;
  * CU-05 (T100-03): asigna automaticamente la siguiente solicitud de la cola.
  *
  * <ul>
- *   <li>Cola: prioridad 1 antes que 2; dentro de cada una, orden de llegada ({@code siguientesParaProcesar}).</li>
+ *   <li>Cola: prioridad 1 antes que 2; dentro de cada una, primero el adulto mayor (60 o mas, T100-24) y luego el
+ *       orden de llegada ({@code siguientesParaProcesar}).</li>
+ *   <li>T100-24: Pediatria solo menores de 10 anios. Si el paciente ya cumplio 10 el dia buscado (por ejemplo, mientras
+ *       esperaba cupo), la solicitud pasa a SIN_CUPO: Pediatria ya no puede atenderlo.</li>
  *   <li>Cada llamada prueba SOLO el {@code diaSolicitado}. Medicos activos de la especialidad, primero el de menos
  *       fichas ese dia (empate: menor medicoId, {@code PENDIENTE PV-13}); por cada uno, sus franjas consecutivas de
  *       {@code duracionCitaMin} dentro de su horario; cada franja se valida con CU-06.</li>
@@ -62,6 +67,7 @@ public class AsignacionService {
     private final CitaService registro;
     private final Reloj reloj;
     private final Transaccion transaccion;
+    private final EdadPaciente edades;
 
     /** Resultado de buscar en un dia: la cita creada, o si alguna franja estaba tomada por otro proceso. */
     private record Busqueda(CitaDTO cita, boolean hubOtroProceso) {
@@ -81,6 +87,12 @@ public class AsignacionService {
     public AsignacionService(SolicitudRepository s, CitaRepository c, DisponibilidadService d,
                              MedicoRepository m, HorarioRepository h, CalendarioHabil cal, CitaService registro,
                              Reloj reloj, Transaccion transaccion) {
+        this(s, c, d, m, h, cal, registro, reloj, transaccion, EdadPaciente.DESCONOCIDA);
+    }
+
+    public AsignacionService(SolicitudRepository s, CitaRepository c, DisponibilidadService d,
+                             MedicoRepository m, HorarioRepository h, CalendarioHabil cal, CitaService registro,
+                             Reloj reloj, Transaccion transaccion, EdadPaciente edades) {
         this.solicitudes = Objects.requireNonNull(s, "solicitudes");
         this.citas = Objects.requireNonNull(c, "citas");
         this.disponibilidad = Objects.requireNonNull(d, "disponibilidad");
@@ -90,6 +102,7 @@ public class AsignacionService {
         this.registro = Objects.requireNonNull(registro, "registro");
         this.reloj = Objects.requireNonNull(reloj, "reloj");
         this.transaccion = Objects.requireNonNull(transaccion, "transaccion");
+        this.edades = Objects.requireNonNull(edades, "edades");
     }
 
     public ResultadoAsignacion procesarSiguiente() {
@@ -120,6 +133,11 @@ public class AsignacionService {
     private Paso procesar(SolicitudDTO s, LocalDateTime ahora, LocalDate limite) {
         LocalDate hoy = ahora.toLocalDate();
         LocalDate dia = s.diaSolicitado();
+        if (!s.especialidad().esBasica() || fueraDePediatria(s, dia.isBefore(hoy) ? hoy : dia)) {
+            LOG.info("Solicitud {} SIN_CUPO: {} no puede atender a este paciente", s.solicitudId(), s.especialidad());
+            guardarEstado(s, EstadoSolicitud.SIN_CUPO, dia);
+            return new Paso(ResultadoAsignacion.SIN_CUPO, null);
+        }
         boolean diaUtil = !dia.isBefore(hoy) && calendario.esHabil(dia)
                 && !citas.pacienteTieneCitaEnFecha(s.pacienteId(), dia);
         if (diaUtil) {
@@ -142,6 +160,14 @@ public class AsignacionService {
         LOG.info("Solicitud {}: NO HAY CUPOS el {}, en espera para el {}", s.solicitudId(), dia, siguiente);
         guardarEstado(s, EstadoSolicitud.EN_ESPERA, siguiente);
         return new Paso(ResultadoAsignacion.EN_ESPERA, null);
+    }
+
+    /** Pediatria solo atiende a menores de 10 anios; sin fecha de nacimiento conocida no se descarta. */
+    private boolean fueraDePediatria(SolicitudDTO s, LocalDate dia) {
+        return s.especialidad() == TipoEspecialidad.PEDIATRIA
+                && edades.fechaNacimiento(s.pacienteId())
+                        .map(n -> !ReglasEdad.admitidoEnPediatria(ReglasEdad.edadEn(n, dia)))
+                        .orElse(false);
     }
 
     private Busqueda buscarEnDia(SolicitudDTO s, LocalDate dia, LocalDateTime ahora) {

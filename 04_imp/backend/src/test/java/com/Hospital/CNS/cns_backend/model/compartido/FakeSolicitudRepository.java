@@ -65,12 +65,19 @@ public class FakeSolicitudRepository implements SolicitudRepository {
                         && esActiva(s));
     }
 
-    /** PENDIENTE o EN_ESPERA con dia solicitado hasta {@code hasta}; orden: prioridad y luego ordenLlegada. */
+    /** Pacientes de 60 anios o mas (en PostgreSQL se calcula con su fecha de nacimiento). */
+    public final java.util.Set<Long> adultosMayores = new java.util.HashSet<>();
+
+    /**
+     * PENDIENTE o EN_ESPERA con dia solicitado hasta {@code hasta}; orden: prioridad, adulto mayor primero y luego
+     * ordenLlegada (T100-24).
+     */
     @Override
     public synchronized List<SolicitudDTO> siguientesParaProcesar(LocalDate hasta, int max) {
         return solicitudes.stream()
                 .filter(s -> esActiva(s) && !s.diaSolicitado().isAfter(hasta))
                 .sorted(Comparator.comparingInt(SolicitudDTO::prioridad)
+                        .thenComparing(s -> !adultosMayores.contains(s.pacienteId()))
                         .thenComparingLong(SolicitudDTO::ordenLlegada))
                 .limit(max)
                 .toList();

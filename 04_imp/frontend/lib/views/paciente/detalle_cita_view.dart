@@ -244,7 +244,8 @@ Future<bool> reprogramarDesdeDetalle(
 
 Future<bool> cancelarDesdeDetalle(BuildContext context, CitaPaciente cita, CancelacionService servicio) async {
   final cancelada =
-      await mostrarDialogoCancelar(context, servicio, cita.citaId, isoDe(cita.inicio), numeroFicha: cita.numeroFicha);
+      await mostrarDialogoCancelar(context, servicio, cita.citaId, isoDe(cita.inicio),
+          numeroFicha: cita.numeroFicha, pacienteId: cita.pacienteId);
   return cancelada == true;
 }
 

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.Hospital.CNS.cns_backend.lib.DB;
 import com.Hospital.CNS.cns_backend.model.compartido.EstadoSolicitud;
+import com.Hospital.CNS.cns_backend.model.compartido.ReglasEdad;
 import com.Hospital.CNS.cns_backend.model.compartido.SolicitudDTO;
 import com.Hospital.CNS.cns_backend.model.compartido.SolicitudRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.TipoEspecialidad;
@@ -111,8 +112,14 @@ public class PgSolicitudRepository implements SolicitudRepository {
 
     @Override
     public List<SolicitudDTO> siguientesParaProcesar(LocalDate hasta, int max) {
-        return consultar(SELECCION + " where estado in ('PENDIENTE', 'EN_ESPERA') and dia_solicitado <= ? "
-                + "order by prioridad, orden_llegada limit ? for update skip locked", hasta, max);
+        // T100-24: dentro de cada prioridad, primero el adulto mayor (60 anios o mas, Ley 369) y luego la llegada.
+        return consultar("select s.id, s.paciente_id, s.especialidad, s.dia_solicitado, s.prioridad, "
+                + "s.orden_llegada, s.estado, s.cita_id from citas.solicitud s "
+                + "join identidad.paciente p on p.id = s.paciente_id "
+                + "where s.estado in ('PENDIENTE', 'EN_ESPERA') and s.dia_solicitado <= ? "
+                + "order by s.prioridad, (p.fecha_nacimiento <= current_date - make_interval(years => ?)) desc, "
+                + "s.orden_llegada limit ? for update of s skip locked",
+                hasta, ReglasEdad.EDAD_ADULTO_MAYOR, max);
     }
 
     private List<SolicitudDTO> consultar(String sql, Object... parametros) {

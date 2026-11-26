@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgAgendaRepository;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgCambioCitaRepository;
+import com.Hospital.CNS.cns_backend.infrastructure.pg.PgOcupacionPaciente;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgSolicitudRepository;
 import com.Hospital.CNS.cns_backend.infrastructure.planificador.ProcesadorCola;
 import com.Hospital.CNS.cns_backend.model.citas.AgendaRepository;
@@ -13,6 +14,8 @@ import com.Hospital.CNS.cns_backend.model.citas.AsignacionService;
 import com.Hospital.CNS.cns_backend.model.citas.CalendarioHabil;
 import com.Hospital.CNS.cns_backend.model.citas.CitaService;
 import com.Hospital.CNS.cns_backend.model.citas.ConsultaCitasPacienteService;
+import com.Hospital.CNS.cns_backend.model.citas.EdadPaciente;
+import com.Hospital.CNS.cns_backend.model.citas.OcupacionPaciente;
 import com.Hospital.CNS.cns_backend.model.citas.ReprogramacionService;
 import com.Hospital.CNS.cns_backend.model.compartido.CancelacionCita;
 import com.Hospital.CNS.cns_backend.model.citas.DisponibilidadService;
@@ -24,6 +27,8 @@ import com.Hospital.CNS.cns_backend.model.compartido.NotificacionPublicador;
 import com.Hospital.CNS.cns_backend.model.compartido.Reloj;
 import com.Hospital.CNS.cns_backend.model.compartido.SolicitudRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.Transaccion;
+import com.Hospital.CNS.cns_backend.model.identidad.PacienteDTO;
+import com.Hospital.CNS.cns_backend.model.identidad.PacienteRepository;
 import com.Hospital.CNS.cns_backend.model.operaciones.CancelacionService;
 import com.Hospital.CNS.cns_backend.model.recursos.DiaNoHabilRepository;
 import com.Hospital.CNS.cns_backend.model.recursos.HorarioRepository;
@@ -57,16 +62,29 @@ public class ConfiguracionCitas {
         return new CalendarioHabil(dias);
     }
 
-    /** CU-04 (T100-06): el paciente registra la solicitud; la cola de abajo la asigna. */
+    /** T100-24: edad del paciente (Pediatria solo menores de 10) a partir de su fecha de nacimiento. */
+    @Bean
+    EdadPaciente edadPaciente(PacienteRepository pacientes) {
+        return pacienteId -> pacientes.porId(pacienteId).map(PacienteDTO::fechaNacimiento);
+    }
+
+    /** T100-24: cruces del paciente con sus fichas internas y cirugias. */
+    @Bean
+    OcupacionPaciente ocupacionPaciente() {
+        return new PgOcupacionPaciente();
+    }
+
+    /** CU-04 (T100-06): el paciente registra la solicitud (especialidad y dia); la cola de abajo la asigna. */
     @Bean
     SolicitudService solicitudService(SolicitudRepository solicitudes, CitaRepository citas,
-                                      CalendarioHabil calendario, Reloj reloj) {
-        return new SolicitudService(solicitudes, citas, calendario, reloj);
+                                      CalendarioHabil calendario, Reloj reloj, EdadPaciente edades) {
+        return new SolicitudService(solicitudes, citas, calendario, reloj, edades);
     }
 
     @Bean
-    DisponibilidadService disponibilidadService(AgendaRepository agenda, CitaRepository citas) {
-        return new DisponibilidadService(agenda, citas);
+    DisponibilidadService disponibilidadService(AgendaRepository agenda, CitaRepository citas,
+                                                OcupacionPaciente ocupacion) {
+        return new DisponibilidadService(agenda, citas, ocupacion);
     }
 
     @Bean
@@ -100,9 +118,9 @@ public class ConfiguracionCitas {
     AsignacionService asignacionService(SolicitudRepository solicitudes, CitaRepository citas,
                                         DisponibilidadService disponibilidad, MedicoRepository medicos,
                                         HorarioRepository horarios, CalendarioHabil calendario, CitaService registro,
-                                        Reloj reloj, Transaccion transaccion) {
+                                        Reloj reloj, Transaccion transaccion, EdadPaciente edades) {
         return new AsignacionService(solicitudes, citas, disponibilidad, medicos, horarios, calendario, registro, reloj,
-                transaccion);
+                transaccion, edades);
     }
 
     @Bean

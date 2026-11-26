@@ -8,6 +8,7 @@ import com.Hospital.CNS.cns_backend.model.compartido.TipoEspecialidad;
 
 public record ResultadoSolicitud(
         long solicitudId,
+        long pacienteId,
         EstadoSolicitud estado,
         String mensaje,
         TipoEspecialidad especialidad,
@@ -36,11 +37,13 @@ public record ResultadoSolicitud(
             mensaje = "La cita fue cancelada.";
 
         } else {
-            mensaje = "Su solicitud fue registrada. El sistema le asignará médico, día y hora en cuanto haya un cupo disponible.";
+            mensaje = "Su solicitud fue registrada. El sistema le asignará médico, hora y consultorio para ese día; "
+                    + "si no hay cupo, seguirá buscando en los siguientes días hábiles y le avisará.";
         }
 
         return new ResultadoSolicitud(
                 solicitud.solicitudId(),
+                solicitud.pacienteId(),
                 solicitud.estado(),
                 mensaje,
                 solicitud.especialidad(),

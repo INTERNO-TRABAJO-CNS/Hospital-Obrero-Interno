@@ -114,7 +114,7 @@ class MisCitasController extends ChangeNotifier with AvisoSeguro {
   /// Cancela y crea la nueva solicitud. Lanza [ApiException] si el backend la rechaza.
   Future<ResultadoSolicitud> reprogramar(CitaPaciente cita) async {
     try {
-      return await _citas.reprogramar(cita.citaId);
+      return await _citas.reprogramar(cita.citaId, pacienteId: cita.pacienteId);
     } finally {
       await cargar();
     }

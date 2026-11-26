@@ -11,6 +11,8 @@ class CitaPaciente {
     required this.medico,
     required this.consultorio,
     required this.estado,
+    this.pacienteId,
+    this.paciente = '',
   });
 
   factory CitaPaciente.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,8 @@ class CitaPaciente {
       medico: (json['nombreMedico'] as String?)?.trim() ?? '',
       consultorio: '${json['consultorio']}',
       estado: EstadoCita.desdeCodigo(json['estado'] as String),
+      pacienteId: (json['pacienteId'] as num?)?.toInt(),
+      paciente: (json['nombrePaciente'] as String?)?.trim() ?? '',
     );
   }
 
@@ -36,6 +40,12 @@ class CitaPaciente {
   final String medico;
   final String consultorio;
   final EstadoCita estado;
+
+  /// Paciente de la cita: el titular o uno de sus beneficiarios (RN-05). Null en datos antiguos.
+  final int? pacienteId;
+
+  /// Nombre del paciente de la cita.
+  final String paciente;
 
   /// Hasta esta hora enfermeria puede confirmar la llegada; despues la cita se cancela sola.
   DateTime get limiteConfirmacion => inicio.subtract(const Duration(minutes: minutosAntesParaConfirmar));
@@ -58,5 +68,7 @@ class CitaPaciente {
         medico: medico,
         consultorio: consultorio,
         estado: estado ?? this.estado,
+        pacienteId: pacienteId,
+        paciente: paciente,
       );
 }

@@ -25,9 +25,14 @@ import jakarta.servlet.http.HttpServletResponse;
 public class FiltroAutenticacion extends OncePerRequestFilter {
 
     /** "METODO ruta" que no necesitan sesion. */
-    private static final Set<String> PUBLICAS = Set.of(
+    /**
+     * Sin sesion. La TV de la sala de espera (RN-16, RF-09) no inicia sesion: su listado solo trae numero de ficha,
+     * hora, especialidad, consultorio y estado, sin datos personales del paciente.
+     */
+    static final Set<String> PUBLICAS = Set.of(
             "POST /api/v1/auth/login",
-            "POST /api/v1/pacientes/titular");
+            "POST /api/v1/pacientes/titular",
+            "GET /api/v1/tv/fichas");
 
     private final AuthService auth;
 

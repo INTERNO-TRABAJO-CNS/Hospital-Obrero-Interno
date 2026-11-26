@@ -23,7 +23,8 @@ class CancelacionControllerTest {
     @BeforeEach
     void preparar() {
         cancelacion = new FakeCancelacionCita();
-        mvc = MockMvcBuilders.standaloneSetup(new CancelacionController(cancelacion, sesiones.resolutor()))
+        mvc = MockMvcBuilders.standaloneSetup(new CancelacionController(cancelacion,
+                        SesionesDePrueba.pacientes("AF-1", 120, 121), sesiones.resolutor()))
                 .setControllerAdvice(new ManejadorErrores())
                 .build();
     }

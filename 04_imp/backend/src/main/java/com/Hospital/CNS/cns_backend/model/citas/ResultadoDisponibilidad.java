@@ -12,6 +12,8 @@ public enum ResultadoDisponibilidad {
     MEDICO_COMPLETO,
     /** [4a] El paciente ya tiene una cita ese dia (en cualquier especialidad). */
     PACIENTE_YA_TIENE_CITA,
+    /** T100-24: el paciente tiene una ficha interna o una cirugia que se cruza con ese intervalo. */
+    PACIENTE_OCUPADO,
     /** [5a] El intervalo se cruza con otra cita del medico. */
     SOLAPADA,
     /** [5a] Otra solicitud simultanea tiene la agenda del medico en ese dia. */
