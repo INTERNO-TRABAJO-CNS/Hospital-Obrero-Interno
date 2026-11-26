@@ -1,163 +1,146 @@
 package com.Hospital.CNS.cns_backend.model.operaciones;
 
-import com.Hospital.CNS.cns_backend.model.compartido.*;
-import com.Hospital.CNS.cns_backend.controller.UsuarioAutenticado;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static com.Hospital.CNS.cns_backend.model.compartido.Citas.cita;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import com.Hospital.CNS.cns_backend.controller.UsuarioAutenticado;
+import com.Hospital.CNS.cns_backend.model.compartido.EstadoCita;
+import com.Hospital.CNS.cns_backend.model.compartido.FakeAgendaEventos;
+import com.Hospital.CNS.cns_backend.model.compartido.FakeCambioCitaRepository;
+import com.Hospital.CNS.cns_backend.model.compartido.FakeCitaRepository;
+import com.Hospital.CNS.cns_backend.model.compartido.RelojFijo;
+import com.Hospital.CNS.cns_backend.model.compartido.ResultadoFinalizacion;
+import com.Hospital.CNS.cns_backend.model.compartido.RolUsuario;
+
+/** CU-12: un test por flujo alternativo, con Fakes y RelojFijo (T-30 exacto, T-31 y T-29). */
 class ActualizacionEstadoServiceTest {
 
-    private CitaRepository citaRepository;
-    private CambioCitaRepository cambioRepository;
-    private AgendaEventos agendaEventos;
-    private Reloj reloj;
+    private static final LocalDate HOY = LocalDate.of(2026, 11, 14);
+    private static final LocalTime HORA_CITA = LocalTime.of(10, 0);
+    private static final long MEDICO = 100;
+    private static final UsuarioAutenticado ENFERMERA =
+            new UsuarioAutenticado(9, RolUsuario.ENFERMERIA, 0, "M. Flores");
+
+    private FakeCitaRepository citas;
+    private FakeCambioCitaRepository cambios;
+    private FakeAgendaEventos eventos;
+    private RelojFijo reloj;
     private ActualizacionEstadoService service;
 
     @BeforeEach
-    void setUp() {
-        citaRepository = mock(CitaRepository.class);
-        cambioRepository = mock(CambioCitaRepository.class);
-        agendaEventos = mock(AgendaEventos.class);
-        reloj = mock(Reloj.class);
-        service = new ActualizacionEstadoService(citaRepository, cambioRepository, agendaEventos, reloj);
+    void preparar() {
+        citas = new FakeCitaRepository();
+        cambios = new FakeCambioCitaRepository();
+        eventos = new FakeAgendaEventos();
+        reloj = new RelojFijo(HOY.atTime(9, 0));
+        service = new ActualizacionEstadoService(citas, cambios, eventos, reloj);
+    }
+
+    private void citaDeHoy(EstadoCita estado) {
+        citas.store(cita(1, 10, MEDICO, HOY, HORA_CITA, 3, estado));
     }
 
     @Test
     void confirmar_aT31min_ok() {
-        LocalDate hoy = LocalDate.of(2026, 11, 14);
-        LocalTime horaCita = LocalTime.of(10, 0);
-        LocalDateTime relojFijo = hoy.atTime(9, 29); // 31 minutos antes (OK)
+        citaDeHoy(EstadoCita.PROGRAMADA);
+        reloj.fijar(HOY.atTime(9, 29));
 
-        when(reloj.ahora()).thenReturn(relojFijo);
-        
-        CitaDTO cita = new CitaDTO(
-            1L, 10L, "Paciente Test", "123", 
-            100L, "Dr Test", null, 1, 
-            hoy, horaCita, 1, EstadoCita.PROGRAMADA
-        );
-        
-        when(citaRepository.porId(1L)).thenReturn(Optional.of(cita));
-        when(citaRepository.cambiarEstado(1L, EstadoCita.PROGRAMADA, EstadoCita.ASISTENCIA_CONFIRMADA)).thenReturn(true);
+        assertEquals(ResultadoConfirmacion.CONFIRMADA, service.confirmarAsistencia(1, ENFERMERA));
+        assertEquals(EstadoCita.ASISTENCIA_CONFIRMADA, citas.porId(1).orElseThrow().estado());
+    }
 
-        UsuarioAutenticado enfermera = mock(UsuarioAutenticado.class);
-        when(enfermera.rol()).thenReturn(RolUsuario.ENFERMERIA);
+    @Test
+    void confirmar_justoEnT30_ok() {
+        citaDeHoy(EstadoCita.PROGRAMADA);
+        reloj.fijar(HOY.atTime(9, 30));
 
-        ResultadoConfirmacion res = service.confirmarAsistencia(1L, enfermera);
-
-        assertEquals(ResultadoConfirmacion.CONFIRMADA, res);
+        assertEquals(ResultadoConfirmacion.CONFIRMADA, service.confirmarAsistencia(1, ENFERMERA));
     }
 
     @Test
     void confirmar_aT29min_fueraDePlazo() {
-        LocalDate hoy = LocalDate.of(2026, 11, 14);
-        LocalTime horaCita = LocalTime.of(10, 0);
-        LocalDateTime relojFijo = hoy.atTime(9, 31); // 29 minutos antes (Fuera de plazo)
+        citaDeHoy(EstadoCita.PROGRAMADA);
+        reloj.fijar(HOY.atTime(9, 31));
 
-        when(reloj.ahora()).thenReturn(relojFijo);
-        
-        CitaDTO cita = new CitaDTO(
-            1L, 10L, "Paciente Test", "123", 
-            100L, "Dr Test", null, 1, 
-            hoy, horaCita, 1, EstadoCita.PROGRAMADA
-        );
-        
-        when(citaRepository.porId(1L)).thenReturn(Optional.of(cita));
-
-        UsuarioAutenticado enfermera = mock(UsuarioAutenticado.class);
-        when(enfermera.rol()).thenReturn(RolUsuario.ENFERMERIA);
-
-        ResultadoConfirmacion res = service.confirmarAsistencia(1L, enfermera);
-
-        assertEquals(ResultadoConfirmacion.FUERA_DE_PLAZO, res);
+        assertEquals(ResultadoConfirmacion.FUERA_DE_PLAZO, service.confirmarAsistencia(1, ENFERMERA));
+        assertEquals(EstadoCita.PROGRAMADA, citas.porId(1).orElseThrow().estado());
+        assertTrue(cambios.cambios.isEmpty());
     }
 
     @Test
     void confirmar_citaDeOtroDia_rechaza() {
-        LocalDate hoy = LocalDate.of(2026, 11, 14);
-        LocalDate otroDia = LocalDate.of(2026, 11, 15);
-        LocalDateTime relojFijo = hoy.atTime(9, 0);
+        citas.store(cita(1, 10, MEDICO, HOY.plusDays(1), HORA_CITA, 3, EstadoCita.PROGRAMADA));
 
-        when(reloj.ahora()).thenReturn(relojFijo);
-        
-        CitaDTO cita = new CitaDTO(
-            1L, 10L, "Paciente Test", "123", 
-            100L, "Dr Test", null, 1, 
-            otroDia, LocalTime.of(10, 0), 1, EstadoCita.PROGRAMADA
-        );
-        
-        when(citaRepository.porId(1L)).thenReturn(Optional.of(cita));
-
-        UsuarioAutenticado enfermera = mock(UsuarioAutenticado.class);
-        when(enfermera.rol()).thenReturn(RolUsuario.ENFERMERIA);
-
-        ResultadoConfirmacion res = service.confirmarAsistencia(1L, enfermera);
-
-        assertEquals(ResultadoConfirmacion.NO_ES_DE_HOY, res);
+        assertEquals(ResultadoConfirmacion.NO_ES_DE_HOY, service.confirmarAsistencia(1, ENFERMERA));
     }
 
     @Test
     void confirmar_rolMedico_rechaza() {
-        LocalDate hoy = LocalDate.of(2026, 11, 14);
-        LocalDateTime relojFijo = hoy.atTime(9, 0);
+        citaDeHoy(EstadoCita.PROGRAMADA);
 
-        when(reloj.ahora()).thenReturn(relojFijo);
-        
-        CitaDTO cita = new CitaDTO(
-            1L, 10L, "Paciente Test", "123", 
-            100L, "Dr Test", null, 1, 
-            hoy, LocalTime.of(10, 0), 1, EstadoCita.PROGRAMADA
-        );
-        
-        when(citaRepository.porId(1L)).thenReturn(Optional.of(cita));
+        UsuarioAutenticado medico = new UsuarioAutenticado(2, RolUsuario.MEDICO, MEDICO);
+        assertEquals(ResultadoConfirmacion.ROL_NO_AUTORIZADO, service.confirmarAsistencia(1, medico));
+    }
 
-        UsuarioAutenticado medico = mock(UsuarioAutenticado.class);
-        when(medico.rol()).thenReturn(RolUsuario.MEDICO);
+    @Test
+    void confirmar_citaInexistente_noEncontrada() {
+        assertEquals(ResultadoConfirmacion.NO_ENCONTRADA, service.confirmarAsistencia(99, ENFERMERA));
+    }
 
-        ResultadoConfirmacion res = service.confirmarAsistencia(1L, medico);
+    @Test
+    void confirmar_yaConfirmada_estadoInvalido() {
+        citaDeHoy(EstadoCita.ASISTENCIA_CONFIRMADA);
 
-        assertEquals(ResultadoConfirmacion.ROL_NO_AUTORIZADO, res);
+        assertEquals(ResultadoConfirmacion.ESTADO_INVALIDO, service.confirmarAsistencia(1, ENFERMERA));
+    }
+
+    @Test
+    void confirmar_registraCambioConNombreYAvisaConEstadoNuevo() {
+        citaDeHoy(EstadoCita.PROGRAMADA);
+
+        service.confirmarAsistencia(1, ENFERMERA);
+
+        assertEquals(1, cambios.cambios.size());
+        assertEquals("ASISTENCIA_CONFIRMADA", cambios.cambios.get(0).accion());
+        assertEquals("Enfermería · M. Flores", cambios.cambios.get(0).usuario());
+        assertEquals("Paciente llegó al hospital", cambios.cambios.get(0).motivo());
+        assertEquals(EstadoCita.ASISTENCIA_CONFIRMADA, eventos.eventos.get(0).estado());
     }
 
     @Test
     void finalizar_desdeConfirmada_atendida() {
-        LocalDate hoy = LocalDate.of(2026, 11, 14);
-        
-        CitaDTO cita = new CitaDTO(
-            1L, 10L, "Paciente Test", "123", 
-            100L, "Dr Test", null, 1, 
-            hoy, LocalTime.of(10, 0), 1, EstadoCita.ASISTENCIA_CONFIRMADA
-        );
-        
-        when(citaRepository.porId(1L)).thenReturn(Optional.of(cita));
-        when(citaRepository.cambiarEstado(1L, EstadoCita.ASISTENCIA_CONFIRMADA, EstadoCita.ATENDIDA)).thenReturn(true);
+        citaDeHoy(EstadoCita.ASISTENCIA_CONFIRMADA);
+        LocalDateTime fin = HOY.atTime(10, 20);
+        reloj.fijar(fin);
 
-        ResultadoFinalizacion res = service.finalizar(1L, 100L);
-
-        assertEquals(ResultadoFinalizacion.FINALIZADA, res);
+        assertEquals(ResultadoFinalizacion.FINALIZADA, service.finalizar(1, MEDICO));
+        assertEquals(EstadoCita.ATENDIDA, citas.porId(1).orElseThrow().estado());
+        assertEquals(fin, citas.horasFin.get(1L));
+        assertEquals("ATENDIDA", cambios.cambios.get(0).accion());
+        assertEquals("Médico · Medico " + MEDICO, cambios.cambios.get(0).usuario());
+        assertEquals(EstadoCita.ATENDIDA, eventos.eventos.get(0).estado());
     }
 
     @Test
     void finalizar_desdeProgramada_rechaza() {
-        LocalDate hoy = LocalDate.of(2026, 11, 14);
-        
-        CitaDTO cita = new CitaDTO(
-            1L, 10L, "Paciente Test", "123", 
-            100L, "Dr Test", null, 1, 
-            hoy, LocalTime.of(10, 0), 1, EstadoCita.PROGRAMADA
-        );
-        
-        when(citaRepository.porId(1L)).thenReturn(Optional.of(cita));
+        citaDeHoy(EstadoCita.PROGRAMADA);
 
-        ResultadoFinalizacion res = service.finalizar(1L, 100L);
+        assertEquals(ResultadoFinalizacion.ESTADO_NO_PERMITE, service.finalizar(1, MEDICO));
+        assertEquals(EstadoCita.PROGRAMADA, citas.porId(1).orElseThrow().estado());
+    }
 
-        assertEquals(ResultadoFinalizacion.ESTADO_NO_PERMITE, res);
+    @Test
+    void finalizar_citaDeOtroMedico_rechaza() {
+        citaDeHoy(EstadoCita.ASISTENCIA_CONFIRMADA);
+
+        assertEquals(ResultadoFinalizacion.NO_ES_DE_SU_AGENDA, service.finalizar(1, 555));
     }
 }

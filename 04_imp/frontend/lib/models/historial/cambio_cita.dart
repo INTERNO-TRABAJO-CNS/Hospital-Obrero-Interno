@@ -9,6 +9,22 @@ class CambioCita {
     required this.motivo,
   });
 
+  /// Una fila de `GET /api/v1/admin/cambios` (`CambioCitaVistaDTO` del backend).
+  factory CambioCita.fromJson(Map<String, dynamic> json) {
+    final citaId = (json['citaId'] as num).toInt();
+    final ficha = (json['numeroFicha'] as num?)?.toInt() ?? 0;
+    final medico = (json['medico'] as String?)?.trim() ?? '';
+    final usuario = (json['usuario'] as String?)?.trim() ?? '';
+    final accion = json['accion'] as String? ?? '';
+    return CambioCita(
+      fecha: DateTime.parse(json['fechaHora'] as String),
+      cita: ficha == 0 ? 'Cita #$citaId' : 'Ficha $ficha · ${medico.isEmpty ? '—' : medico} (#$citaId)',
+      accion: textoAccion(accion, usuario),
+      usuario: usuario.toUpperCase() == 'SISTEMA' ? 'Sistema' : usuario,
+      motivo: (json['motivo'] as String?) ?? '',
+    );
+  }
+
   final DateTime fecha;
 
   /// "Ficha 3 · Ramos".
@@ -20,6 +36,23 @@ class CambioCita {
   /// "Enfermería · M. Flores", "Sistema", "Médico · Dr. Ramos"...
   final String usuario;
   final String motivo;
+}
+
+/// Texto del Figma para cada accion que guarda el backend.
+String textoAccion(String accion, String usuario) {
+  switch (accion) {
+    case 'CREADA':
+    case 'PROGRAMADA':
+      return 'Cita registrada';
+    case 'ASISTENCIA_CONFIRMADA':
+      return 'Asistencia confirmada';
+    case 'ATENDIDA':
+      return 'Atención finalizada';
+    case 'CANCELADA':
+      return usuario.toUpperCase() == 'SISTEMA' ? 'Cancelada (automática)' : 'Cancelada por paciente';
+    default:
+      return accion;
+  }
 }
 
 /// Filtros de la busqueda (todos opcionales).

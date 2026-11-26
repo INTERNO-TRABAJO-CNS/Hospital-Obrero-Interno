@@ -19,12 +19,13 @@ public class FakeCambioCitaRepository implements CambioCitaRepository {
         return cambios.stream().filter(c -> c.citaId() == citaId).toList();
     }
 
-    /** Cada filtro null se ignora; {@code desde} y {@code hasta} incluyen el dia indicado. */
+    /** Igual que PgCambioCitaRepository: usuario "contiene" sin mayusculas; fechas incluyen el dia indicado. */
     @Override
     public synchronized List<CambioCitaDTO> buscar(Long citaId, String usuario, LocalDate desde, LocalDate hasta) {
         return cambios.stream()
                 .filter(c -> citaId == null || c.citaId() == citaId)
-                .filter(c -> usuario == null || usuario.equals(c.usuario()))
+                .filter(c -> usuario == null
+                        || (c.usuario() != null && c.usuario().toLowerCase().contains(usuario.toLowerCase())))
                 .filter(c -> desde == null || !c.fechaHora().toLocalDate().isBefore(desde))
                 .filter(c -> hasta == null || !c.fechaHora().toLocalDate().isAfter(hasta))
                 .toList();

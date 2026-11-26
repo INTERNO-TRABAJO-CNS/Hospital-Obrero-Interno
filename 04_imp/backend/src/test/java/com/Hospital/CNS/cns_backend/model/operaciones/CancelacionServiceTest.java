@@ -50,7 +50,7 @@ class CancelacionServiceTest {
         assertEquals(EstadoCita.CANCELADA, citas.porId(1).orElseThrow().estado());
         assertEquals(1, citas.citas.size());
         assertEquals("Cancelada por el paciente", cambios.cambios.get(0).motivo());
-        assertEquals("Paciente " + PACIENTE, cambios.cambios.get(0).usuario());
+        assertEquals("Paciente · Paciente " + PACIENTE, cambios.cambios.get(0).usuario());
         assertEquals("CITA_CANCELADA", notificaciones.publicadas.get(0).tipo());
         assertEquals(EstadoCita.CANCELADA, eventos.eventos.get(0).estado());
     }

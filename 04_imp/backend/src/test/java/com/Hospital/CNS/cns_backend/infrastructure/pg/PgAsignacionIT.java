@@ -268,6 +268,10 @@ class PgAsignacionIT {
         assertEquals(cuando, deCita.get(0).fechaHora());
         assertEquals(1, cambios.buscar(c.citaId(), "SISTEMA", DIA, DIA).size());
         assertEquals(0, cambios.buscar(c.citaId(), null, DIA.plusDays(1), null).size());
+        // CU-18: el usuario se busca por "contiene" sin mayusculas, y % o _ se toman como texto.
+        assertEquals(1, cambios.buscar(c.citaId(), "siste", null, null).size());
+        assertEquals(0, cambios.buscar(c.citaId(), "%", null, null).size());
+        assertEquals(0, cambios.buscar(c.citaId(), "S_STEMA", null, null).size());
     }
 
     private AsignacionService servicio() {

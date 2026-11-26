@@ -94,7 +94,7 @@ class _FichasDiaViewState extends State<FichasDiaView> {
               ),
             const NotaPie('Solo se muestran las fichas del día actual. Consulta de solo lectura: toca una ficha '
                 'para imprimir su ticket.'),
-            const AvisoDatosPrueba(),
+            if (widget.servicio is FakeEnfermeriaService) const AvisoDatosPrueba(),
           ],
         );
       },

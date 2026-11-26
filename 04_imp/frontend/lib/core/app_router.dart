@@ -13,6 +13,7 @@ import '../models/medico/medico_actual.dart';
 import '../services/auth_service.dart';
 import '../services/catalogo_service.dart';
 import '../services/cancelacion_service.dart';
+import '../services/citas_paciente_service.dart';
 import '../services/cirugias_service.dart';
 import '../services/cuentas_service.dart';
 import '../services/enfermeria_service.dart';
@@ -267,13 +268,14 @@ Widget _pagina(String nombre) {
         ),
       );
 
-    // Consultar solicitudes del paciente.
+    // CU-08/CU-10/CU-11: mis citas, detalle, reprogramar y cancelar.
     case AppRutas.misCitas:
       return _conRol(
         {Rol.paciente},
         (_) => MisCitasView(
-          controller: solicitudControllerApp,
-          cancelacionService: cancelacionApp,
+          citas: citasPacienteApp,
+          cancelacion: cancelacionApp,
+          solicitudes: solicitudServicioApp,
         ),
       );
 
@@ -565,8 +567,17 @@ Future<void> _cerrarSesion(BuildContext context) async {
 /// Cliente HTTP compartido.
 final ApiClient apiApp = ApiClient()..alPerderSesion = _alPerderSesion;
 
+/// Con AUTH_FAKE las citas del paciente son de prueba (en memoria).
+final FakeCitasPacienteService? _citasPrueba =
+    const bool.fromEnvironment('AUTH_FAKE') ? FakeCitasPacienteService() : null;
+
+/// CU-08/CU-10: citas del paciente y reprogramacion.
+final CitasPacienteService citasPacienteApp =
+    _citasPrueba ?? ApiCitasPacienteService(apiApp);
+
 /// CU-11: cancelacion de citas del paciente.
-final CancelacionService cancelacionApp = ApiCancelacionService(apiApp);
+final CancelacionService cancelacionApp =
+    _citasPrueba ?? ApiCancelacionService(apiApp);
 
 /// CU-04: servicio y controlador para solicitar y consultar citas.
 final SolicitudService solicitudServicioApp = ApiSolicitudService(apiApp);
@@ -635,11 +646,23 @@ final CatalogoService catalogoApp = _catalogoFake
 final CuentasService cuentasApp =
     _catalogoFake ? FakeCuentasService() : ApiCuentasService(apiApp);
 
-// Datos de prueba en memoria.
-final FakeHistorialCambiosService historialApp = FakeHistorialCambiosService();
+/// Enfermería (CU-09/CU-12) e historial de cambios (CU-18): backend real; con AUTH_FAKE o
+/// ENFERMERIA_FAKE usan datos de prueba en memoria.
+const bool _enfermeriaFake =
+    bool.fromEnvironment('AUTH_FAKE') || bool.fromEnvironment('ENFERMERIA_FAKE');
 
-final FakeEnfermeriaService enfermeriaApp =
-    FakeEnfermeriaService(historial: historialApp);
+final FakeHistorialCambiosService _historialPrueba =
+    FakeHistorialCambiosService();
+
+final FakeEnfermeriaService _enfermeriaPrueba =
+    FakeEnfermeriaService(historial: _historialPrueba);
+
+final HistorialCambiosService historialApp = _enfermeriaFake
+    ? _historialPrueba
+    : ApiHistorialCambiosService(apiApp);
+
+final EnfermeriaService enfermeriaApp =
+    _enfermeriaFake ? _enfermeriaPrueba : ApiEnfermeriaService(apiApp);
 
 /// Quirófanos (T100-19).
 final QuirofanoService quirofanosApp =
@@ -651,7 +674,7 @@ const bool _reportesFake =
     bool.fromEnvironment('AUTH_FAKE') || bool.fromEnvironment('REPORTES_FAKE');
 
 final SupervisionService _supervisionPrueba = FakeSupervisionService(
-  enfermeria: enfermeriaApp,
+  enfermeria: _enfermeriaPrueba,
   quirofanos: quirofanosApp,
 );
 

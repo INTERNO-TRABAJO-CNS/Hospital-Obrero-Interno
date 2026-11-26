@@ -12,6 +12,9 @@ import com.Hospital.CNS.cns_backend.model.citas.AgendaRepository;
 import com.Hospital.CNS.cns_backend.model.citas.AsignacionService;
 import com.Hospital.CNS.cns_backend.model.citas.CalendarioHabil;
 import com.Hospital.CNS.cns_backend.model.citas.CitaService;
+import com.Hospital.CNS.cns_backend.model.citas.ConsultaCitasPacienteService;
+import com.Hospital.CNS.cns_backend.model.citas.ReprogramacionService;
+import com.Hospital.CNS.cns_backend.model.compartido.CancelacionCita;
 import com.Hospital.CNS.cns_backend.model.citas.DisponibilidadService;
 import com.Hospital.CNS.cns_backend.model.citas.SolicitudService;
 import com.Hospital.CNS.cns_backend.model.compartido.AgendaEventos;
@@ -77,6 +80,20 @@ public class ConfiguracionCitas {
     CancelacionService cancelacionService(CitaRepository citas, CambioCitaRepository cambios,
                                           NotificacionPublicador avisos, AgendaEventos eventos, Reloj reloj) {
         return new CancelacionService(citas, cambios, avisos, eventos, reloj);
+    }
+
+    /** CU-08 (T100-07): mis citas y detalle. */
+    @Bean
+    ConsultaCitasPacienteService consultaCitasPacienteService(CitaRepository citas) {
+        return new ConsultaCitasPacienteService(citas);
+    }
+
+    /** CU-10 (T100-07): cancelar + nueva solicitud con prioridad 2, en una transaccion. */
+    @Bean
+    ReprogramacionService reprogramacionService(CitaRepository citas, CancelacionCita cancelacion,
+                                                SolicitudService solicitudes, CalendarioHabil calendario,
+                                                Reloj reloj, Transaccion transaccion) {
+        return new ReprogramacionService(citas, cancelacion, solicitudes, calendario, reloj, transaccion);
     }
 
     @Bean

@@ -65,7 +65,7 @@ class _HistorialCambiosViewState extends State<HistorialCambiosView> {
                     key: const Key('filtro_cita'),
                     onChanged: (v) => _c.cita = v,
                     onSubmitted: (_) => _c.buscar(),
-                    decoration: decoracionBlanca('Cita (ficha)'),
+                    decoration: decoracionBlanca('Cita (N° o ficha)'),
                   ),
                 ),
                 SizedBox(
@@ -122,7 +122,7 @@ class _HistorialCambiosViewState extends State<HistorialCambiosView> {
               textoVacio: _c.cargando ? 'Buscando…' : 'No hay cambios con esos filtros',
             ),
             const NotaPie('Los registros no se modifican ni se borran. Consulta para enfermería y administrador.'),
-            const AvisoDatosPrueba(),
+            if (widget.servicio is FakeHistorialCambiosService) const AvisoDatosPrueba(),
           ],
         );
       },

@@ -3,6 +3,7 @@ package com.Hospital.CNS.cns_backend.model.citas;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.Hospital.CNS.cns_backend.model.compartido.CitaRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.DominioException;
@@ -66,6 +67,28 @@ public class SolicitudService {
         validarDia(dia);
         validarDisponibilidadPaciente(pacienteId, dia);
         return guardar(pacienteId, especialidad, dia, PRIORIDAD_REPROGRAMADA);
+    }
+
+    /**
+     * CU-10: primer dia habil desde {@code desde} (incluido) en el que el paciente puede tener la solicitud
+     * reprogramada: dentro de la ventana de 15 dias habiles y sin otra cita ni solicitud activa ese dia. Vacio si
+     * no hay ninguno en la ventana.
+     */
+    public Optional<LocalDate> primerDiaReprogramable(long pacienteId, LocalDate desde) {
+        LocalDate hoy = reloj.ahora().toLocalDate();
+        LocalDate limite = calendario.sumarDiasHabiles(hoy, DIAS_HABILES_MAXIMOS);
+        LocalDate dia = desde.isBefore(hoy) ? hoy : desde;
+        if (!calendario.esHabil(dia)) {
+            dia = calendario.siguienteDiaHabil(dia);
+        }
+        while (!dia.isAfter(limite)) {
+            if (!citas.pacienteTieneCitaEnFecha(pacienteId, dia)
+                    && !solicitudes.pacienteTieneSolicitudActivaEnDia(pacienteId, dia)) {
+                return Optional.of(dia);
+            }
+            dia = calendario.siguienteDiaHabil(dia);
+        }
+        return Optional.empty();
     }
 
     public List<SolicitudDTO> listarPorPaciente(long pacienteId) {

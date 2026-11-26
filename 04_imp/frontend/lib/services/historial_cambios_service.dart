@@ -1,4 +1,6 @@
+import '../core/api_client.dart';
 import '../models/comun/fechas.dart';
+import '../models/comun/fechas_iso.dart';
 import '../models/historial/cambio_cita.dart';
 
 /// Historial de cambios de las citas (consulta para enfermeria y administrador).
@@ -7,7 +9,42 @@ abstract class HistorialCambiosService {
   Future<List<CambioCita>> buscar(FiltroCambios filtro);
 }
 
-/// En memoria: el backend todavia no guarda el historial. Las otras pantallas de prueba
+/// Con el backend: `GET /api/v1/admin/cambios?cita=&usuario=&desde=&hasta=` (ENFERMERIA y ADMINISTRADOR).
+/// Si "Cita" es un numero se busca esa cita en el backend; si es texto ("Ficha 3", "Ramos") se filtra aqui.
+class ApiHistorialCambiosService implements HistorialCambiosService {
+  ApiHistorialCambiosService(this._api);
+
+  final ApiClient _api;
+
+  @override
+  Future<List<CambioCita>> buscar(FiltroCambios filtro) async {
+    final textoCita = filtro.cita.trim().replaceFirst('#', '');
+    final citaId = int.tryParse(textoCita);
+    final json = await _api.get('/api/v1/admin/cambios', consulta: {
+      if (citaId != null) 'cita': '$citaId',
+      if (filtro.usuario.trim().isNotEmpty) 'usuario': filtro.usuario.trim(),
+      if (filtro.desde != null) 'desde': isoDe(filtro.desde!),
+      if (filtro.hasta != null) 'hasta': isoDe(filtro.hasta!),
+    });
+    final cambios = leerRespuesta(() {
+      final datos = json['datos'];
+      if (datos is! List) {
+        throw const FormatException('se esperaba una lista de cambios');
+      }
+      return [for (final c in datos) CambioCita.fromJson(Map<String, dynamic>.from(c as Map))];
+    });
+    if (citaId != null || textoCita.isEmpty) {
+      return cambios;
+    }
+    final soloTexto = FiltroCambios(cita: textoCita);
+    return [
+      for (final c in cambios)
+        if (soloTexto.acepta(c)) c
+    ];
+  }
+}
+
+/// En memoria (con ENFERMERIA_FAKE o AUTH_FAKE). Las pantallas de prueba de enfermeria
 /// (confirmar asistencia) registran aqui sus cambios con [registrar].
 class FakeHistorialCambiosService implements HistorialCambiosService {
   FakeHistorialCambiosService({DateTime Function()? reloj}) : _reloj = reloj ?? DateTime.now {

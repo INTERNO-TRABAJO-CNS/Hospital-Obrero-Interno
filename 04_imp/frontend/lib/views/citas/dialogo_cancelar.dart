@@ -9,14 +9,25 @@ Future<bool?> mostrarDialogoCancelar(
   BuildContext context,
   CancelacionService servicio,
   int citaId,
-  String fechaIso,
-) {
+  String fechaIso, {
+  int? numeroFicha,
+}) {
   return showDialog<bool>(
     context: context,
-    builder: (_) => _DialogoCancelar(
-      servicio: servicio,
-      citaId: citaId,
-      fechaIso: fechaIso,
+    // El Figma no tiene modo oscuro: el dialogo siempre con el tema claro.
+    builder: (_) => Theme(
+      data: AppTheme.claro(),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 460),
+          child: _DialogoCancelar(
+            servicio: servicio,
+            citaId: citaId,
+            fechaIso: fechaIso,
+            numeroFicha: numeroFicha,
+          ),
+        ),
+      ),
     ),
   );
 }
@@ -26,11 +37,15 @@ class _DialogoCancelar extends StatefulWidget {
     required this.servicio,
     required this.citaId,
     required this.fechaIso,
+    this.numeroFicha,
   });
 
   final CancelacionService servicio;
   final int citaId;
   final String fechaIso;
+
+  /// Numero de ficha que ve el paciente (si no se conoce, se muestra el de la cita).
+  final int? numeroFicha;
 
   @override
   State<_DialogoCancelar> createState() => _DialogoCancelarState();
@@ -76,9 +91,9 @@ class _DialogoCancelarState extends State<_DialogoCancelar> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Se cancelará la ficha N° ${widget.citaId} del '
+            'Se cancelará la ficha N° ${widget.numeroFicha ?? widget.citaId} del '
             '${_fechaCancelacion(widget.fechaIso)}. '
-            'La cita se conserva como CANCELADA y se libera del cupo.',
+            'La cita se conserva como CANCELADA y se libera el cupo.',
           ),
           if (_error != null) ...[
             const SizedBox(height: 12),
@@ -94,6 +109,7 @@ class _DialogoCancelarState extends State<_DialogoCancelar> {
           children: [
             Expanded(
               child: FilledButton(
+                key: const Key('cancelar_volver'),
                 onPressed:
                     _trabajando ? null : () => Navigator.of(context).pop(false),
                 style: FilledButton.styleFrom(
@@ -106,6 +122,7 @@ class _DialogoCancelarState extends State<_DialogoCancelar> {
             const SizedBox(width: 12),
             Expanded(
               child: FilledButton(
+                key: const Key('cancelar_si'),
                 onPressed: _trabajando ? null : _cancelar,
                 style: FilledButton.styleFrom(
                   backgroundColor: ColoresCns.peligro,

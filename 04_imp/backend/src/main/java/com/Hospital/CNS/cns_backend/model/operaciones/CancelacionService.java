@@ -51,7 +51,8 @@ public class CancelacionService implements CancelacionCita {
         if (cita.estado() != EstadoCita.PROGRAMADA) {
             return ResultadoCancelacion.ESTADO_NO_PERMITE;
         }
-        return cancelar(cita, "Paciente " + pacienteId, MOTIVO_PACIENTE, reloj.ahora())
+        return cancelar(cita, ActualizacionEstadoService.usuarioConRol("Paciente", cita.nombrePaciente()),
+                MOTIVO_PACIENTE, reloj.ahora())
                 ? ResultadoCancelacion.CANCELADA
                 : ResultadoCancelacion.ESTADO_NO_PERMITE;
     }

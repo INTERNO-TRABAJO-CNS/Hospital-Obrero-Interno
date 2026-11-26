@@ -15,7 +15,38 @@ abstract class EnfermeriaService {
   Future<FichaDelDia> confirmarLlegada(int citaId, {required String usuario});
 }
 
-/// En memoria: el backend todavia no tiene los endpoints de enfermeria. Los horarios se arman
+/// Con el backend (CU-09 y CU-12). El usuario que confirma sale del token de la sesion, no se envia.
+class ApiEnfermeriaService implements EnfermeriaService {
+  ApiEnfermeriaService(this._api);
+
+  final ApiClient _api;
+
+  /// `GET /api/v1/fichas/hoy` (rol ENFERMERIA): todas las citas de hoy, en cualquier estado.
+  @override
+  Future<List<FichaDelDia>> fichasDeHoy() async {
+    final json = await _api.get('/api/v1/fichas/hoy');
+    return leerRespuesta(() {
+      final datos = json['datos'];
+      if (datos is! List) {
+        throw const FormatException('se esperaba una lista de fichas');
+      }
+      return [for (final f in datos) FichaDelDia.fromJson(Map<String, dynamic>.from(f as Map))]
+        ..sort((a, b) => a.inicio.compareTo(b.inicio));
+    });
+  }
+
+  /// `POST /api/v1/citas/{id}/confirmar-asistencia`. Errores del backend: FUERA_DE_PLAZO,
+  /// ESTADO_NO_PERMITE, NO_ES_DE_HOY, NO_ENCONTRADA.
+  @override
+  Future<FichaDelDia> confirmarLlegada(int citaId, {required String usuario}) async {
+    await _api.post('/api/v1/citas/$citaId/confirmar-asistencia');
+    final hoy = await fichasDeHoy();
+    return hoy.firstWhere((f) => f.citaId == citaId,
+        orElse: () => throw const ApiException('NO_ENCONTRADA', 'La cita confirmada ya no figura entre las de hoy'));
+  }
+}
+
+/// En memoria (con `--dart-define=ENFERMERIA_FAKE=true` o AUTH_FAKE). Los horarios se arman
 /// alrededor de la hora actual para que siempre haya citas atendidas y otras por confirmar.
 class FakeEnfermeriaService implements EnfermeriaService {
   FakeEnfermeriaService({DateTime Function()? reloj, FakeHistorialCambiosService? historial})

@@ -96,7 +96,7 @@ class _ConfirmarAsistenciaViewState extends State<ConfirmarAsistenciaView> {
                     alConfirmar: () => _confirmar(f),
                   ),
                 ),
-            const AvisoDatosPrueba(),
+            if (widget.servicio is FakeEnfermeriaService) const AvisoDatosPrueba(),
           ],
         );
       },

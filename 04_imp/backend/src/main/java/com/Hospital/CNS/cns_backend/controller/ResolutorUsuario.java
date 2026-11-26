@@ -30,7 +30,7 @@ public class ResolutorUsuario {
     /** @param cabecera funcion que devuelve el valor de un header (o null si no viene). */
     public UsuarioAutenticado resolver(Function<String, String> cabecera) {
         UsuarioSesion u = auth.usuarioDelToken(token(cabecera.apply(HEADER_AUTORIZACION)));
-        return new UsuarioAutenticado(u.usuarioId(), u.rol(), u.personaId());
+        return new UsuarioAutenticado(u.usuarioId(), u.rol(), u.personaId(), u.nombre());
     }
 
     /** El token de un valor "Bearer xxx" (o null si no tiene ese formato). */

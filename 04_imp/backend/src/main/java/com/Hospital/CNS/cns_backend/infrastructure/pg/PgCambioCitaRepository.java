@@ -48,7 +48,10 @@ public class PgCambioCitaRepository implements CambioCitaRepository {
         return consultar(SELECCION + " where cita_id = ? order by fecha_hora, id", List.of(citaId));
     }
 
-    /** Cada filtro null se ignora; {@code desde} y {@code hasta} incluyen el dia indicado. */
+    /**
+     * Cada filtro null se ignora; {@code usuario} busca "contiene" sin distinguir mayusculas; {@code desde} y
+     * {@code hasta} incluyen el dia indicado.
+     */
     @Override
     public List<CambioCitaDTO> buscar(Long citaId, String usuario, LocalDate desde, LocalDate hasta) {
         StringBuilder sql = new StringBuilder(SELECCION).append(" where true");
@@ -58,8 +61,8 @@ public class PgCambioCitaRepository implements CambioCitaRepository {
             parametros.add(citaId);
         }
         if (usuario != null) {
-            sql.append(" and usuario = ?");
-            parametros.add(usuario);
+            sql.append(" and usuario ilike ? escape '!'");
+            parametros.add("%" + escaparLike(usuario) + "%");
         }
         if (desde != null) {
             sql.append(" and fecha_hora >= ?");
@@ -71,6 +74,11 @@ public class PgCambioCitaRepository implements CambioCitaRepository {
         }
         sql.append(" order by fecha_hora, id");
         return consultar(sql.toString(), parametros);
+    }
+
+    /** Los comodines que escribe el usuario (%, _) se buscan como texto; '!' es el caracter de escape. */
+    static String escaparLike(String texto) {
+        return texto.replace("!", "!!").replace("%", "!%").replace("_", "!_");
     }
 
     private List<CambioCitaDTO> consultar(String sql, List<Object> parametros) {
