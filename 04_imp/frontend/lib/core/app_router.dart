@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../controllers/solicitud_controller.dart';
@@ -564,16 +563,16 @@ Future<void> _cerrarSesion(BuildContext context) async {
 /// Cliente HTTP compartido.
 final ApiClient apiApp = ApiClient()..alPerderSesion = _alPerderSesion;
 
-/// Servicio y controlador de las fichas para la pantalla de TV.
-final FichasService fichasTvService = FichasService(apiApp);
-final FichasController fichasTvController =
-    FichasController(fichasService: fichasTvService);
-
 /// CU-04: servicio y controlador para solicitar y consultar citas.
 final SolicitudService solicitudServicioApp = ApiSolicitudService(apiApp);
 
 final SolicitudController solicitudControllerApp =
     SolicitudController(service: solicitudServicioApp);
+
+/// Servicio y controlador de las fichas para la pantalla de TV.
+final FichasService fichasTvService = FichasService(apiApp);
+final FichasController fichasTvController =
+    FichasController(fichasService: fichasTvService);
 
 /// El backend respondió 401 a una petición con token.
 void _alPerderSesion(ApiException error) {
