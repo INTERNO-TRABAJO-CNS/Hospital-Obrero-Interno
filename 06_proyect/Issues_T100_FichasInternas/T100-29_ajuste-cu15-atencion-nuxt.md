@@ -1,4 +1,6 @@
-# [T100-29][Nuxt][Ajuste CU-15] Registrar receta y fin de la atención en la web Nuxt, con acceso a «Ticket interno»
+# [T100-29][Flutter][Ajuste CU-15] Registrar receta y fin de la atención en la app Flutter, con acceso a «Ticket interno»
+
+> **Actualización 15/11/2026:** el proyecto ya no usa Nuxt. Todas las pantallas del médico (general, pediatría, odontología y especialistas) están en la **app Flutter** (`04_imp/frontend`), igual que paciente, enfermería, administrador y TV. Equivalencias: `pages/` → `lib/views/medico/`, `stores/` → `lib/controllers/`, `services/` → `lib/services/`, `models/` → `lib/models/medico/`; `npm run test` → `flutter test`. CORS del backend: `http://localhost:5050` (`flutter run -d chrome --web-port 5050`). El proyecto Nuxt (`04_imp/frontend-web`) se borró.
 
 | Campo | Valor |
 |---|---|
@@ -15,7 +17,7 @@
 | Depende de / Bloquea | T100-14 (backend), T100-18 / Bloquea: — |
 
 ## Objetivo
-La pantalla de atención del médico pasa de Flutter a la web Nuxt. El backend de T100-14 no cambia.
+La pantalla de atención del médico pasa de Flutter a la app Flutter. El backend de T100-14 no cambia.
 
 ## Reglas de negocio que debes cumplir
 - Mismas reglas de T100-14 (datos autocompletados, receta de 1 a 2000 caracteres, «Finalizar atención»).
@@ -29,8 +31,8 @@ La pantalla de atención del médico pasa de Flutter a la web Nuxt. El backend d
 ## Dónde va cada archivo (rutas desde la raíz del repositorio)
 | Ruta | Qué debe contener |
 |---|---|
-| `04_imp/frontend-web/pages/medico/atencion/[citaId].vue` | tarjeta con datos, campo «Medicación», «Finalizar atención», «Generar ticket interno» |
-| `04_imp/frontend-web/stores/atencion.ts, services/atencionService.ts + fake, models/atencion.ts, tests/atencion.test.ts` | `GET/POST /api/v1/citas/{id}/atencion` |
+| `04_imp/frontend/lib/views/medico/atencion_view.dart` | tarjeta con datos, campo «Medicación», «Finalizar atención», «Generar ticket interno» |
+| `04_imp/frontend/lib/controllers/atencion_controller.dart, lib/models/medico/atencion.dart, test/medico/agenda_y_atencion_test.dart` | `GET/POST /api/v1/citas/{id}/atencion` |
 
 ## Paso a paso
 1. Rama `feature/T100-29-ajuste-cu15-atencion-nuxt`.
@@ -56,18 +58,18 @@ git push -u origin feature/T100-29-ajuste-cu15-atencion-nuxt
 Abrir el Pull Request con **base = `feature/T100-algoritmos-ejecucion`** (no `develop`, no `main`). Solo Benjamín integra; nadie integra su propio PR.
 
 ## Reglas de código (las revisa quien aprueba el PR)
-- **MVC también en la web:** `pages/` = vista, `stores/` (Pinia) = controlador de interfaz, `services/` = llamadas REST, `models/` = tipos. Una página **nunca** llama `fetch` directo: usa su *store* y el *store* usa el *service*.
+- **MVC en Flutter:** `views/` = vista, `controllers/` = controlador, `services/` = llamadas REST, `models/` = datos. Una vista **nunca** llama a `http` directo: usa su *controller* y el *controller* usa el *service*.
 - Sin reglas de negocio en la web: el backend decide; la web muestra el resultado o el mensaje del `codigo` de error.
 - Cada *service* tiene su `Fake*` en `services/fake/` para trabajar sin backend (igual que `FakeCatalogoService` en Flutter).
-- Pruebas con Vitest (`npm run test`) para *stores* y *services*.
-- La URL del backend sale de `NUXT_PUBLIC_API_URL`; nada de usuarios ni claves escritos en el código.
+- Pruebas con `flutter test` para *controllers*, *services* y vistas.
+- La URL del backend sale de `--dart-define=API_URL=...`; nada de usuarios ni claves escritos en el código.
 
 ## Fuera de alcance
 - Backend de atención (T100-14).
 
 ## Definition of Done
 - [ ] Cumple las reglas de negocio y todos los flujos alternativos listados
-- [ ] `./mvnw test` en verde (y `flutter test` / `npm run test` si la tarjeta toca Flutter / Nuxt)
+- [ ] `./mvnw test` en verde (y `flutter test` si la tarjeta toca Flutter)
 - [ ] Pantallas probadas en el tamaño que corresponde (celular / escritorio)
 - [ ] PR hacia la rama T100 aprobado por el revisor e integrado por Benjamín
 - [ ] Tarjeta movida a **Hecho** en el tablero Kanban y resumen del PR enviado a Benjamín

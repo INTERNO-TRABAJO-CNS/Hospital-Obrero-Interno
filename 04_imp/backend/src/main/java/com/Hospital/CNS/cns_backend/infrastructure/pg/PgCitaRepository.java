@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -58,22 +59,34 @@ public class PgCitaRepository implements CitaRepository {
                 + "consultorio_id = excluded.consultorio_id, especialidad = excluded.especialidad, "
                 + "fecha = excluded.fecha, hora = excluded.hora, numero_ficha = excluded.numero_ficha, "
                 + "estado = excluded.estado";
-        try (Connection conn = DB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setLong(1, c.citaId());
-            stmt.setLong(2, c.pacienteId());
-            stmt.setLong(3, c.medicoId());
-            stmt.setInt(4, c.consultorio());
-            stmt.setString(5, c.especialidad().name());
-            stmt.setObject(6, c.fecha());
-            stmt.setObject(7, c.hora());
-            stmt.setInt(8, c.numeroFicha());
-            stmt.setString(9, c.estado().name());
-            stmt.executeUpdate();
+        try (Connection conn = DB.getConnection()) {
+            // Dentro de una transaccion, un UNIQUE roto la dejaria abortada: el savepoint permite seguir (CU-05 3a).
+            Savepoint antes = conn.getAutoCommit() ? null : conn.setSavepoint();
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setLong(1, c.citaId());
+                stmt.setLong(2, c.pacienteId());
+                stmt.setLong(3, c.medicoId());
+                stmt.setInt(4, c.consultorio());
+                stmt.setString(5, c.especialidad().name());
+                stmt.setObject(6, c.fecha());
+                stmt.setObject(7, c.hora());
+                stmt.setInt(8, c.numeroFicha());
+                stmt.setString(9, c.estado().name());
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                if (antes != null) {
+                    conn.rollback(antes);
+                }
+                if (ErroresPg.UNICO.equals(e.getSQLState())) {
+                    return false;
+                }
+                throw e;
+            }
+            if (antes != null) {
+                conn.releaseSavepoint(antes);
+            }
             return true;
         } catch (SQLException e) {
-            if (ErroresPg.UNICO.equals(e.getSQLState())) {
-                return false;
-            }
             throw ErroresPg.traducir(LOG, "guardar la cita " + c.citaId(), e);
         }
     }

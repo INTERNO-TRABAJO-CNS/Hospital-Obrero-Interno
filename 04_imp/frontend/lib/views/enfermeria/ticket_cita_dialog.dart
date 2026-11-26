@@ -83,7 +83,7 @@ class _TicketCitaDialogState extends State<TicketCitaDialog> {
               const SizedBox(height: 12),
               const Text(
                 'Para pacientes sin internet. Enfermería imprime tickets de citas comunes; los de fichas internas '
-                'y cirugías los imprime el médico o especialista desde la web.',
+                'y cirugías los imprime el médico o especialista desde sus pantallas.',
                 style: TextStyle(fontSize: 11.5, color: ColoresCns.textoSuave),
               ),
               if (_aviso != null) ...[

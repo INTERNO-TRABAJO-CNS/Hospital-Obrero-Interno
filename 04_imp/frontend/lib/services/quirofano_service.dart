@@ -17,7 +17,7 @@ abstract class QuirofanoService {
   Future<void> desactivar(int id);
 }
 
-/// En memoria: la tabla de quirofanos llega con T100-17 (todavia no esta en el backend).
+/// En memoria (`--dart-define=CATALOGO_FAKE=true` y pruebas).
 class FakeQuirofanoService implements QuirofanoService {
   FakeQuirofanoService() {
     const temprano = TimeOfDay(hour: 8, minute: 0);
@@ -114,4 +114,30 @@ class FakeQuirofanoService implements QuirofanoService {
     }
     return i;
   }
+}
+
+/// Catalogo de quirofanos contra el backend (T100-19): queda en PostgreSQL (solo ADMINISTRADOR).
+class ApiQuirofanoService implements QuirofanoService {
+  ApiQuirofanoService(this._api);
+
+  final ApiClient _api;
+
+  @override
+  Future<List<Quirofano>> listar() async {
+    final json = await _api.get('/api/v1/admin/quirofanos');
+    return leerRespuesta(() => [
+          for (final q in (json['datos'] as List? ?? const [])) Quirofano.fromJson(Map<String, dynamic>.from(q as Map))
+        ]);
+  }
+
+  @override
+  Future<Quirofano> guardar(Quirofano quirofano) async {
+    final json = quirofano.id == 0
+        ? await _api.post('/api/v1/admin/quirofanos', quirofano.toJson())
+        : await _api.put('/api/v1/admin/quirofanos/${quirofano.id}', quirofano.toJson());
+    return leerRespuesta(() => Quirofano.fromJson(json));
+  }
+
+  @override
+  Future<void> desactivar(int id) => _api.delete('/api/v1/admin/quirofanos/$id');
 }

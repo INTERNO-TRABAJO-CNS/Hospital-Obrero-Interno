@@ -1,10 +1,16 @@
-import 'package:flutter/material.dart' show TimeOfDay;
+import 'dart:async';
 
+import 'package:flutter/material.dart' show TimeOfDay;
+import 'package:web_socket_channel/web_socket_channel.dart';
+
+import '../core/api_client.dart';
 import '../models/catalogo/especialidad.dart';
 import '../models/catalogo/horario.dart';
 import '../models/comun/fechas.dart';
 import '../models/enfermeria/ficha_dia.dart';
 import '../models/supervision/supervision.dart';
+import '../models/supervision/supervision_api.dart';
+import 'catalogo_service.dart' show listaDe;
 import 'enfermeria_service.dart';
 import 'quirofano_service.dart';
 
@@ -18,10 +24,140 @@ abstract class SupervisionService {
 
   /// Ocupacion de todos los quirofanos activos hoy.
   Future<ResumenQuirofanos> quirofanos();
+
+  /// Avisa cada vez que una cita cambia (WebSocket /ws/supervision). Termina si se corta la conexion.
+  Stream<void> cambios();
+
+  /// `true` si la pestaña de citas comunes muestra datos de prueba (sin backend).
+  bool get citasDePrueba;
+}
+
+/// CU-19 con el backend: la pestaña de citas comunes sale de GET /api/v1/admin/supervision y se
+/// actualiza sola por el WebSocket /ws/supervision (RNF-08). Fichas internas y quirofanos todavia no
+/// tienen supervision en el backend: se piden a [respaldo] (datos de prueba).
+class ApiSupervisionService implements SupervisionService {
+  ApiSupervisionService(
+    this._api, {
+    required SupervisionService respaldo,
+    DateTime Function()? reloj,
+    WebSocketChannel Function(Uri uri)? conectar,
+  })  : _respaldo = respaldo,
+        _reloj = reloj ?? DateTime.now,
+        _conectar = conectar ?? WebSocketChannel.connect;
+
+  final ApiClient _api;
+  final SupervisionService _respaldo;
+  final DateTime Function() _reloj;
+  final WebSocketChannel Function(Uri uri) _conectar;
+
+  static const String _base = '/api/v1/admin/supervision';
+
+  @override
+  bool get citasDePrueba => false;
+
+  @override
+  Future<ResumenCitas> citasComunes({Especialidad? especialidad}) async {
+    // Sin fecha: el backend usa el dia de hoy en la hora del hospital.
+    final r = await _api.get(_base);
+    final medicos = [
+      for (final m in listaDe(r, ResumenMedicoDia.desdeJson))
+        if (especialidad == null || m.especialidad == especialidad) m
+    ];
+    final fichas = await Future.wait([
+      for (final m in medicos)
+        m.total == 0 ? Future.value(const <FichaSupervision>[]) : _fichasDe(m.medicoId),
+    ]);
+
+    final ahora = horaTexto(_reloj());
+    final filas = <FilaAgendaMedico>[];
+    for (var i = 0; i < medicos.length; i++) {
+      final m = medicos[i];
+      final lista = fichas[i];
+      final empezadas = lista.where((f) => f.hora.compareTo(ahora) <= 0);
+      final actual = lista.isEmpty ? null : (empezadas.isEmpty ? lista.first : empezadas.last);
+      filas.add(FilaAgendaMedico(
+        medico: m.nombreMedico,
+        especialidadOFicha: m.especialidad.nombre,
+        fichasOPaciente: '${m.fichas} / ${m.cupoMaximo}',
+        horarioOConsultorio: m.horaInicio == null ? '—' : '${m.horaInicio} – ${m.horaFin}',
+        estado: actual?.estado ?? 'SIN FICHAS',
+      ));
+      for (final f in lista.where((f) => f.estado == EstadoCita.asistenciaConfirmada.codigo)) {
+        filas.add(FilaAgendaMedico(
+          medico: m.nombreMedico,
+          especialidadOFicha: 'Ficha ${f.numeroFicha} · ${f.hora}',
+          fichasOPaciente: f.paciente,
+          horarioOConsultorio: '${f.consultorio}',
+          estado: f.estado,
+          detalle: true,
+        ));
+      }
+    }
+    int sumar(int Function(ResumenMedicoDia m) campo) => medicos.fold(0, (n, m) => n + campo(m));
+    return ResumenCitas(
+      fichasHoy: sumar((m) => m.total),
+      atendidas: sumar((m) => m.atendidas),
+      confirmadas: sumar((m) => m.confirmadas),
+      canceladas: sumar((m) => m.canceladas),
+      filas: filas,
+    );
+  }
+
+  Future<List<FichaSupervision>> _fichasDe(int medicoId) async {
+    final r = await _api.get('$_base/medicos/$medicoId/fichas');
+    return listaDe(r, FichaSupervision.desdeJson);
+  }
+
+  @override
+  Future<ResumenFichasInternas> fichasInternas(Especialidad especialidad, TablaInterna tabla) =>
+      _respaldo.fichasInternas(especialidad, tabla);
+
+  @override
+  Future<ResumenQuirofanos> quirofanos() => _respaldo.quirofanos();
+
+  @override
+  Stream<void> cambios() {
+    WebSocketChannel? canal;
+    StreamSubscription<dynamic>? escucha;
+    late final StreamController<void> avisos;
+    avisos = StreamController<void>(
+      onListen: () {
+        try {
+          canal = _conectar(uriWebSocket(_api.urlBase, '/ws/supervision', _api.token));
+        } catch (_) {
+          avisos.close();
+          return;
+        }
+        escucha = canal!.stream.listen(
+          (_) => avisos.add(null),
+          onError: (Object _) => avisos.close(),
+          onDone: avisos.close,
+          cancelOnError: true,
+        );
+      },
+      onCancel: () async {
+        await escucha?.cancel();
+        await canal?.sink.close();
+      },
+    );
+    return avisos.stream;
+  }
+}
+
+/// `http://host:8080` -> `ws://host:8080/ws/...?token=...` (`https` -> `wss`). El navegador no deja
+/// mandar el header Authorization al abrir un WebSocket: el token va en la URL.
+Uri uriWebSocket(String urlBase, String ruta, String? token) {
+  final base = Uri.parse(urlBase);
+  final camino = base.path.endsWith('/') ? base.path.substring(0, base.path.length - 1) : base.path;
+  return base.replace(
+    scheme: base.scheme == 'https' ? 'wss' : 'ws',
+    path: '$camino$ruta',
+    queryParameters: token == null ? null : {'token': token},
+  );
 }
 
 /// De prueba: arma la supervision con los datos de las otras pantallas de prueba (fichas del dia
-/// de enfermeria y catalogo de quirofanos). El backend todavia no publica estos datos.
+/// de enfermeria y catalogo de quirofanos).
 class FakeSupervisionService implements SupervisionService {
   FakeSupervisionService({
     required EnfermeriaService enfermeria,
@@ -37,6 +173,13 @@ class FakeSupervisionService implements SupervisionService {
 
   /// Cupo diario de los medicos de las fichas de prueba.
   static const Map<String, int> _cupos = {'Dr. Ramos': 7, 'Dr. Mamani': 5, 'Dra. Quispe': 6};
+
+  @override
+  bool get citasDePrueba => true;
+
+  /// Sin backend no hay WebSocket: la pantalla se refresca sola cada cierto tiempo.
+  @override
+  Stream<void> cambios() => const Stream.empty();
 
   @override
   Future<ResumenCitas> citasComunes({Especialidad? especialidad}) async {

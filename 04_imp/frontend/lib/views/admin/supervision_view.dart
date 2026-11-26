@@ -62,7 +62,7 @@ class _SupervisionViewState extends State<SupervisionView> {
             PestanaSupervision.internas => _internas(),
             PestanaSupervision.quirofanos => _quirofanos(),
           },
-          const AvisoDatosPrueba(),
+          if (_c.datosDePrueba) const AvisoDatosPrueba(),
         ],
       ),
     );

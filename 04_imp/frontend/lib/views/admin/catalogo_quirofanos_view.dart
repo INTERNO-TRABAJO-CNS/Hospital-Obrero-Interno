@@ -149,7 +149,6 @@ class _CatalogoQuirofanosViewState extends State<CatalogoQuirofanosView> {
               const NotaPie('Cada quirófano es de una sola especialidad (no se comparten). Horario por defecto '
                   '07:00–19:00; las urgencias pueden operarse fuera de horario. Cardiología, Nefrología, Neumología '
                   'y Endocrinología operan solo si hay tiempo (pendiente PV-20).'),
-              const AvisoDatosPrueba(),
             ],
           ),
           lateral: _panel(),

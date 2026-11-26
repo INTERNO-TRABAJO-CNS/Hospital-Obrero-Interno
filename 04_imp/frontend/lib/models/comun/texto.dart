@@ -12,3 +12,6 @@ String nombreCorto(String nombre) {
   }
   return '${partes.first[0]}. ${partes.last}';
 }
+
+/// Compara nombres sin importar tildes ni mayusculas ("Raul Vargas" = "Raúl Vargas").
+bool mismoNombre(String? a, String? b) => a != null && b != null && a.isNotEmpty && textoPlano(a) == textoPlano(b);

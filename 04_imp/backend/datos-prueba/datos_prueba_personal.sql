@@ -6,7 +6,9 @@
 -- Crea consultorios, medicos (como en el Figma), horarios, pacientes beneficiarios de la tabla interna de
 -- afiliados y la agenda de HOY del Dr. Ramos (Medico General) con los 4 estados de cita. No crea cuentas:
 -- el administrador las crea desde la app (Catalogos > Cuentas) o con POST /api/v1/admin/usuarios.
--- Requiere las migraciones V1..V6 (el backend las aplica al arrancar).
+-- Tambien da horario y consultorio a los especialistas (fichas internas, V7) y crea una paciente pediatrica.
+-- Crea los quirofanos del Figma (G-1, G-2, H-1, D-1).
+-- Requiere las migraciones V1..V8 (el backend las aplica al arrancar).
 
 DO $$
 DECLARE
@@ -102,3 +104,51 @@ BEGIN
                 (current_date - 30) + time '10:05', 3);
     END IF;
 END $$;
+
+-- Especialistas (fichas internas, decision del 15/11/2026) --------------------------------------------------
+-- Consultorios del Figma (12, 14, 15, 16 y la UTI) y horario de lunes a viernes. Una paciente de 6 anios para
+-- probar la tabla pediatrica.
+DO $$
+DECLARE
+    etiqueta text;
+BEGIN
+    FOREACH etiqueta IN ARRAY ARRAY['Consultorio 12', 'Consultorio 14', 'Consultorio 15', 'Consultorio 16', 'UTI']
+    LOOP
+        PERFORM 1 FROM recursos.consultorio WHERE lower(consultorio.nombre) = lower(etiqueta) AND activo;
+        IF NOT FOUND THEN
+            INSERT INTO recursos.consultorio (id, nombre) VALUES (nextval('recursos.consultorio_id_seq'), etiqueta);
+        END IF;
+    END LOOP;
+
+    INSERT INTO recursos.horario_medico (id, medico_id, consultorio_id, dia_semana, hora_inicio, hora_fin)
+    SELECT nextval('recursos.horario_medico_id_seq'), m.id, c.id, d, e.desde, e.hasta
+    FROM (VALUES
+        ('Raul', 'Vargas', 'Consultorio 12', time '08:00', time '12:00'),
+        ('Patricia', 'Arce', 'Consultorio 14', time '08:00', time '12:00'),
+        ('Miguel', 'Paredes', 'Consultorio 15', time '14:00', time '17:00'),
+        ('Daniela', 'Salinas', 'Consultorio 16', time '08:00', time '11:00'),
+        ('Hugo', 'Lima', 'UTI', time '08:00', time '16:00')
+    ) AS e (nombres, apellidos, consultorio, desde, hasta)
+    JOIN LATERAL (SELECT id FROM recursos.medico x WHERE x.nombres = e.nombres AND x.apellidos = e.apellidos
+                  ORDER BY id LIMIT 1) m ON true
+    JOIN recursos.consultorio c ON lower(c.nombre) = lower(e.consultorio) AND c.activo
+    CROSS JOIN generate_series(1, 5) d
+    WHERE NOT EXISTS (SELECT 1 FROM recursos.horario_medico h WHERE h.medico_id = m.id AND h.dia_semana = d AND h.activo);
+
+    INSERT INTO identidad.paciente (id, numero_afiliado, ci, nombres, apellidos, fecha_nacimiento, es_titular)
+    SELECT nextval('identidad.paciente_id_seq'), 'AF-10003', 'PR-0007', 'Sofia', 'Condori', date '2020-03-01', false
+    WHERE NOT EXISTS (SELECT 1 FROM identidad.paciente x WHERE x.numero_afiliado = 'AF-10003' AND x.ci = 'PR-0007');
+    INSERT INTO clinico.historial (paciente_id)
+    SELECT id FROM identidad.paciente WHERE ci = 'PR-0007' ON CONFLICT (paciente_id) DO NOTHING;
+END $$;
+
+-- Quirofanos del Figma (no se comparten entre especialidades) ----------------------------------------------
+INSERT INTO quirofano.quirofano (nombre, especialidad, apertura, cierre, limpieza_min)
+SELECT q.nombre, q.especialidad, q.apertura, q.cierre, q.limpieza
+FROM (VALUES
+    ('G-1', 'GASTROENTEROLOGIA', time '07:00', time '19:00', 40),
+    ('G-2', 'GASTROENTEROLOGIA', time '07:00', time '19:00', 30),
+    ('H-1', 'HEMATOLOGIA', time '07:00', time '19:00', 45),
+    ('D-1', 'DERMATOLOGIA', time '08:00', time '16:00', 30)
+) AS q (nombre, especialidad, apertura, cierre, limpieza)
+WHERE NOT EXISTS (SELECT 1 FROM quirofano.quirofano x WHERE lower(x.nombre) = lower(q.nombre) AND x.activo);

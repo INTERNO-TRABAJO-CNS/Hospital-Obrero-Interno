@@ -33,6 +33,25 @@ class Quirofano {
   final int cirugiasProgramadas;
   final bool activo;
 
+  factory Quirofano.fromJson(Map<String, dynamic> json) => Quirofano(
+        id: (json['quirofanoId'] as num).toInt(),
+        nombre: json['nombre'] as String? ?? '',
+        especialidad: Especialidad.desdeCodigo(json['especialidad'] as String? ?? ''),
+        apertura: horaDesdeTexto(json['apertura'] as String? ?? '07:00'),
+        cierre: horaDesdeTexto(json['cierre'] as String? ?? '19:00'),
+        limpiezaMin: (json['limpiezaMin'] as num?)?.toInt() ?? limpiezaMinima,
+        cirugiasProgramadas: (json['cirugiasProgramadas'] as num?)?.toInt() ?? 0,
+        activo: json['activo'] as bool? ?? true,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'nombre': nombre.trim(),
+        'especialidad': especialidad.codigo,
+        'apertura': horaATexto(apertura),
+        'cierre': horaATexto(cierre),
+        'limpiezaMin': limpiezaMin,
+      };
+
   /// "07:00 – 19:00".
   String get horario => '${horaATexto(apertura)} – ${horaATexto(cierre)}';
 

@@ -18,7 +18,7 @@ import com.Hospital.CNS.cns_backend.model.identidad.AuthService;
  *   <li>Cada peticion a /api/** lleva {@code Authorization: Bearer <token>} (salvo login y registro del titular);
  *       lo revisa {@link FiltroAutenticacion} y cada controller pide el rol que necesita.</li>
  *   <li>Sin sesiones de servidor ni cookies: por eso CSRF no aplica y se desactiva.</li>
- *   <li>CORS: usa el CorsConfigurationSource de ConfiguracionCors (web Nuxt del medico).</li>
+ *   <li>CORS: usa el CorsConfigurationSource de ConfiguracionCors (app Flutter en el navegador).</li>
  * </ul>
  */
 @Configuration
