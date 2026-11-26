@@ -6,11 +6,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -40,12 +46,14 @@ import com.zaxxer.hikari.HikariDataSource;
  */
 public final class DB {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DB.class);
     static final String URL_DEFECTO = "jdbc:postgresql://localhost:5432/cns_db";
     static final String USUARIO_DEFECTO = "postgres";
     static final String CLAVE_DEFECTO = "postgres";
 
     private static final String ARCHIVO_LOCAL = "application-local.properties";
     private static final ThreadLocal<Connection> TRANSACCION = new ThreadLocal<>();
+    private static final ThreadLocal<List<Runnable>> DESPUES_DE_COMMIT = new ThreadLocal<>();
 
     private static volatile DataSource origen;
 
@@ -90,10 +98,12 @@ public final class DB {
             throw new IllegalStateException("No se pudo iniciar la transaccion: " + e.getMessage(), e);
         }
         TRANSACCION.set(conn);
+        List<Runnable> accionesPosteriores = new ArrayList<>();
+        DESPUES_DE_COMMIT.set(accionesPosteriores);
+        T resultado;
         try {
-            T resultado = trabajo.get();
+            resultado = trabajo.get();
             conn.commit();
-            return resultado;
         } catch (RuntimeException | Error e) {
             deshacer(conn, e);
             throw e;
@@ -102,7 +112,27 @@ public final class DB {
             throw new IllegalStateException("No se pudo confirmar la transaccion: " + e.getMessage(), e);
         } finally {
             TRANSACCION.remove();
+            DESPUES_DE_COMMIT.remove();
             cerrar(conn);
+        }
+        for (Runnable accion : accionesPosteriores) {
+            try {
+                accion.run();
+            } catch (RuntimeException e) {
+                LOG.error("No se pudo ejecutar una accion posterior al commit", e);
+            }
+        }
+        return resultado;
+    }
+
+    /** Ejecuta una accion despues del commit actual, o de inmediato si no hay una transaccion activa. */
+    public static void despuesDeCommit(Runnable accion) {
+        Objects.requireNonNull(accion, "accion");
+        List<Runnable> acciones = DESPUES_DE_COMMIT.get();
+        if (acciones == null) {
+            accion.run();
+        } else {
+            acciones.add(accion);
         }
     }
 

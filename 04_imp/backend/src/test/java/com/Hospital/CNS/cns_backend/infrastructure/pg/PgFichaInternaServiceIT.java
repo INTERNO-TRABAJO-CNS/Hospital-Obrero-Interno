@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Hospital.CNS.cns_backend.lib.DB;
+import com.Hospital.CNS.cns_backend.infrastructure.ws.NotificacionesWs;
 import com.Hospital.CNS.cns_backend.model.compartido.CitaDTO;
 import com.Hospital.CNS.cns_backend.model.compartido.DominioException;
 import com.Hospital.CNS.cns_backend.model.compartido.EstadoCita;
@@ -35,6 +36,7 @@ import com.Hospital.CNS.cns_backend.model.identidad.PacienteDTO;
 import com.Hospital.CNS.cns_backend.model.recursos.ConsultorioDTO;
 import com.Hospital.CNS.cns_backend.model.recursos.HorarioDTO;
 import com.Hospital.CNS.cns_backend.model.recursos.MedicoDTO;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * CU-21/22/23 de punta a punta contra PostgreSQL: FichaInternaService con todos los Pg*Repository y la
@@ -88,7 +90,7 @@ class PgFichaInternaServiceIT {
         AsignadorFichaInterna asignador = new AsignadorFichaInterna(fichas, medicos, horarios, consultorios, citas,
                 new PgDiaNoHabilRepository(), null, reloj);
         service = new FichaInternaService(fichas, citas, medicos, pacientes, asignador, new PgCambioFichaRepository(),
-                new PgNotificacionPublicador(), new PgTransaccion(), reloj);
+                new PgNotificacionPublicador(new NotificacionesWs(new ObjectMapper())), new PgTransaccion(), reloj);
     }
 
     @AfterEach

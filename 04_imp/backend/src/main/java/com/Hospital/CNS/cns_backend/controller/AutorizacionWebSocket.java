@@ -42,6 +42,7 @@ public class AutorizacionWebSocket implements HandshakeInterceptor {
                 return false;
             }
             atributos.put("usuarioId", usuario.usuarioId());
+            atributos.put("personaId", usuario.personaId());
             return true;
         } catch (DominioException sinSesion) {
             respuesta.setStatusCode(HttpStatus.UNAUTHORIZED);

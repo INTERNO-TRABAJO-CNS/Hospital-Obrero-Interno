@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -58,5 +59,21 @@ class AutorizacionWebSocketTest {
         MockHttpServletResponse respuesta = new MockHttpServletResponse();
         assertFalse(conectar("no-existe", respuesta));
         assertEquals(401, respuesta.getStatus());
+    }
+
+    @Test
+    void pacienteAutenticado_exponeSuPersonaIdParaElCanalPrivado() {
+        AutorizacionWebSocket soloPaciente =
+                new AutorizacionWebSocket(sesiones.resolutor(), RolUsuario.PACIENTE);
+        MockHttpServletRequest peticion = new MockHttpServletRequest("GET", "/ws/notificaciones");
+        peticion.setQueryString("token=" + sesiones.bearer(1, "PACIENTE", 7).substring("Bearer ".length()));
+        Map<String, Object> atributos = new HashMap<>();
+
+        assertTrue(soloPaciente.beforeHandshake(
+                new ServletServerHttpRequest(peticion),
+                new ServletServerHttpResponse(new MockHttpServletResponse()),
+                null,
+                atributos));
+        assertEquals(7L, atributos.get("personaId"));
     }
 }
