@@ -37,6 +37,7 @@ import '../views/comun/historial_cambios_view.dart';
 import '../views/comun/marco_personal.dart';
 import '../views/enfermeria/confirmar_asistencia_view.dart';
 import '../views/enfermeria/fichas_dia_view.dart';
+import '../views/enfermeria/pacientes_view.dart';
 import '../views/medico/agenda_medico_view.dart';
 import '../views/medico/atencion_view.dart';
 import '../views/medico/cirugias_view.dart';
@@ -74,6 +75,7 @@ class AppRutas {
   /// Enfermería: "Fichas del día" es su inicio.
   static const String enfermeria = '/enfermeria';
   static const String enfermeriaConfirmar = '/enfermeria/confirmar';
+  static const String enfermeriaPacientes = '/enfermeria/pacientes';
   static const String enfermeriaHistorial = '/enfermeria/historial';
 
   /// Administrador: "Catálogos" es su inicio.
@@ -88,6 +90,7 @@ class AppRutas {
 const List<OpcionMenu> menuEnfermeria = [
   OpcionMenu('Fichas del día', AppRutas.enfermeria),
   OpcionMenu('Confirmar asistencia', AppRutas.enfermeriaConfirmar),
+  OpcionMenu('Pacientes', AppRutas.enfermeriaPacientes),
   OpcionMenu('Historial de cambios', AppRutas.enfermeriaHistorial),
 ];
 
@@ -312,6 +315,16 @@ Widget _pagina(String nombre) {
           servicio: enfermeriaApp,
           usuario: _usuarioHistorial(s),
         ),
+      );
+
+    // CU-03 (S3-12): buscar y registrar pacientes sin duplicar.
+    case AppRutas.enfermeriaPacientes:
+      return _personal(
+        Rol.enfermeria,
+        nombre,
+        'Pacientes',
+        menuEnfermeria,
+        (_) => PacientesView(servicio: pacientesEnfermeriaApp),
       );
 
     case AppRutas.enfermeriaHistorial:
@@ -663,6 +676,11 @@ final HistorialCambiosService historialApp = _enfermeriaFake
 
 final EnfermeriaService enfermeriaApp =
     _enfermeriaFake ? _enfermeriaPrueba : ApiEnfermeriaService(apiApp);
+
+/// CU-03 para enfermería: buscar y registrar pacientes.
+final PacienteService pacientesEnfermeriaApp = _enfermeriaFake
+    ? FakePacienteService(conDatosDeEjemplo: true)
+    : ApiPacienteService(apiApp);
 
 /// Quirófanos (T100-19).
 final QuirofanoService quirofanosApp =
