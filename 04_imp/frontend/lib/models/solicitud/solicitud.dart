@@ -4,7 +4,8 @@ enum EstadoSolicitudApp {
   pendiente,
   enEspera,
   asignada,
-  sinCupo;
+  sinCupo,
+  cancelada;
 
   static EstadoSolicitudApp desdeJson(String valor) {
     switch (valor) {
@@ -16,6 +17,8 @@ enum EstadoSolicitudApp {
         return EstadoSolicitudApp.asignada;
       case 'SIN_CUPO':
         return EstadoSolicitudApp.sinCupo;
+      case 'CANCELADA':
+        return EstadoSolicitudApp.cancelada;
       default:
         throw FormatException('Estado de solicitud desconocido: $valor');
     }

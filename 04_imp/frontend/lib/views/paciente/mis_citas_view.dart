@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../../controllers/solicitud_controller.dart';
+import '../../models/comun/fechas_iso.dart';
 import '../../models/solicitud/solicitud.dart';
+import '../../services/cancelacion_service.dart';
+import '../citas/dialogo_cancelar.dart';
 
 class MisCitasView extends StatefulWidget {
   const MisCitasView({
     super.key,
     required this.controller,
+    required this.cancelacionService,
   });
 
   final SolicitudController controller;
+  final CancelacionService cancelacionService;
 
   @override
   State<MisCitasView> createState() => _MisCitasViewState();
@@ -32,6 +37,8 @@ class _MisCitasViewState extends State<MisCitasView> {
         return 'Asignada';
       case EstadoSolicitudApp.sinCupo:
         return 'Sin cupo';
+      case EstadoSolicitudApp.cancelada:
+        return 'Cancelada';
     }
   }
 
@@ -44,6 +51,7 @@ class _MisCitasViewState extends State<MisCitasView> {
       case EstadoSolicitudApp.asignada:
         return Colors.green;
       case EstadoSolicitudApp.sinCupo:
+      case EstadoSolicitudApp.cancelada:
         return Colors.red;
     }
   }
@@ -59,6 +67,23 @@ class _MisCitasViewState extends State<MisCitasView> {
     await widget.controller.listar();
   }
 
+  Future<void> _cancelar(ResultadoSolicitud solicitud) async {
+    final citaId = solicitud.citaId;
+    if (citaId == null) {
+      return;
+    }
+
+    final cancelada = await mostrarDialogoCancelar(
+      context,
+      widget.cancelacionService,
+      citaId,
+      isoDe(solicitud.diaSolicitado),
+    );
+    if (cancelada == true && mounted) {
+      await _actualizar();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,15 +95,13 @@ class _MisCitasViewState extends State<MisCitasView> {
         builder: (context, child) {
           final controller = widget.controller;
 
-          if (controller.cargando &&
-              controller.solicitudes.isEmpty) {
+          if (controller.cargando && controller.solicitudes.isEmpty) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          if (controller.error != null &&
-              controller.solicitudes.isEmpty) {
+          if (controller.error != null && controller.solicitudes.isEmpty) {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -217,6 +240,18 @@ class _MisCitasViewState extends State<MisCitasView> {
             Text(
               'Número de solicitud: ${solicitud.solicitudId}',
             ),
+            if (solicitud.estado == EstadoSolicitudApp.asignada &&
+                solicitud.citaId != null) ...[
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerRight,
+                child: OutlinedButton.icon(
+                  onPressed: () => _cancelar(solicitud),
+                  icon: const Icon(Icons.event_busy_outlined),
+                  label: const Text('Cancelar cita'),
+                ),
+              ),
+            ],
           ],
         ),
       ),

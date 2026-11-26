@@ -31,6 +31,10 @@ public record ResultadoSolicitud(
 
             mensaje = "NO HAY CUPOS — no se encontró cupo en los próximos 15 días hábiles.";
 
+        } else if (solicitud.estado() == EstadoSolicitud.CANCELADA) {
+
+            mensaje = "La cita fue cancelada.";
+
         } else {
             mensaje = "Su solicitud fue registrada. El sistema le asignará médico, día y hora en cuanto haya un cupo disponible.";
         }

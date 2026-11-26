@@ -16,18 +16,18 @@ import com.Hospital.CNS.cns_backend.lib.DB;
 import com.Hospital.CNS.cns_backend.model.compartido.CambioCitaDTO;
 import com.Hospital.CNS.cns_backend.model.compartido.CambioCitaRepository;
 
-/** Auditoria de citas en citas.cambio_cita (migracion V10). El id lo pone la base. */
+/** Auditoria de citas en operaciones.cambio_cita. El id lo pone la base. */
 public class PgCambioCitaRepository implements CambioCitaRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(PgCambioCitaRepository.class);
     private static final int MAX_MOTIVO = 500;
 
     private static final String SELECCION = "select id, cita_id, accion, usuario, fecha_hora, motivo "
-            + "from citas.cambio_cita";
+            + "from operaciones.cambio_cita";
 
     @Override
     public void registrar(CambioCitaDTO c) {
-        String sql = "insert into citas.cambio_cita (cita_id, accion, usuario, fecha_hora, motivo) "
+        String sql = "insert into operaciones.cambio_cita (cita_id, accion, usuario, fecha_hora, motivo) "
                 + "values (?, ?, ?, ?, ?)";
         String motivo = c.motivo() != null && c.motivo().length() > MAX_MOTIVO
                 ? c.motivo().substring(0, MAX_MOTIVO) : c.motivo();

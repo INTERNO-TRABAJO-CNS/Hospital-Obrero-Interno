@@ -12,6 +12,7 @@ import '../models/catalogo/especialidad.dart';
 import '../models/medico/medico_actual.dart';
 import '../services/auth_service.dart';
 import '../services/catalogo_service.dart';
+import '../services/cancelacion_service.dart';
 import '../services/cirugias_service.dart';
 import '../services/cuentas_service.dart';
 import '../services/enfermeria_service.dart';
@@ -272,6 +273,7 @@ Widget _pagina(String nombre) {
         {Rol.paciente},
         (_) => MisCitasView(
           controller: solicitudControllerApp,
+          cancelacionService: cancelacionApp,
         ),
       );
 
@@ -562,6 +564,9 @@ Future<void> _cerrarSesion(BuildContext context) async {
 
 /// Cliente HTTP compartido.
 final ApiClient apiApp = ApiClient()..alPerderSesion = _alPerderSesion;
+
+/// CU-11: cancelacion de citas del paciente.
+final CancelacionService cancelacionApp = ApiCancelacionService(apiApp);
 
 /// CU-04: servicio y controlador para solicitar y consultar citas.
 final SolicitudService solicitudServicioApp = ApiSolicitudService(apiApp);

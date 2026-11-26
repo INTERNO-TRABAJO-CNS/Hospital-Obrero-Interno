@@ -21,6 +21,7 @@ import com.Hospital.CNS.cns_backend.model.compartido.NotificacionPublicador;
 import com.Hospital.CNS.cns_backend.model.compartido.Reloj;
 import com.Hospital.CNS.cns_backend.model.compartido.SolicitudRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.Transaccion;
+import com.Hospital.CNS.cns_backend.model.operaciones.CancelacionService;
 import com.Hospital.CNS.cns_backend.model.recursos.DiaNoHabilRepository;
 import com.Hospital.CNS.cns_backend.model.recursos.HorarioRepository;
 import com.Hospital.CNS.cns_backend.model.recursos.MedicoRepository;
@@ -70,6 +71,12 @@ public class ConfiguracionCitas {
                             NotificacionPublicador avisos, AgendaEventos eventos, Reloj reloj,
                             Transaccion transaccion) {
         return new CitaService(citas, solicitudes, cambios, avisos, eventos, reloj, transaccion);
+    }
+
+    @Bean
+    CancelacionService cancelacionService(CitaRepository citas, CambioCitaRepository cambios,
+                                          NotificacionPublicador avisos, AgendaEventos eventos, Reloj reloj) {
+        return new CancelacionService(citas, cambios, avisos, eventos, reloj);
     }
 
     @Bean

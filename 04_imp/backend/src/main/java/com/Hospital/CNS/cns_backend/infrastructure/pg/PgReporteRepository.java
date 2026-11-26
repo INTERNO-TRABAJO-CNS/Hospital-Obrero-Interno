@@ -26,9 +26,9 @@ import com.Hospital.CNS.cns_backend.model.reportes.ResumenEspecialidadDTO;
 
 /**
  * ReporteRepository sobre PostgreSQL: solo SELECT (count / group by) sobre citas.cita, citas.solicitud,
- * citas.cambio_cita y los catalogos de recursos. No modifica nada.
+ * operaciones.cambio_cita y los catalogos de recursos. No modifica nada.
  *
- * <p>Una cancelacion es automatica cuando la registro el sistema en citas.cambio_cita (accion CANCELADA, usuario
+ * <p>Una cancelacion es automatica cuando la registro el sistema en operaciones.cambio_cita (accion CANCELADA, usuario
  * SISTEMA o Sistema): el paciente no confirmo su asistencia hasta T-30.</p>
  */
 public class PgReporteRepository implements ReporteRepository {
@@ -36,7 +36,7 @@ public class PgReporteRepository implements ReporteRepository {
     private static final Logger LOG = LoggerFactory.getLogger(PgReporteRepository.class);
 
     /** Condicion "esta cita la cancelo el sistema" (alias c = citas.cita). */
-    private static final String CANCELADA_POR_SISTEMA = "exists (select 1 from citas.cambio_cita x "
+    private static final String CANCELADA_POR_SISTEMA = "exists (select 1 from operaciones.cambio_cita x "
             + "where x.cita_id = c.id and x.accion = 'CANCELADA' and upper(x.usuario) = 'SISTEMA')";
 
     @Override
@@ -180,7 +180,7 @@ public class PgReporteRepository implements ReporteRepository {
                 + " from citas.cita c where c.fecha between ? and ?";
         String sqlTiempo = "select avg(extract(epoch from (c.hora_fin - x.fecha_hora)) / 60) as minutos,"
                 + " count(*) as muestras"
-                + " from citas.cita c join citas.cambio_cita x"
+                + " from citas.cita c join operaciones.cambio_cita x"
                 + "   on x.cita_id = c.id and x.accion = 'ASISTENCIA_CONFIRMADA'"
                 + " where c.estado = 'ATENDIDA' and c.hora_fin is not null and c.hora_fin >= x.fecha_hora"
                 + "   and c.fecha between ? and ?";
