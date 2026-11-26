@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Hospital.CNS.cns_backend.lib.DB;
+import com.Hospital.CNS.cns_backend.infrastructure.ws.NotificacionesWs;
 import com.Hospital.CNS.cns_backend.model.cirugias.CirugiaDTO;
 import com.Hospital.CNS.cns_backend.model.cirugias.CirugiaDTOs;
 import com.Hospital.CNS.cns_backend.model.cirugias.ProgramacionCirugiaService;
@@ -35,6 +36,7 @@ import com.Hospital.CNS.cns_backend.model.fichasinternas.FichaInternaDTO;
 import com.Hospital.CNS.cns_backend.model.identidad.PacienteDTO;
 import com.Hospital.CNS.cns_backend.model.recursos.MedicoDTO;
 import com.Hospital.CNS.cns_backend.model.recursos.QuirofanoDTO;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * CU-24 contra PostgreSQL: migracion V8 (EXCLUDE de quirofano, cirujano y paciente), PgQuirofanoRepository,
@@ -132,7 +134,7 @@ class PgCirugiaIT {
     void proponerConfirmarYChoqueAlConfirmarDosVeces() {
         ProgramacionCirugiaService service = new ProgramacionCirugiaService(cirugias, fichas, soloElDeLaPrueba(),
                 medicos, new PgCitaRepository(), new PgDiaNoHabilRepository(), new PgCambioFichaRepository(),
-                new PgNotificacionPublicador(), new PgTransaccion(), reloj);
+                new PgNotificacionPublicador(new NotificacionesWs(new ObjectMapper())), new PgTransaccion(), reloj);
         CirugiaDTOs.Solicitud s = new CirugiaDTOs.Solicitud(ficha, 45, Gravedad.ALTA, false);
 
         CirugiaDTOs.Propuesta p = service.proponer(s, cirujano);

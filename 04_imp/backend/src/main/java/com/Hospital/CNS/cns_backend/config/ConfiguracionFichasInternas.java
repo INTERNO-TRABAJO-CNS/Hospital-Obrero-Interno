@@ -8,6 +8,7 @@ import com.Hospital.CNS.cns_backend.infrastructure.pg.PgCambioFichaRepository;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgFichaInternaRepository;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgNotificacionPublicador;
 import com.Hospital.CNS.cns_backend.infrastructure.planificador.ProcesadorFichasEnEspera;
+import com.Hospital.CNS.cns_backend.infrastructure.ws.NotificacionesWs;
 import com.Hospital.CNS.cns_backend.model.cirugias.CirugiaRepository;
 import com.Hospital.CNS.cns_backend.model.cirugias.OcupacionCirugias;
 import com.Hospital.CNS.cns_backend.model.compartido.CitaRepository;
@@ -43,8 +44,8 @@ public class ConfiguracionFichasInternas {
     }
 
     @Bean
-    NotificacionPublicador notificacionPublicador() {
-        return new PgNotificacionPublicador();
+    NotificacionPublicador notificacionPublicador(NotificacionesWs websocket) {
+        return new PgNotificacionPublicador(websocket);
     }
 
     @Bean

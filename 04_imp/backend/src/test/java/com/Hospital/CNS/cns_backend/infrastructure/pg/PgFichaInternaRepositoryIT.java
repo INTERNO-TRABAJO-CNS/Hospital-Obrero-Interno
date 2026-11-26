@@ -24,9 +24,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Hospital.CNS.cns_backend.lib.DB;
+import com.Hospital.CNS.cns_backend.infrastructure.ws.NotificacionesWs;
 import com.Hospital.CNS.cns_backend.model.compartido.EstadoFichaInterna;
 import com.Hospital.CNS.cns_backend.model.compartido.Gravedad;
 import com.Hospital.CNS.cns_backend.model.compartido.NotificacionDTO;
+import tools.jackson.databind.ObjectMapper;
 import com.Hospital.CNS.cns_backend.model.compartido.TipoEspecialidad;
 import com.Hospital.CNS.cns_backend.model.fichasinternas.FichaInternaDTO;
 import com.Hospital.CNS.cns_backend.model.identidad.PacienteDTO;
@@ -165,8 +167,9 @@ class PgFichaInternaRepositoryIT {
             fichas.bloquearEspecialidad(TipoEspecialidad.GASTROENTEROLOGIA);
             fichas.insertar(ficha(id, true));
             new PgCambioFichaRepository().registrar("FICHA", id, "GENERADA", "IT", null);
-            new PgNotificacionPublicador().publicar(NotificacionDTO.deFicha(paciente, id, "FICHA_INTERNA_EN_ESPERA",
-                    "Prueba", LocalDateTime.now()));
+            new PgNotificacionPublicador(new NotificacionesWs(new ObjectMapper()))
+                    .publicar(NotificacionDTO.deFicha(paciente, id, "FICHA_INTERNA_EN_ESPERA",
+                            "Prueba", LocalDateTime.now()));
         });
 
         assertTrue(fichas.porId(id).orElseThrow().pediatrica());

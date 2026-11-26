@@ -5,6 +5,7 @@ import '../services/solicitud_service.dart';
 import '../controllers/enfermeria_controller.dart';
 import '../controllers/medico_controller.dart';
 import '../controllers/sesion_controller.dart';
+import '../controllers/notificaciones_controller.dart';
 import '../models/auth/sesion.dart';
 import '../models/catalogo/especialidad.dart';
 import '../models/medico/medico_actual.dart';
@@ -20,6 +21,7 @@ import '../services/fichas_internas_service.dart';
 import '../services/historial_cambios_service.dart';
 import '../services/medico_service.dart';
 import '../services/paciente_service.dart';
+import '../services/notificaciones_service.dart';
 import '../services/quirofano_service.dart';
 import '../services/reportes_service.dart';
 import '../services/supervision_service.dart';
@@ -40,6 +42,7 @@ import '../views/medico/fichas_internas_view.dart';
 import '../views/medico/historial_paciente_view.dart';
 import '../views/medico/ticket_interno_view.dart';
 import '../views/paciente/home_paciente_view.dart';
+import '../views/paciente/notificaciones_view.dart';
 import '../views/paciente/mis_citas_view.dart';
 import '../views/paciente/registro_beneficiario_view.dart';
 import '../views/paciente/solicitar_cita_view.dart';
@@ -56,6 +59,7 @@ class AppRutas {
   static const String salir = '/salir';
   static const String registro = '/registro';
   static const String paciente = '/paciente';
+  static const String notificaciones = '/paciente/notificaciones';
   static const String beneficiario = '/paciente/beneficiario';
   static const String solicitarCita = '/paciente/solicitar-cita';
   static const String misCitas = '/paciente/mis-citas';
@@ -194,6 +198,11 @@ Widget _pagina(String nombre) {
                 ruta: AppRutas.paciente,
               ),
               DestinoShell(
+                etiqueta: 'Notificaciones',
+                icono: Icons.notifications_outlined,
+                ruta: AppRutas.notificaciones,
+              ),
+              DestinoShell(
                 etiqueta: 'Salir',
                 icono: Icons.logout,
                 ruta: AppRutas.salir,
@@ -210,6 +219,37 @@ Widget _pagina(String nombre) {
               alRegistrarBeneficiario: () {
                 Navigator.of(context).pushNamed(AppRutas.beneficiario);
               },
+            ),
+          ),
+        ),
+      );
+
+    case AppRutas.notificaciones:
+      return _conRol(
+        {Rol.paciente},
+        (sesion) => AppShell(
+          rutaActual: nombre,
+          destinos: const [
+            DestinoShell(
+              etiqueta: 'Inicio',
+              icono: Icons.home_outlined,
+              ruta: AppRutas.paciente,
+            ),
+            DestinoShell(
+              etiqueta: 'Notificaciones',
+              icono: Icons.notifications_outlined,
+              ruta: AppRutas.notificaciones,
+            ),
+            DestinoShell(
+              etiqueta: 'Salir',
+              icono: Icons.logout,
+              ruta: AppRutas.salir,
+            ),
+          ],
+          child: NotificacionesView(
+            controller: NotificacionesController(
+              RestNotificacionesService(apiApp),
+              sesion.personaId,
             ),
           ),
         ),
@@ -344,10 +384,9 @@ Widget _paginaMedico(String nombre) {
 
     final menu = menuMedico(medico);
     final uri = Uri.parse(nombre);
-    final camino =
-        uri.path.startsWith('/medico/pacientes/')
-            ? RutasMedico.historial
-            : uri.path;
+    final camino = uri.path.startsWith('/medico/pacientes/')
+        ? RutasMedico.historial
+        : uri.path;
 
     final coinciden = [
       for (final op in menu)
@@ -585,13 +624,11 @@ final CatalogoService catalogoApp = _catalogoFake
     ? FakeCatalogoService(conDatosDeEjemplo: true)
     : ApiCatalogoService(apiApp);
 
-final CuentasService cuentasApp = _catalogoFake
-    ? FakeCuentasService()
-    : ApiCuentasService(apiApp);
+final CuentasService cuentasApp =
+    _catalogoFake ? FakeCuentasService() : ApiCuentasService(apiApp);
 
 // Datos de prueba en memoria.
-final FakeHistorialCambiosService historialApp =
-    FakeHistorialCambiosService();
+final FakeHistorialCambiosService historialApp = FakeHistorialCambiosService();
 
 final FakeEnfermeriaService enfermeriaApp =
     FakeEnfermeriaService(historial: historialApp);
@@ -699,4 +736,3 @@ Future<void> _irSegunRol(BuildContext context, Sesion sesion) async {
       mensajes.showSnackBar(SnackBar(content: Text(motivo)));
   }
 }
-
