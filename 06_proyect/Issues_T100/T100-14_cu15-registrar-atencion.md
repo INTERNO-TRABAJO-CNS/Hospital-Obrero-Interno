@@ -27,7 +27,7 @@ El médico ve los datos autocompletados de la cita en atención, escribe la medi
 - Comportamiento (cada `[Na]` = un test): `03_des/01-diagramaCompor/CU-15_RegistrarDatosAtencion.puml`
 - Estados: `03_des/diagramasEstado/ED-01_SolicitudCita.puml`, `ED-02_CitaMedica.puml`
 - Clases: `03_des/02-arquitecturaGeneral/diagramas/ARQ-03_ModeloDominio.puml`
-- Pantallas: Figma `KgJK1swBix6WpC5wfDw2B6` (páginas PHONE, COMPUTER, TV'S)
+- Pantallas: Figma `n2XbqM0jcK8ow40Nsx8uoe` (páginas PHONE, COMPUTER, TV'S)
 
 ## Dónde va cada archivo (rutas desde la raíz del repositorio)
 | Ruta | Qué debe contener |

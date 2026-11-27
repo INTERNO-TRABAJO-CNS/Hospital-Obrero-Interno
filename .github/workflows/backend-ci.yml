@@ -1,0 +1,85 @@
+# S3-03 (#48): cada PR y cada push a las ramas de integracion compila y prueba el backend y la app.
+# Si una prueba falla, el check queda en rojo. Proteger las ramas (PR + check obligatorio) se hace a mano en
+# GitHub > Settings > Branches.
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main, feature/T100-algoritmos-ejecucion]
+  push:
+    branches: [develop, main, feature/T100-algoritmos-ejecucion]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (Java + PostgreSQL)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: 04_imp/backend
+    services:
+      # Base vacia solo para las pruebas: los IT aplican las migraciones de Flyway por su cuenta.
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: cns_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DB_URL: jdbc:postgresql://localhost:5432/cns_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Compilar y probar
+        run: |
+          chmod +x mvnw
+          ./mvnw -B verify
+
+      - name: Reportes de pruebas
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: 04_imp/backend/target/surefire-reports/
+
+  frontend:
+    name: App Flutter
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: 04_imp/frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      # Version fija, la misma del equipo: con "stable" sin version, una version nueva de Flutter marco como
+      # obsoleto package:flutter/material.dart y flutter analyze fallo sin que cambiara el codigo.
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.9
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
