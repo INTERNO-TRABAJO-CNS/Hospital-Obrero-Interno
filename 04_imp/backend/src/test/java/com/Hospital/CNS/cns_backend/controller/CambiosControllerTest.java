@@ -1,20 +1,19 @@
 package com.Hospital.CNS.cns_backend.controller;
 
-import static com.Hospital.CNS.cns_backend.model.compartido.Citas.cita;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.Hospital.CNS.cns_backend.model.compartido.CambioCitaDTO;
+import static com.Hospital.CNS.cns_backend.model.compartido.Citas.cita;
 import com.Hospital.CNS.cns_backend.model.compartido.EstadoCita;
 import com.Hospital.CNS.cns_backend.model.compartido.FakeCambioCitaRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.FakeCitaRepository;
