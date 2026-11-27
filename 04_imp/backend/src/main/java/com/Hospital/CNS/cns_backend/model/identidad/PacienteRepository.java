@@ -14,6 +14,6 @@ public interface PacienteRepository {
 
     Optional<PacienteDTO> porAfiliadoYCi(String numeroAfiliado, String ci);
 
-    /** Titular y beneficiarios de una afiliacion, titular primero. */
+    /** Titular y beneficiarios ACTIVOS de una afiliacion (los dados de baja no cuentan), titular primero. */
     List<PacienteDTO> deLaAfiliacion(String numeroAfiliado);
 }

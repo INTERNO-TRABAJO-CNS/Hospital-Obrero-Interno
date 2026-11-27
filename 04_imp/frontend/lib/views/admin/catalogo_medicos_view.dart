@@ -10,9 +10,12 @@ import 'catalogo_widgets.dart';
 /// CU-02 · Catalogo de medicos (Figma "ADMIN CATALOGO MEDICOS v2"): tabla con el tipo
 /// (BÁSICA / INTERNA) y panel "Nuevo / editar médico" con las 13 especialidades agrupadas.
 class CatalogoMedicosView extends StatefulWidget {
-  const CatalogoMedicosView({super.key, required this.controller});
+  const CatalogoMedicosView({super.key, required this.controller, this.soloLectura = false});
 
   final CatalogoController controller;
+
+  /// En "Catálogos" solo se consulta la tabla; crear, editar y dar de baja se hace en "Gestionar".
+  final bool soloLectura;
 
   @override
   State<CatalogoMedicosView> createState() => _CatalogoMedicosViewState();
@@ -107,7 +110,7 @@ class _CatalogoMedicosViewState extends State<CatalogoMedicosView> {
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: _c,
-      builder: (context, _) => DosColumnas(principal: _tabla(), lateral: _panel()),
+      builder: (context, _) => DosColumnas(principal: _tabla(), lateral: widget.soloLectura ? null : _panel()),
     );
   }
 
@@ -160,7 +163,7 @@ class _CatalogoMedicosViewState extends State<CatalogoMedicosView> {
               ],
           ],
           seleccionada: i < 0 ? null : i,
-          alTocarFila: (fila) => _seleccionar(lista[fila]),
+          alTocarFila: widget.soloLectura ? null : (fila) => _seleccionar(lista[fila]),
           textoVacio: 'No hay médicos registrados',
         ),
         const NotaPie('Las 3 básicas las pide el paciente; las 10 internas solo se asignan por ficha interna. '

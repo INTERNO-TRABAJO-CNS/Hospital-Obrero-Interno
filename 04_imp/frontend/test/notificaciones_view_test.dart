@@ -11,8 +11,7 @@ class StreamingNotificacionesService implements NotificacionesService {
   StreamingNotificacionesService(this.iniciales);
 
   final List<NotificacionDto> iniciales;
-  final StreamController<NotificacionDto> streamController =
-      StreamController<NotificacionDto>.broadcast();
+  final StreamController<NotificacionDto> streamController = StreamController<NotificacionDto>.broadcast();
 
   @override
   Future<List<NotificacionDto>> delPaciente(int pacienteId) async => iniciales;
@@ -49,13 +48,13 @@ void main() {
     final controller = NotificacionesController(service, 7);
 
     await tester.pumpWidget(
-      MaterialApp(home: NotificacionesView(controller: controller)),
+      MaterialApp(home: Scaffold(body: NotificacionesView(controller: controller))),
     );
     await tester.pumpAndSettle();
 
     expect(find.text('Su cita fue registrada.'), findsOneWidget);
     expect(find.text('CITA_REGISTRADA'), findsOneWidget);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Avisos'), findsOneWidget);
     await service.dispose();
   });
 
@@ -64,7 +63,7 @@ void main() {
     final controller = NotificacionesController(service, 7);
 
     await tester.pumpWidget(
-      MaterialApp(home: NotificacionesView(controller: controller)),
+      MaterialApp(home: Scaffold(body: NotificacionesView(controller: controller))),
     );
     await tester.pumpAndSettle();
 

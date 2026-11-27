@@ -243,9 +243,8 @@ Future<bool> reprogramarDesdeDetalle(
 }
 
 Future<bool> cancelarDesdeDetalle(BuildContext context, CitaPaciente cita, CancelacionService servicio) async {
-  final cancelada =
-      await mostrarDialogoCancelar(context, servicio, cita.citaId, isoDe(cita.inicio),
-          numeroFicha: cita.numeroFicha, pacienteId: cita.pacienteId);
+  final cancelada = await mostrarDialogoCancelar(context, servicio, cita.citaId, isoDe(cita.inicio),
+      numeroFicha: cita.numeroFicha, pacienteId: cita.pacienteId);
   return cancelada == true;
 }
 
@@ -318,12 +317,14 @@ class _DetalleCitaViewState extends State<DetalleCitaView> {
   }
 }
 
-/// Logo + titulo grande, como el encabezado de las pantallas del paciente en el Figma (celular).
+/// Logo + titulo grande, como el encabezado de las pantallas del paciente en el Figma (celular). Con [alSalir]
+/// muestra a la derecha el boton "Cerrar sesión" (pide confirmacion).
 class EncabezadoPaciente extends StatelessWidget {
-  const EncabezadoPaciente({super.key, required this.titulo, this.alVolver});
+  const EncabezadoPaciente({super.key, required this.titulo, this.alVolver, this.alSalir});
 
   final String titulo;
   final VoidCallback? alVolver;
+  final VoidCallback? alSalir;
 
   @override
   Widget build(BuildContext context) {
@@ -340,7 +341,61 @@ class EncabezadoPaciente extends StatelessWidget {
         Expanded(
           child: Text(titulo, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
         ),
+        if (alSalir != null) BotonCerrarSesion(alSalir: alSalir!),
       ],
+    );
+  }
+}
+
+/// Boton blanco redondo "Cerrar sesión" de las pantallas del paciente. Pide confirmacion antes de salir;
+/// despues se puede entrar con otro usuario.
+class BotonCerrarSesion extends StatelessWidget {
+  const BotonCerrarSesion({super.key, required this.alSalir});
+
+  final VoidCallback alSalir;
+
+  Future<void> _confirmar(BuildContext context) async {
+    final salir = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('Cerrar sesión'),
+        content: const Text('¿Desea cerrar sesión? Podrá entrar de nuevo o con otro usuario.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancelar')),
+          FilledButton(
+            key: const Key('confirmar_cerrar_sesion'),
+            onPressed: () => Navigator.pop(c, true),
+            child: const Text('Cerrar sesión'),
+          ),
+        ],
+      ),
+    );
+    if (salir ?? false) {
+      alSalir();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: ColoresCns.blanco,
+      shape: const StadiumBorder(),
+      child: InkWell(
+        key: const Key('paciente_cerrar_sesion'),
+        customBorder: const StadiumBorder(),
+        onTap: () => _confirmar(context),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.logout, size: 18, color: ColoresCns.menu),
+              SizedBox(width: 6),
+              Text('Salir', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

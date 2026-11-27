@@ -24,6 +24,7 @@ import '../services/fichas_internas_service.dart';
 import '../services/historial_cambios_service.dart';
 import '../services/medico_service.dart';
 import '../services/paciente_service.dart';
+import '../services/pacientes_admin_service.dart';
 import '../services/notificaciones_service.dart';
 import '../services/quirofano_service.dart';
 import '../services/reportes_service.dart';
@@ -46,6 +47,7 @@ import '../views/medico/fichas_internas_view.dart';
 import '../views/medico/historial_paciente_view.dart';
 import '../views/medico/ticket_interno_view.dart';
 import '../views/paciente/home_paciente_view.dart';
+import '../views/paciente/marco_paciente.dart';
 import '../views/paciente/notificaciones_view.dart';
 import '../views/paciente/mis_citas_view.dart';
 import '../views/paciente/registro_beneficiario_view.dart';
@@ -83,6 +85,9 @@ class AppRutas {
   static const String adminSupervision = '/admin/supervision';
   static const String adminReportes = '/admin/reportes';
   static const String adminHistorial = '/admin/historial';
+
+  /// Crear, editar y dar de baja médicos, consultorios, horarios, quirófanos, pacientes y cuentas.
+  static const String adminGestionar = '/admin/gestionar';
   static const String tv = rutaTv;
 }
 
@@ -100,6 +105,7 @@ const List<OpcionMenu> menuAdmin = [
   OpcionMenu('Supervisión', AppRutas.adminSupervision),
   OpcionMenu('Reportes', AppRutas.adminReportes),
   OpcionMenu('Historial de cambios', AppRutas.adminHistorial),
+  OpcionMenu('Gestionar', AppRutas.adminGestionar),
 ];
 
 /// Menú lateral del médico según su tipo.
@@ -110,8 +116,7 @@ List<OpcionMenu> menuMedico(MedicoActual medico) {
         'Agenda de fichas internas',
         RutasMedico.fichasInternas,
       ),
-      if (medico.operaEnQuirofano &&
-          medico.especialidad != Especialidad.terapiaIntensiva)
+      if (medico.operaEnQuirofano && medico.especialidad != Especialidad.terapiaIntensiva)
         const OpcionMenu('Cirugías', RutasMedico.cirugias),
     ];
   }
@@ -150,8 +155,7 @@ class PantallaMarcador extends StatelessWidget {
 
 /// Navegador y mensajes de la app.
 final GlobalKey<NavigatorState> navegadorApp = GlobalKey<NavigatorState>();
-final GlobalKey<ScaffoldMessengerState> mensajesApp =
-    GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<ScaffoldMessengerState> mensajesApp = GlobalKey<ScaffoldMessengerState>();
 
 /// Se usa en MaterialApp.onGenerateRoute.
 Route<dynamic> generarRuta(RouteSettings ajustes) {
@@ -187,77 +191,33 @@ Widget _pagina(String nombre) {
         builder: (context) => RegistroTitularView(
           controller: sesionApp,
           alRegistrar: (sesion) => _irSegunRol(context, sesion),
-          alVolver: () =>
-              Navigator.of(context).pushReplacementNamed(AppRutas.login),
+          alVolver: () => Navigator.of(context).pushReplacementNamed(AppRutas.login),
         ),
       );
 
+    // Paciente (Figma "HOME PACIENTE", "MIS CITAS", "NOTIFICACIONES v2"): tres pestañas con la barra inferior
+    // Inicio / Mis citas / Avisos y "Salir" en la cabecera.
     case AppRutas.paciente:
-      return _conRol(
-        {Rol.paciente},
-        (sesion) => Builder(
-          builder: (context) => AppShell(
-            rutaActual: nombre,
-            destinos: const [
-              DestinoShell(
-                etiqueta: 'Inicio',
-                icono: Icons.home_outlined,
-                ruta: AppRutas.paciente,
-              ),
-              DestinoShell(
-                etiqueta: 'Notificaciones',
-                icono: Icons.notifications_outlined,
-                ruta: AppRutas.notificaciones,
-              ),
-              DestinoShell(
-                etiqueta: 'Salir',
-                icono: Icons.logout,
-                ruta: AppRutas.salir,
-              ),
-            ],
-            child: HomePacienteView(
-              sesion: sesion,
-              alSolicitarCita: () {
-                Navigator.of(context).pushNamed(AppRutas.solicitarCita);
-              },
-              alMisCitas: () {
-                Navigator.of(context).pushNamed(AppRutas.misCitas);
-              },
-              alRegistrarBeneficiario: () {
-                Navigator.of(context).pushNamed(AppRutas.beneficiario);
-              },
-            ),
-          ),
+      return _paciente(
+        PestanaPaciente.inicio,
+        (context, sesion, salir) => HomePacienteView(
+          sesion: sesion,
+          citas: citasPacienteApp,
+          alSalir: salir,
+          alSolicitarCita: () => Navigator.of(context).pushNamed(AppRutas.solicitarCita),
+          alMisCitas: () => Navigator.of(context).pushReplacementNamed(AppRutas.misCitas),
+          alRegistrarBeneficiario: () => Navigator.of(context).pushNamed(AppRutas.beneficiario),
         ),
       );
 
     case AppRutas.notificaciones:
-      return _conRol(
-        {Rol.paciente},
-        (sesion) => AppShell(
-          rutaActual: nombre,
-          destinos: const [
-            DestinoShell(
-              etiqueta: 'Inicio',
-              icono: Icons.home_outlined,
-              ruta: AppRutas.paciente,
-            ),
-            DestinoShell(
-              etiqueta: 'Notificaciones',
-              icono: Icons.notifications_outlined,
-              ruta: AppRutas.notificaciones,
-            ),
-            DestinoShell(
-              etiqueta: 'Salir',
-              icono: Icons.logout,
-              ruta: AppRutas.salir,
-            ),
-          ],
-          child: NotificacionesView(
-            controller: NotificacionesController(
-              RestNotificacionesService(apiApp),
-              sesion.personaId,
-            ),
+      return _paciente(
+        PestanaPaciente.avisos,
+        (context, sesion, salir) => NotificacionesView(
+          alSalir: salir,
+          controller: NotificacionesController(
+            RestNotificacionesService(apiApp),
+            sesion.personaId,
           ),
         ),
       );
@@ -274,12 +234,14 @@ Widget _pagina(String nombre) {
 
     // CU-08/CU-10/CU-11: mis citas, detalle, reprogramar y cancelar.
     case AppRutas.misCitas:
-      return _conRol(
-        {Rol.paciente},
-        (_) => MisCitasView(
+      return _paciente(
+        PestanaPaciente.misCitas,
+        (context, sesion, salir) => MisCitasView(
           citas: citasPacienteApp,
           cancelacion: cancelacionApp,
           solicitudes: solicitudServicioApp,
+          alSalir: salir,
+          conVolver: false,
         ),
       );
 
@@ -347,6 +309,23 @@ Widget _pagina(String nombre) {
           servicio: catalogoApp,
           quirofanos: quirofanosApp,
           cuentas: cuentasApp,
+          pacientes: pacientesAdminApp,
+        ),
+      );
+
+    // Crear / editar / dar de baja (los formularios que antes estaban en Catálogos).
+    case AppRutas.adminGestionar:
+      return _personal(
+        Rol.administrador,
+        nombre,
+        'Gestionar',
+        menuAdmin,
+        (_) => CatalogosView(
+          servicio: catalogoApp,
+          quirofanos: quirofanosApp,
+          cuentas: cuentasApp,
+          pacientes: pacientesAdminApp,
+          editable: true,
         ),
       );
 
@@ -403,9 +382,7 @@ Widget _paginaMedico(String nombre) {
 
     final menu = menuMedico(medico);
     final uri = Uri.parse(nombre);
-    final camino = uri.path.startsWith('/medico/pacientes/')
-        ? RutasMedico.historial
-        : uri.path;
+    final camino = uri.path.startsWith('/medico/pacientes/') ? RutasMedico.historial : uri.path;
 
     final coinciden = [
       for (final op in menu)
@@ -545,6 +522,34 @@ Widget _conRol(Set<Rol> roles, Widget Function(Sesion sesion) pagina) {
   return pagina(sesion);
 }
 
+/// Pantalla del paciente con su barra inferior. [contenido] recibe la accion de cerrar sesion.
+Widget _paciente(
+  PestanaPaciente pestana,
+  Widget Function(BuildContext context, Sesion sesion, VoidCallback salir) contenido,
+) {
+  return _conRol(
+    {Rol.paciente},
+    (sesion) => Builder(
+      builder: (context) => MarcoPaciente(
+        actual: pestana,
+        alElegir: (p) => Navigator.of(context).pushReplacementNamed(_rutaPestana(p)),
+        child: contenido(context, sesion, () => _cerrarSesion(context)),
+      ),
+    ),
+  );
+}
+
+String _rutaPestana(PestanaPaciente p) {
+  switch (p) {
+    case PestanaPaciente.inicio:
+      return AppRutas.paciente;
+    case PestanaPaciente.misCitas:
+      return AppRutas.misCitas;
+    case PestanaPaciente.avisos:
+      return AppRutas.notificaciones;
+  }
+}
+
 /// Pantalla del personal dentro del marco del Figma.
 Widget _personal(
   Rol rol,
@@ -568,8 +573,7 @@ Widget _personal(
   );
 }
 
-String _usuarioHistorial(Sesion s) =>
-    usuarioParaHistorial(s.rol.etiqueta, s.nombre);
+String _usuarioHistorial(Sesion s) => usuarioParaHistorial(s.rol.etiqueta, s.nombre);
 
 Future<void> _cerrarSesion(BuildContext context) async {
   final navegador = Navigator.of(context);
@@ -586,18 +590,15 @@ final FakeCitasPacienteService? _citasPrueba =
     const bool.fromEnvironment('AUTH_FAKE') ? FakeCitasPacienteService() : null;
 
 /// CU-08/CU-10: citas del paciente y reprogramacion.
-final CitasPacienteService citasPacienteApp =
-    _citasPrueba ?? ApiCitasPacienteService(apiApp);
+final CitasPacienteService citasPacienteApp = _citasPrueba ?? ApiCitasPacienteService(apiApp);
 
 /// CU-11: cancelacion de citas del paciente.
-final CancelacionService cancelacionApp =
-    _citasPrueba ?? ApiCancelacionService(apiApp);
+final CancelacionService cancelacionApp = _citasPrueba ?? ApiCancelacionService(apiApp);
 
 /// CU-04: servicio y controlador para solicitar y consultar citas (especialidad y dia; el titular tambien pide para
 /// sus beneficiarios). Con AUTH_FAKE, en memoria.
-final SolicitudService solicitudServicioApp = const bool.fromEnvironment('AUTH_FAKE')
-    ? FakeSolicitudService()
-    : ApiSolicitudService(apiApp);
+final SolicitudService solicitudServicioApp =
+    const bool.fromEnvironment('AUTH_FAKE') ? FakeSolicitudService() : ApiSolicitudService(apiApp);
 
 final SolicitudController solicitudControllerApp = SolicitudController(
   service: solicitudServicioApp,
@@ -608,8 +609,7 @@ final SolicitudController solicitudControllerApp = SolicitudController(
 
 /// Servicio y controlador de las fichas para la pantalla de TV.
 final FichasService fichasTvService = FichasService(apiApp);
-final FichasController fichasTvController =
-    FichasController(fichasService: fichasTvService);
+final FichasController fichasTvController = FichasController(fichasService: fichasTvService);
 
 /// El backend respondió 401 a una petición con token.
 void _alPerderSesion(ApiException error) {
@@ -660,82 +660,66 @@ SesionController _crearSesion() {
 /// CU-02: catálogos y cuentas.
 const bool _catalogoFake = bool.fromEnvironment('CATALOGO_FAKE');
 
-final CatalogoService catalogoApp = _catalogoFake
-    ? FakeCatalogoService(conDatosDeEjemplo: true)
-    : ApiCatalogoService(apiApp);
+final CatalogoService catalogoApp =
+    _catalogoFake ? FakeCatalogoService(conDatosDeEjemplo: true) : ApiCatalogoService(apiApp);
 
-final CuentasService cuentasApp =
-    _catalogoFake ? FakeCuentasService() : ApiCuentasService(apiApp);
+final CuentasService cuentasApp = _catalogoFake ? FakeCuentasService() : ApiCuentasService(apiApp);
+
+/// Pacientes del administrador (Catálogos / Gestionar > Pacientes).
+final PacientesAdminService pacientesAdminApp =
+    _catalogoFake ? FakePacientesAdminService() : ApiPacientesAdminService(apiApp);
 
 /// Enfermería (CU-09/CU-12) e historial de cambios (CU-18): backend real; con AUTH_FAKE o
 /// ENFERMERIA_FAKE usan datos de prueba en memoria.
-const bool _enfermeriaFake =
-    bool.fromEnvironment('AUTH_FAKE') || bool.fromEnvironment('ENFERMERIA_FAKE');
+const bool _enfermeriaFake = bool.fromEnvironment('AUTH_FAKE') || bool.fromEnvironment('ENFERMERIA_FAKE');
 
-final FakeHistorialCambiosService _historialPrueba =
-    FakeHistorialCambiosService();
+final FakeHistorialCambiosService _historialPrueba = FakeHistorialCambiosService();
 
-final FakeEnfermeriaService _enfermeriaPrueba =
-    FakeEnfermeriaService(historial: _historialPrueba);
+final FakeEnfermeriaService _enfermeriaPrueba = FakeEnfermeriaService(historial: _historialPrueba);
 
-final HistorialCambiosService historialApp = _enfermeriaFake
-    ? _historialPrueba
-    : ApiHistorialCambiosService(apiApp);
+final HistorialCambiosService historialApp = _enfermeriaFake ? _historialPrueba : ApiHistorialCambiosService(apiApp);
 
-final EnfermeriaService enfermeriaApp =
-    _enfermeriaFake ? _enfermeriaPrueba : ApiEnfermeriaService(apiApp);
+final EnfermeriaService enfermeriaApp = _enfermeriaFake ? _enfermeriaPrueba : ApiEnfermeriaService(apiApp);
 
 /// CU-03 para enfermería: buscar y registrar pacientes.
-final PacienteService pacientesEnfermeriaApp = _enfermeriaFake
-    ? FakePacienteService(conDatosDeEjemplo: true)
-    : ApiPacienteService(apiApp);
+final PacienteService pacientesEnfermeriaApp =
+    _enfermeriaFake ? FakePacienteService(conDatosDeEjemplo: true) : ApiPacienteService(apiApp);
 
 /// Quirófanos (T100-19).
-final QuirofanoService quirofanosApp =
-    _catalogoFake ? FakeQuirofanoService() : ApiQuirofanoService(apiApp);
+final QuirofanoService quirofanosApp = _catalogoFake ? FakeQuirofanoService() : ApiQuirofanoService(apiApp);
 
 /// Supervision y reportes del administrador (T100-04, CU-19/CU-20). Con AUTH_FAKE o REPORTES_FAKE
 /// usan datos de prueba; si no, el backend (fichas internas y quirofanos siguen siendo de prueba).
-const bool _reportesFake =
-    bool.fromEnvironment('AUTH_FAKE') || bool.fromEnvironment('REPORTES_FAKE');
+const bool _reportesFake = bool.fromEnvironment('AUTH_FAKE') || bool.fromEnvironment('REPORTES_FAKE');
 
 final SupervisionService _supervisionPrueba = FakeSupervisionService(
   enfermeria: _enfermeriaPrueba,
   quirofanos: quirofanosApp,
 );
 
-final SupervisionService supervisionApp = _reportesFake
-    ? _supervisionPrueba
-    : ApiSupervisionService(apiApp, respaldo: _supervisionPrueba);
+final SupervisionService supervisionApp =
+    _reportesFake ? _supervisionPrueba : ApiSupervisionService(apiApp, respaldo: _supervisionPrueba);
 
-final ReportesService reportesApp = _reportesFake
-    ? FakeReportesService()
-    : ApiReportesService(apiApp, respaldo: FakeReportesService());
+final ReportesService reportesApp =
+    _reportesFake ? FakeReportesService() : ApiReportesService(apiApp, respaldo: FakeReportesService());
 
 /// Médico (CU-13/14/15).
-const bool _medicoFake =
-    bool.fromEnvironment('AUTH_FAKE') || bool.fromEnvironment('MEDICO_FAKE');
+const bool _medicoFake = bool.fromEnvironment('AUTH_FAKE') || bool.fromEnvironment('MEDICO_FAKE');
 
-final MedicoService medicoServicioApp = _medicoFake
-    ? FakeMedicoService(sesion: () => sesionApp.sesion)
-    : ApiMedicoService(apiApp);
+final MedicoService medicoServicioApp =
+    _medicoFake ? FakeMedicoService(sesion: () => sesionApp.sesion) : ApiMedicoService(apiApp);
 
-final AtencionService atencionApp =
-    _medicoFake ? FakeAtencionService() : ApiAtencionService(apiApp);
+final AtencionService atencionApp = _medicoFake ? FakeAtencionService() : ApiAtencionService(apiApp);
 
-final HistorialPacienteService historialPacienteApp = _medicoFake
-    ? FakeHistorialPacienteService()
-    : ApiHistorialPacienteService(apiApp);
+final HistorialPacienteService historialPacienteApp =
+    _medicoFake ? FakeHistorialPacienteService() : ApiHistorialPacienteService(apiApp);
 
 /// Fichas internas (CU-21..CU-23, CU-25).
-final FichasInternasService fichasInternasApp = _medicoFake
-    ? FakeFichasInternasService()
-    : ApiFichasInternasService(apiApp);
+final FichasInternasService fichasInternasApp =
+    _medicoFake ? FakeFichasInternasService() : ApiFichasInternasService(apiApp);
 
 /// Cirugías (CU-24).
-final CirugiasService cirugiasApp = _medicoFake
-    ? FakeCirugiasService(fichasInternasApp)
-    : ApiCirugiasService(apiApp);
+final CirugiasService cirugiasApp = _medicoFake ? FakeCirugiasService(fichasInternasApp) : ApiCirugiasService(apiApp);
 
 /// Datos del médico de la sesión y su agenda.
 final MedicoController medicoApp = MedicoController(medicoServicioApp);
@@ -755,8 +739,7 @@ Widget _login() {
     builder: (context) => LoginView(
       controller: sesionApp,
       alEntrar: (sesion) => _irSegunRol(context, sesion),
-      alRegistrarse: () =>
-          Navigator.of(context).pushReplacementNamed(AppRutas.registro),
+      alRegistrarse: () => Navigator.of(context).pushReplacementNamed(AppRutas.registro),
     ),
   );
 }
@@ -785,8 +768,7 @@ Future<void> _irSegunRol(BuildContext context, Sesion sesion) async {
         return;
       }
 
-      final motivo =
-          medicoApp.error ?? 'No se pudieron cargar tus datos de médico.';
+      final motivo = medicoApp.error ?? 'No se pudieron cargar tus datos de médico.';
 
       await sesionApp.salir();
       _olvidarMedico();

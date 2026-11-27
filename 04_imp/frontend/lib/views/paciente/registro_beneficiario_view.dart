@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/app_theme.dart';
+
 import '../../controllers/sesion_controller.dart';
 import '../../models/auth/paciente.dart';
 
@@ -72,7 +74,11 @@ class _RegistroBeneficiarioViewState extends State<RegistroBeneficiarioView> {
     final tema = Theme.of(context);
     final fecha = _nacimiento;
     return Scaffold(
+      backgroundColor: ColoresCns.fondo,
       appBar: AppBar(
+        backgroundColor: ColoresCns.fondo,
+        surfaceTintColor: Colors.transparent,
+        titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: ColoresCns.texto),
         title: const Text('Registrar beneficiario'),
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: widget.alTerminar),
       ),
@@ -112,8 +118,8 @@ class _RegistroBeneficiarioViewState extends State<RegistroBeneficiarioView> {
                     ),
                     const SizedBox(height: 16),
                     if (_error != null) ...[
-                      Text(_error!, key: const Key('beneficiario_error'),
-                          style: TextStyle(color: tema.colorScheme.error)),
+                      Text(_error!,
+                          key: const Key('beneficiario_error'), style: TextStyle(color: tema.colorScheme.error)),
                       const SizedBox(height: 12),
                     ],
                     FilledButton(

@@ -12,9 +12,12 @@ import 'catalogo_widgets.dart';
 /// Figma "ADMIN CATALOGO QUIROFANOS": tabla y panel "Nuevo / editar quirófano". Los rechazos se
 /// muestran en la caja roja con su codigo (p. ej. QUIROFANO_CON_CIRUGIAS).
 class CatalogoQuirofanosView extends StatefulWidget {
-  const CatalogoQuirofanosView({super.key, required this.controller});
+  const CatalogoQuirofanosView({super.key, required this.controller, this.soloLectura = false});
 
   final QuirofanosController controller;
+
+  /// En "Catálogos" solo se consulta la tabla; crear, editar y dar de baja se hace en "Gestionar".
+  final bool soloLectura;
 
   @override
   State<CatalogoQuirofanosView> createState() => _CatalogoQuirofanosViewState();
@@ -143,7 +146,7 @@ class _CatalogoQuirofanosViewState extends State<CatalogoQuirofanosView> {
                     ],
                 ],
                 seleccionada: i < 0 ? null : i,
-                alTocarFila: (fila) => _seleccionar(lista[fila]),
+                alTocarFila: widget.soloLectura ? null : (fila) => _seleccionar(lista[fila]),
                 textoVacio: 'No hay quirófanos registrados',
               ),
               const NotaPie('Cada quirófano es de una sola especialidad (no se comparten). Horario por defecto '
@@ -151,7 +154,7 @@ class _CatalogoQuirofanosViewState extends State<CatalogoQuirofanosView> {
                   'y Endocrinología operan solo si hay tiempo (pendiente PV-20).'),
             ],
           ),
-          lateral: _panel(),
+          lateral: widget.soloLectura ? null : _panel(),
         );
       },
     );

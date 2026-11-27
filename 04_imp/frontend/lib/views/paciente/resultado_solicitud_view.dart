@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../core/app_theme.dart';
 import '../../models/catalogo/especialidad.dart';
 import '../../models/solicitud/solicitud.dart';
 
@@ -62,7 +64,11 @@ class ResultadoSolicitudView extends StatelessWidget {
     final colores = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: ColoresCns.fondo,
       appBar: AppBar(
+        backgroundColor: ColoresCns.fondo,
+        surfaceTintColor: Colors.transparent,
+        titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: ColoresCns.texto),
         title: const Text('Resultado de solicitud'),
         automaticallyImplyLeading: false,
       ),
@@ -97,15 +103,13 @@ class ResultadoSolicitudView extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       const Divider(height: 32),
-                      _dato('Número de solicitud',
-                          resultado.solicitudId.toString()),
+                      _dato('Número de solicitud', resultado.solicitudId.toString()),
                       _dato('Especialidad', _nombreEspecialidad()),
                       _dato(
                         'Buscando cupo desde',
                         _formatearFecha(resultado.diaSolicitado),
                       ),
-                      _dato('Orden de llegada',
-                          resultado.ordenLlegada.toString()),
+                      _dato('Orden de llegada', resultado.ordenLlegada.toString()),
                     ],
                   ),
                 ),

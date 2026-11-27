@@ -8,9 +8,12 @@ import 'catalogo_widgets.dart';
 /// CU-02 · Catalogo de consultorios. El Figma no tiene esta pantalla: sigue el
 /// mismo formato que la de medicos (tabla + panel "Nuevo / editar").
 class CatalogoConsultoriosView extends StatefulWidget {
-  const CatalogoConsultoriosView({super.key, required this.controller});
+  const CatalogoConsultoriosView({super.key, required this.controller, this.soloLectura = false});
 
   final CatalogoController controller;
+
+  /// En "Catálogos" solo se consulta la tabla; crear, editar y dar de baja se hace en "Gestionar".
+  final bool soloLectura;
 
   @override
   State<CatalogoConsultoriosView> createState() => _CatalogoConsultoriosViewState();
@@ -90,15 +93,19 @@ class _CatalogoConsultoriosViewState extends State<CatalogoConsultoriosView> {
         final i = lista.indexWhere((c) => c.id == _seleccionado?.id);
         return DosColumnas(
           principal: TablaCatalogo(
-            columnas: const [ColumnaTabla('N.º'), ColumnaTabla('Consultorio', flex: 4), ColumnaTabla('Estado', flex: 2)],
+            columnas: const [
+              ColumnaTabla('N.º'),
+              ColumnaTabla('Consultorio', flex: 4),
+              ColumnaTabla('Estado', flex: 2)
+            ],
             filas: [
               for (final c in lista) [Text('${c.id}'), Text(c.nombre), EstadoChip(activo: c.activo)],
             ],
             seleccionada: i < 0 ? null : i,
-            alTocarFila: (fila) => _seleccionar(lista[fila]),
+            alTocarFila: widget.soloLectura ? null : (fila) => _seleccionar(lista[fila]),
             textoVacio: 'No hay consultorios registrados',
           ),
-          lateral: _panel(),
+          lateral: widget.soloLectura ? null : _panel(),
         );
       },
     );
@@ -130,8 +137,7 @@ class _CatalogoConsultoriosViewState extends State<CatalogoConsultoriosView> {
             ),
             const SizedBox(height: 10),
             BotonPeligro(texto: 'Dar de baja', alTocar: editando && _seleccionado!.activo ? _darDeBaja : null),
-            if (editando)
-              TextButton(onPressed: () => _seleccionar(null), child: const Text('Nuevo consultorio')),
+            if (editando) TextButton(onPressed: () => _seleccionar(null), child: const Text('Nuevo consultorio')),
             const SizedBox(height: 8),
             Text('No se da de baja si tiene citas programadas.', style: Theme.of(context).textTheme.bodySmall),
           ],

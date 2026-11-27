@@ -78,11 +78,17 @@ class DosColumnas extends StatelessWidget {
   const DosColumnas({super.key, required this.principal, required this.lateral, this.anchoLateral = 340});
 
   final Widget principal;
-  final Widget lateral;
+
+  /// Sin panel lateral (pantalla de solo lectura) la tabla ocupa todo el ancho.
+  final Widget? lateral;
   final double anchoLateral;
 
   @override
   Widget build(BuildContext context) {
+    final lateral = this.lateral;
+    if (lateral == null) {
+      return principal;
+    }
     return LayoutBuilder(builder: (context, r) {
       if (r.maxWidth < anchoMinimoDosColumnas) {
         return Column(

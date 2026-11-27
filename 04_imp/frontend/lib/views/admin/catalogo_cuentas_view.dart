@@ -12,12 +12,15 @@ import 'catalogo_widgets.dart';
 /// formato de los otros catalogos (tabla + panel). La contrasena inicial la entrega el
 /// administrador en persona; nunca se vuelve a mostrar.
 class CatalogoCuentasView extends StatefulWidget {
-  const CatalogoCuentasView({super.key, required this.controller, required this.catalogo});
+  const CatalogoCuentasView({super.key, required this.controller, required this.catalogo, this.soloLectura = false});
 
   final CuentasController controller;
 
   /// Para elegir el medico de una cuenta MEDICO.
   final CatalogoController catalogo;
+
+  /// En "Catálogos" solo se consulta la tabla; crear, editar y dar de baja se hace en "Gestionar".
+  final bool soloLectura;
 
   @override
   State<CatalogoCuentasView> createState() => _CatalogoCuentasViewState();
@@ -136,17 +139,20 @@ class _CatalogoCuentasViewState extends State<CatalogoCuentasView> {
                     ],
                 ],
                 seleccionada: i < 0 ? null : i,
-                alTocarFila: (fila) => setState(() {
-                  _seleccionada = lista[fila];
-                  _error = null;
-                }),
+                alTocarFila: widget.soloLectura
+                    ? null
+                    : (fila) => setState(() {
+                          _seleccionada = lista[fila];
+                          _error = null;
+                        }),
                 textoVacio: 'No hay cuentas del personal',
               ),
-              const NotaPie('Las cuentas de pacientes las crea cada titular al registrarse en la app. '
+              const NotaPie(
+                  'Las cuentas de pacientes se crean en Gestionar > Pacientes o las crea cada titular al registrarse en la app. '
                   'Una cuenta dada de baja ya no puede iniciar sesión.'),
             ],
           ),
-          lateral: _panel(),
+          lateral: widget.soloLectura ? null : _panel(),
         );
       },
     );

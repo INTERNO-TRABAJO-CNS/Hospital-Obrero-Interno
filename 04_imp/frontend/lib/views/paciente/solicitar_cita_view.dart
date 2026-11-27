@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/app_theme.dart';
+
 import '../../controllers/solicitud_controller.dart';
 import '../../models/auth/paciente.dart';
 import '../../models/catalogo/especialidad.dart';
@@ -113,7 +115,11 @@ class _SolicitarCitaViewState extends State<SolicitarCitaView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ColoresCns.fondo,
       appBar: AppBar(
+        backgroundColor: ColoresCns.fondo,
+        surfaceTintColor: Colors.transparent,
+        titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: ColoresCns.texto),
         title: const Text('Solicitar cita'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

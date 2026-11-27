@@ -25,7 +25,7 @@ void main() {
     ));
 
     expect(find.text('Hola, Juan'), findsOneWidget);
-    expect(find.text('Solicitar cita'), findsOneWidget);
+    expect(find.text('Nueva cita'), findsOneWidget);
     expect(find.text('Mis citas'), findsOneWidget);
     expect(find.byKey(const Key('home_sin_avisos')), findsOneWidget);
     expect(tester.takeException(), isNull, reason: 'no debe desbordarse en celular');
@@ -51,5 +51,32 @@ void main() {
 
     expect(find.text('Su cita de mañana es a las 08:40'), findsOneWidget);
     expect(find.byKey(const Key('home_sin_avisos')), findsNothing);
+  });
+
+  testWidgets('Salir pide confirmación y cierra la sesión', (tester) async {
+    var salidas = 0;
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: HomePacienteView(
+          sesion: _sesion,
+          alSolicitarCita: () {},
+          alMisCitas: () {},
+          alRegistrarBeneficiario: () {},
+          alSalir: () => salidas++,
+        ),
+      ),
+    ));
+
+    await tester.tap(find.byKey(const Key('paciente_cerrar_sesion')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancelar'));
+    await tester.pumpAndSettle();
+    expect(salidas, 0);
+
+    await tester.tap(find.byKey(const Key('paciente_cerrar_sesion')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('confirmar_cerrar_sesion')));
+    await tester.pumpAndSettle();
+    expect(salidas, 1);
   });
 }

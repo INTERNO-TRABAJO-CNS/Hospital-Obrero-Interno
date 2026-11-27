@@ -35,8 +35,7 @@ class ColoresCns {
   static const Color limpieza = Color(0xFFB5B5B5);
 }
 
-/// Tema claro y oscuro de la app. Las pantallas del personal y el login usan siempre
-/// el claro (el Figma no tiene modo oscuro).
+/// Tema de la app. Siempre claro: el Figma no tiene modo oscuro (ver `themeMode` en main.dart).
 class AppTheme {
   const AppTheme._();
 
@@ -101,13 +100,6 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
-    );
-  }
-
-  static ThemeData oscuro() {
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(seedColor: ColoresCns.menu, brightness: Brightness.dark),
     );
   }
 }

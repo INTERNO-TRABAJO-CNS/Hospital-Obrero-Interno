@@ -8,9 +8,12 @@ import 'catalogo_widgets.dart';
 /// CU-02 · "Horarios de medicos" (Figma "ADMIN CATALOGO HORARIOS Y DIAS NO HABILES").
 /// Cada fila agrupa los dias con la misma franja (ej. Lun–Vie 08:00–12:00).
 class CatalogoHorariosView extends StatelessWidget {
-  const CatalogoHorariosView({super.key, required this.controller});
+  const CatalogoHorariosView({super.key, required this.controller, this.soloLectura = false});
 
   final CatalogoController controller;
+
+  /// En "Catálogos" solo se consulta la tabla; crear, editar y dar de baja se hace en "Gestionar".
+  final bool soloLectura;
 
   @override
   Widget build(BuildContext context) {
@@ -40,18 +43,20 @@ class CatalogoHorariosView extends StatelessWidget {
                     Text(controller.nombreConsultorio(g.consultorioId)),
                   ],
               ],
-              alTocarFila: (i) => _abrirFormulario(context, grupos[i]),
+              alTocarFila: soloLectura ? null : (i) => _abrirFormulario(context, grupos[i]),
               textoVacio: 'No hay horarios registrados',
             ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: FilledButton(
-                key: const Key('horario_agregar'),
-                onPressed: () => _abrirFormulario(context, null),
-                child: const Text('Agregar horario'),
+            if (!soloLectura) ...[
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: FilledButton(
+                  key: const Key('horario_agregar'),
+                  onPressed: () => _abrirFormulario(context, null),
+                  child: const Text('Agregar horario'),
+                ),
               ),
-            ),
+            ],
           ],
         );
       },

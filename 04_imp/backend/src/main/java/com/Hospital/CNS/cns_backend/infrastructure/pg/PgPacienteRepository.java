@@ -73,7 +73,7 @@ public class PgPacienteRepository implements PacienteRepository {
 
     @Override
     public List<PacienteDTO> deLaAfiliacion(String numeroAfiliado) {
-        return consultar("select " + COLUMNAS + " from identidad.paciente where numero_afiliado = ? "
+        return consultar("select " + COLUMNAS + " from identidad.paciente where numero_afiliado = ? and activo "
                 + "order by es_titular desc, apellidos, nombres", numeroAfiliado);
     }
 

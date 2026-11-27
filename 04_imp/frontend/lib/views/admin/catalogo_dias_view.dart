@@ -13,9 +13,12 @@ String fechaCorta(DateTime f) => '${f.day} ${_meses[f.month - 1]} ${f.year}';
 /// CU-02 · "Dias no habiles": carga manual (sin calendario oficial de feriados).
 /// La primera fila (Sab–Dom) es informativa: los fines de semana no se atienden.
 class CatalogoDiasView extends StatelessWidget {
-  const CatalogoDiasView({super.key, required this.controller});
+  const CatalogoDiasView({super.key, required this.controller, this.soloLectura = false});
 
   final CatalogoController controller;
+
+  /// En "Catálogos" solo se consulta la tabla; crear, editar y dar de baja se hace en "Gestionar".
+  final bool soloLectura;
 
   @override
   Widget build(BuildContext context) {
@@ -33,17 +36,19 @@ class CatalogoDiasView extends StatelessWidget {
               filas: [
                 for (final d in dias) [Text(fechaCorta(d.fecha)), Text(d.descripcion)],
               ],
-              alTocarFila: (i) => _abrirFormulario(context, dias[i]),
+              alTocarFila: soloLectura ? null : (i) => _abrirFormulario(context, dias[i]),
             ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: FilledButton(
-                key: const Key('dia_agregar'),
-                onPressed: () => _abrirFormulario(context, null),
-                child: const Text('Agregar día no hábil'),
+            if (!soloLectura) ...[
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: FilledButton(
+                  key: const Key('dia_agregar'),
+                  onPressed: () => _abrirFormulario(context, null),
+                  child: const Text('Agregar día no hábil'),
+                ),
               ),
-            ),
+            ],
           ],
         );
       },

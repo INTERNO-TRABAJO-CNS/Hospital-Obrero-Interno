@@ -23,6 +23,8 @@ class MisCitasView extends StatefulWidget {
     required this.cancelacion,
     this.solicitudes,
     this.reloj,
+    this.alSalir,
+    this.conVolver = true,
   });
 
   final CitasPacienteService citas;
@@ -31,6 +33,12 @@ class MisCitasView extends StatefulWidget {
   /// Para mostrar las solicitudes que siguen buscando cupo (opcional).
   final SolicitudService? solicitudes;
   final DateTime Function()? reloj;
+
+  /// Cerrar sesión / cambiar de usuario. Sin él no se muestra el botón.
+  final VoidCallback? alSalir;
+
+  /// false cuando "Mis citas" es una pestaña de la barra inferior (no hay a dónde volver).
+  final bool conVolver;
 
   @override
   State<MisCitasView> createState() => _MisCitasViewState();
@@ -103,13 +111,13 @@ class _MisCitasViewState extends State<MisCitasView> {
   // ---------------------------------------------------------------- celular
 
   Widget _celular() {
-    final volver = Navigator.of(context).canPop() ? () => Navigator.of(context).maybePop() : null;
+    final volver = widget.conVolver && Navigator.of(context).canPop() ? () => Navigator.of(context).maybePop() : null;
     return RefreshIndicator(
       onRefresh: _c.cargar,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(18, 14, 18, 24),
         children: [
-          EncabezadoPaciente(titulo: 'Mis citas', alVolver: volver),
+          EncabezadoPaciente(titulo: 'Mis citas', alVolver: volver, alSalir: widget.alSalir),
           const SizedBox(height: 18),
           ..._estadoCarga(),
           for (final s in _c.enCurso) ...[_TarjetaSolicitud(s), const SizedBox(height: 12)],
@@ -164,7 +172,7 @@ class _MisCitasViewState extends State<MisCitasView> {
         children: [
           Row(
             children: [
-              if (Navigator.of(context).canPop())
+              if (widget.conVolver && Navigator.of(context).canPop())
                 IconButton(
                   tooltip: 'Volver',
                   onPressed: () => Navigator.of(context).maybePop(),
@@ -174,6 +182,10 @@ class _MisCitasViewState extends State<MisCitasView> {
                 child: Text('Mis citas', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
               ),
               IconButton(tooltip: 'Actualizar', onPressed: _c.cargar, icon: const Icon(Icons.refresh)),
+              if (widget.alSalir != null) ...[
+                const SizedBox(width: 8),
+                BotonCerrarSesion(alSalir: widget.alSalir!),
+              ],
             ],
           ),
           const SizedBox(height: 12),

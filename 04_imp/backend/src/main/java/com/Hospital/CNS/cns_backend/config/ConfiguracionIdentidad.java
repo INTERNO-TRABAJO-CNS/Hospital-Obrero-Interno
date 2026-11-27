@@ -9,6 +9,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.Hospital.CNS.cns_backend.infrastructure.pg.PgAdminPacienteRepository;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgAfiliadoRepository;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgPacienteRepository;
 import com.Hospital.CNS.cns_backend.infrastructure.pg.PgSesionRepository;
@@ -18,6 +19,8 @@ import com.Hospital.CNS.cns_backend.model.compartido.DominioException;
 import com.Hospital.CNS.cns_backend.model.compartido.HistorialRepository;
 import com.Hospital.CNS.cns_backend.model.compartido.Reloj;
 import com.Hospital.CNS.cns_backend.model.compartido.Transaccion;
+import com.Hospital.CNS.cns_backend.model.identidad.AdminPacienteRepository;
+import com.Hospital.CNS.cns_backend.model.identidad.AdminPacienteService;
 import com.Hospital.CNS.cns_backend.model.identidad.AfiliadoRepository;
 import com.Hospital.CNS.cns_backend.model.identidad.AuthService;
 import com.Hospital.CNS.cns_backend.model.identidad.CifradorClave;
@@ -74,6 +77,21 @@ public class ConfiguracionIdentidad {
                                     CifradorClave cifrador, Reloj reloj, Transaccion transaccion,
                                     LimitadorIntentos limitador) {
         return new PacienteService(pacientes, afiliados, historiales, usuarios, cifrador, reloj, transaccion, limitador);
+    }
+
+    @Bean
+    AdminPacienteRepository adminPacienteRepository() {
+        return new PgAdminPacienteRepository();
+    }
+
+    /** Gestionar > Pacientes del administrador. */
+    @Bean
+    AdminPacienteService adminPacienteService(AdminPacienteRepository admin, PacienteRepository pacientes,
+                                              PacienteService registro, HistorialRepository historiales,
+                                              UsuarioRepository usuarios, CifradorClave cifrador, Reloj reloj,
+                                              Transaccion transaccion) {
+        return new AdminPacienteService(admin, pacientes, registro, historiales, usuarios, cifrador, reloj,
+                transaccion);
     }
 
     @Bean

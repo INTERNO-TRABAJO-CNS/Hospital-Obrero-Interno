@@ -18,7 +18,8 @@ import com.Hospital.CNS.cns_backend.model.identidad.UsuarioRepository;
 
 /**
  * UsuarioRepository sobre PostgreSQL (tabla identidad.usuario, migracion V2). La clave se guarda cifrada.
- * Una cuenta MEDICO solo cuenta como activa si su medico sigue activo en recursos.medico.
+ * Una cuenta MEDICO solo cuenta como activa si su medico sigue activo en recursos.medico, y una PACIENTE si el
+ * paciente no fue dado de baja (identidad.paciente.activo, migracion V13).
  */
 public class PgUsuarioRepository implements UsuarioRepository {
 
@@ -26,7 +27,8 @@ public class PgUsuarioRepository implements UsuarioRepository {
     private static final String VIOLACION_UNIQUE = "23505";
     private static final String SELECCION = "select u.id, u.usuario, u.clave_cifrada, u.rol, u.persona_id, u.nombre, "
             + "(u.activo and (u.rol <> 'MEDICO' or exists (select 1 from recursos.medico m "
-            + "where m.id = u.persona_id and m.activo))) as activo from identidad.usuario u";
+            + "where m.id = u.persona_id and m.activo)) and (u.rol <> 'PACIENTE' or exists (select 1 "
+            + "from identidad.paciente p where p.id = u.persona_id and p.activo))) as activo from identidad.usuario u";
 
     @Override
     public long nextIdentity() {

@@ -1,4 +1,5 @@
 import 'package:cns_app/services/cuentas_service.dart';
+import 'package:cns_app/services/pacientes_admin_service.dart';
 import 'package:cns_app/services/fake_catalogo_service.dart';
 import 'package:cns_app/services/quirofano_service.dart';
 import 'package:cns_app/views/admin/catalogos_view.dart';
@@ -7,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Pantallas de computadora (1440 x 900, como el Figma) dentro del marco del personal.
-Future<(FakeCatalogoService, FakeQuirofanoService, FakeCuentasService)> _mostrar(WidgetTester tester) async {
+Future<(FakeCatalogoService, FakeQuirofanoService, FakeCuentasService)> _mostrar(WidgetTester tester,
+    {bool editable = true, FakePacientesAdminService? pacientes}) async {
   tester.view.physicalSize = const Size(1440, 900);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
@@ -22,7 +24,8 @@ Future<(FakeCatalogoService, FakeQuirofanoService, FakeCuentasService)> _mostrar
       rutaActual: '/admin',
       alSalir: () {},
       alNavegar: (_) {},
-      child: CatalogosView(servicio: servicio, quirofanos: quirofanos, cuentas: cuentas),
+      child: CatalogosView(
+          servicio: servicio, quirofanos: quirofanos, cuentas: cuentas, pacientes: pacientes, editable: editable),
     ),
   ));
   await tester.pumpAndSettle();
@@ -165,5 +168,77 @@ void main() {
 
     expect(find.text('La contraseña debe tener al menos 6 caracteres.'), findsOneWidget);
     expect(cuentas.cuentas, hasLength(3));
+  });
+
+  testWidgets('Catálogos es solo consulta: sin panel "Nuevo / editar" ni botón Agregar', (tester) async {
+    await _mostrar(tester, editable: false, pacientes: FakePacientesAdminService());
+
+    expect(find.text('Carlos Ramos'), findsOneWidget);
+    expect(find.text('Nuevo / editar médico'), findsNothing);
+    expect(find.byKey(const Key('medico_guardar')), findsNothing);
+
+    await tester.tap(find.text('Horarios y días no hábiles'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('horario_agregar')), findsNothing);
+
+    // Pacientes ya no está deshabilitado: muestra la lista.
+    await tester.tap(find.text('Pacientes'));
+    await tester.pumpAndSettle();
+    expect(find.text('Juan Carlos Choque Mamani'), findsOneWidget);
+    expect(find.text('Nuevo / editar paciente'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Gestionar > Pacientes: registra un titular con cuenta y lo da de baja', (tester) async {
+    final pacientes = FakePacientesAdminService();
+    await _mostrar(tester, pacientes: pacientes);
+
+    await tester.tap(find.text('Pacientes'));
+    await tester.pumpAndSettle();
+    expect(find.text('Nuevo / editar paciente'), findsOneWidget);
+
+    await tester.enterText(find.byKey(const Key('paciente_afiliado')), 'AF-30001');
+    await tester.enterText(find.byKey(const Key('paciente_ci')), '7700001');
+    await tester.enterText(find.byKey(const Key('paciente_nombres')), 'Rosa');
+    await tester.enterText(find.byKey(const Key('paciente_apellidos')), 'Mamani Apaza');
+    await tester.enterText(find.byKey(const Key('paciente_usuario')), 'rosam');
+    await tester.enterText(find.byKey(const Key('paciente_clave')), 'secreta1');
+
+    // Sin fecha de nacimiento no se guarda.
+    await tester.ensureVisible(find.byKey(const Key('paciente_guardar')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('paciente_guardar')));
+    await tester.pumpAndSettle();
+    expect(find.text('Elija la fecha de nacimiento.'), findsOneWidget);
+    expect(pacientes.pacientes, hasLength(3));
+
+    await tester.ensureVisible(find.byKey(const Key('paciente_fecha')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('paciente_fecha')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('paciente_guardar')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('paciente_guardar')));
+    await tester.pumpAndSettle();
+
+    expect(pacientes.pacientes, hasLength(4));
+    expect(pacientes.pacientes.last.usuario, 'rosam');
+    expect(find.text('Rosa Mamani Apaza'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('Rosa Mamani Apaza'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Rosa Mamani Apaza'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('paciente_baja')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('paciente_baja')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Confirmar'));
+    await tester.pumpAndSettle();
+
+    expect(pacientes.pacientes.last.activo, isFalse);
+    expect(tester.takeException(), isNull);
   });
 }

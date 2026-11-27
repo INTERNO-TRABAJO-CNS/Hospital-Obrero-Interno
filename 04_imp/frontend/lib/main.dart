@@ -18,8 +18,8 @@ class CnsApp extends StatelessWidget {
       navigatorKey: navegadorApp,
       scaffoldMessengerKey: mensajesApp,
       theme: AppTheme.claro(),
-      darkTheme: AppTheme.oscuro(),
-      themeMode: ThemeMode.system,
+      // El Figma no tiene modo oscuro: siempre el tema claro, aunque el sistema este en modo oscuro.
+      themeMode: ThemeMode.light,
       initialRoute: AppRutas.login,
       onGenerateRoute: generarRuta,
     );
